@@ -60,7 +60,6 @@ TileTile_EnterMainLoop:
 	call VDP_EnableBlank
 
 	call TileTile_LoadTileSet
-	call TileTile_DrawTileMap
 
 	call VDP_DisableBlank
 
@@ -69,7 +68,28 @@ TileTile_EnterMainLoop:
 
 ; ix = this
 TileTile_MainLoop:
+	call TileTile_UpdatePosition
+	call TileTile_DrawTileMap
 	jp TileTile_MainLoop
+	ret
+
+; ix = this
+TileTile_UpdatePosition:
+	push ix
+	call TileTile_GetMap
+	ld a,(NEWKEY + 8)
+	bit 4,a
+	call z,Map_MoveLeft
+	ld a,(NEWKEY + 8)
+	bit 7,a
+	call z,Map_MoveRight
+	ld a,(NEWKEY + 8)
+	bit 5,a
+	call z,Map_MoveUp
+	ld a,(NEWKEY + 8)
+	bit 6,a
+	call z,Map_MoveDown
+	pop ix
 	ret
 
 ; ix = this
