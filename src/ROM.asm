@@ -53,6 +53,10 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "System.asm"
 	INCLUDE "Memory.asm"
 	INCLUDE "VDP.asm"
+	INCLUDE "VDPCommand.asm"
+	INCLUDE "Map.asm"
+
+	INCLUDE "TileMap.asm"
 
 	ENDS
 

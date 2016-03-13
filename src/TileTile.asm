@@ -1,8 +1,11 @@
 ;
-; Top-level TileTile program class
+; Top-level program class
 ;
-; Program entry point
-;
+TileTile: MACRO
+	map:
+		Map
+	ENDM
+
 TileTile_Main:
 	call VDP_GetVersion
 	cp 2
@@ -16,6 +19,38 @@ TileTile_Main:
 
 	call Memory_UnitTest
 
+	ld ix,TileTile_instance
+	call TileTile_Construct
+	call TileTile_EnterMainLoop
+
+	call KILBUF
+	ret
+
+; ix = this
+TileTile_Construct:
+	ld a,(TileMap_dimensions)
+	ld c,a
+	ld b,0
+	ld a,(TileMap_dimensions + 1)
+	ld e,a
+	ld d,0
+	ld hl,TileMap_data
+	push ix
+	push de
+	call TileTile_GetMap
+	pop de
+	call Map_Construct
+	pop ix
+	ret
+
+; ix = this
+TileTile_GetMap:
+	ld de,TileTile.map
+	add ix,de
+	ret
+
+; ix = this
+TileTile_EnterMainLoop:
 	call VDP_InitScreen5
 	call VDP_DisableSprites
 	call VDP_Enable60Hz
@@ -23,28 +58,31 @@ TileTile_Main:
 	call VDP_SetColor
 
 	call VDP_EnableBlank
+
 	call TileTile_LoadTileSet
+	call TileTile_DrawTileMap
+
 	call VDP_DisableBlank
 
-	call TileTile_EnterMainLoop
-
-	call KILBUF
-	ret
-
-;
-TileTile_EnterMainLoop:
 	call TileTile_MainLoop
 	ret
 
-;
-TileTile_MainLoop: PROC
+; ix = this
+TileTile_MainLoop:
 	jp TileTile_MainLoop
 	ret
-	ENDP
 
-;
+; ix = this
+TileTile_DrawTileMap:
+	push ix
+	call TileTile_GetMap
+	call Map_Draw
+	pop ix
+	ret
+
+; ix = this
 TileTile_LoadTileSet:
-	ld a,0
+	ld a,1
 	ld hl,0
 	call VDP_SetWriteAddress
 	ld hl,(ROM_bank6000)
@@ -75,3 +113,10 @@ TileTile_LoadTileSet:
 	pop hl
 	ld (hl),l
 	ret
+
+;
+	SECTION RAM
+
+TileTile_instance: TileTile
+
+	ENDS
