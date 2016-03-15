@@ -17,6 +17,8 @@ Map: MACRO
 	data:
 		dw 0
 	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 16, 16, 0, 0, VDPCommand_HMMM
+	screen:
+		ds 16 * 12,255
 	ENDM
 
 ; bc = width
@@ -125,6 +127,12 @@ Map_Draw: PROC
 	push de
 	call Map_GetDataPosition
 	pop de
+	exx
+	ld hl,Map.screen
+	ld e,ixl
+	ld d,ixh
+	add hl,de
+	exx
 	ld c,(ix + Map.screenHeight)
 	ld (iy + VDPCommand.dy),0
 RowLoop:
@@ -132,11 +140,18 @@ RowLoop:
 	ld (iy + VDPCommand.dx),0
 TileLoop:
 	ld a,(hl)
-	call Map_DrawTile
+	exx
+	cp (hl)
+	ld (hl),a
+	exx
+	call nz,Map_DrawTile
 	ld a,(iy + VDPCommand.dx)
 	add a,16
 	ld (iy + VDPCommand.dx),a
 	inc hl
+	exx
+	inc hl
+	exx
 	djnz TileLoop
 	ld a,(iy + VDPCommand.dy)
 	add a,16
