@@ -132,19 +132,7 @@ RowLoop:
 	ld (iy + VDPCommand.dx),0
 TileLoop:
 	ld a,(hl)
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld (iy + VDPCommand.sx),a
-	ld a,(hl)
-	and 0F0H
-	ld (iy + VDPCommand.sy),a
-	push bc
-	push hl
-	call VDPCommand_Execute_IY
-	pop hl
-	pop bc
+	call Map_DrawTile
 	ld a,(iy + VDPCommand.dx)
 	add a,16
 	ld (iy + VDPCommand.dx),a
@@ -158,6 +146,26 @@ TileLoop:
 	jr nz,RowLoop
 	ret
 	ENDP
+
+; a = tile
+; ix = this
+; iy = VDP command
+; Modifies: af
+Map_DrawTile:
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld (iy + VDPCommand.sx),a
+	ld a,(hl)
+	and 0F0H
+	ld (iy + VDPCommand.sy),a
+	push bc
+	push hl
+	call VDPCommand_Execute_IY
+	pop hl
+	pop bc
+	ret
 
 ; bc = multiplicand
 ; de = multiplier
