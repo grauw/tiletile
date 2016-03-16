@@ -54,7 +54,7 @@ TileTile_EnterMainLoop:
 	call VDP_InitScreen5
 	call VDP_DisableSprites
 	call VDP_Enable60Hz
-	ld a,0FH
+	ld a,0F1H
 	call VDP_SetColor
 
 	call VDP_EnableBlank
