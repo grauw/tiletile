@@ -52,6 +52,7 @@ TileTile_GetMap:
 ; ix = this
 TileTile_EnterMainLoop:
 	call VDP_InitScreen5
+	call VDP_Enable192Lines
 	call VDP_DisableSprites
 	call VDP_Enable60Hz
 	ld a,0F1H
