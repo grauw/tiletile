@@ -51,6 +51,8 @@ TileTile_GetMap:
 
 ; ix = this
 TileTile_EnterMainLoop:
+	ld a,0
+	ld (CLIKSW),a  ; disable key click
 	call VDP_InitScreen5
 	call VDP_Enable192Lines
 	call VDP_DisableSprites
