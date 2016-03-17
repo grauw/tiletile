@@ -6,10 +6,10 @@ Copyright 2016 Laurens Holst
 Project information
 -------------------
 
+Tile² game engine
+
 Author: Laurens Holst <laurens.nospam@grauw.nl>  
 Site: <https://bitbucket.org/grauw/tiletile>  
-
-Tile² game engine
 
 
 System Requirements
