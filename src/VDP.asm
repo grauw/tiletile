@@ -94,6 +94,14 @@ NoClamp:
 	call VDP_SetRegister
 	ret
 
+VDP_EnableSprites:
+	ld a,(VDP_MIRROR_8 + 8)
+	and 11111101B
+	ld (VDP_MIRROR_8 + 8),a
+	ld b,8
+	call VDP_SetRegister
+	ret
+
 VDP_DisableSprites:
 	ld a,(VDP_MIRROR_8 + 8)
 	or 00000010B
