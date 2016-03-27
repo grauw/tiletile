@@ -63,13 +63,13 @@ VDPCommand_Execute_IY:
 ; ix = this
 ; Modifies: af, bc, hl
 VDPCommand_Execute_HL:
+	ld c,VDP_PORT_3
 	ld a,32
 	di
 	out (VDP_PORT_1),a
 	ld a,17 | 128
 	ei
 	out (VDP_PORT_1),a
-	ld c,VDP_PORT_3
 WaitReady:
 	ld a,2
 	di
