@@ -1,12 +1,12 @@
 ;
 ; Top-level program class
 ;
-TileTile: MACRO
+Application: MACRO
 	map:
 		Map
 	ENDM
 
-TileTile_Main:
+Application_Main:
 	call VDP_GetVersion
 	cp 2
 	ret c
@@ -19,15 +19,15 @@ TileTile_Main:
 
 	call Memory_UnitTest
 
-	ld ix,TileTile_instance
-	call TileTile_Construct
-	call TileTile_EnterMainLoop
+	ld ix,Application_instance
+	call Application_Construct
+	call Application_EnterMainLoop
 
 	call KILBUF
 	ret
 
 ; ix = this
-TileTile_Construct:
+Application_Construct:
 	ld a,(TileMap_dimensions)
 	ld c,a
 	ld b,0
@@ -37,20 +37,20 @@ TileTile_Construct:
 	ld hl,TileMap_data
 	push ix
 	push de
-	call TileTile_GetMap
+	call Application_GetMap
 	pop de
 	call Map_Construct
 	pop ix
 	ret
 
 ; ix = this
-TileTile_GetMap:
-	ld de,TileTile.map
+Application_GetMap:
+	ld de,Application.map
 	add ix,de
 	ret
 
 ; ix = this
-TileTile_EnterMainLoop:
+Application_EnterMainLoop:
 	ld a,0
 	ld (CLIKSW),a  ; disable key click
 	call VDP_InitScreen5
@@ -62,24 +62,24 @@ TileTile_EnterMainLoop:
 
 	call VDP_EnableBlank
 
-	call TileTile_LoadTileSet
+	call Application_LoadTileSet
 
 	call VDP_DisableBlank
 
-	call TileTile_MainLoop
+	call Application_MainLoop
 	ret
 
 ; ix = this
-TileTile_MainLoop:
-	call TileTile_UpdatePosition
-	call TileTile_DrawTileMap
-	jp TileTile_MainLoop
+Application_MainLoop:
+	call Application_UpdatePosition
+	call Application_DrawTileMap
+	jp Application_MainLoop
 	ret
 
 ; ix = this
-TileTile_UpdatePosition:
+Application_UpdatePosition:
 	push ix
-	call TileTile_GetMap
+	call Application_GetMap
 	ld a,(NEWKEY + 8)
 	bit 4,a
 	call z,Map_MoveLeft
@@ -96,15 +96,15 @@ TileTile_UpdatePosition:
 	ret
 
 ; ix = this
-TileTile_DrawTileMap:
+Application_DrawTileMap:
 	push ix
-	call TileTile_GetMap
+	call Application_GetMap
 	call Map_Draw
 	pop ix
 	ret
 
 ; ix = this
-TileTile_LoadTileSet:
+Application_LoadTileSet:
 	ld a,1
 	ld hl,0
 	call VDP_SetWriteAddress
@@ -140,6 +140,6 @@ TileTile_LoadTileSet:
 ;
 	SECTION RAM
 
-TileTile_instance: TileTile
+Application_instance: Application
 
 	ENDS

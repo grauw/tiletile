@@ -41,14 +41,14 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	SECTION ROM_HEADER
 
 	db "AB"
-	dw TileTile_Main
+	dw Application_Main
 	dw 0, 0, 0, 0, 0, 0
 
 	ENDS
 
 	SECTION ROM
 
-	INCLUDE "TileTile.asm"
+	INCLUDE "Application.asm"
 	INCLUDE "BIOS.asm"
 	INCLUDE "System.asm"
 	INCLUDE "Memory.asm"
