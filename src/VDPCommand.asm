@@ -70,7 +70,20 @@ VDPCommand_Execute_HL:
 	ei
 	out (VDP_PORT_1),a
 	ld c,VDP_PORT_3
-	call VDPCommand_WaitReady
+WaitReady:
+	ld a,2
+	di
+	out (VDP_PORT_1),a  ; select s#2
+	ld a,15 | 128
+	out (VDP_PORT_1),a
+	in a,(VDP_PORT_1)
+	rra
+	ld a,0
+	out (VDP_PORT_1),a  ; select s#0
+	ld a,15 | 128
+	ei
+	out (VDP_PORT_1),a
+	jr c,WaitReady
 	REPT 15
 	outi
 	ENDM
