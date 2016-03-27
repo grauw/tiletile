@@ -4,6 +4,8 @@
 Application: MACRO
 	map:
 		Map
+	softsprite:
+		Softsprite
 	ENDM
 
 Application_Main:
@@ -50,6 +52,12 @@ Application_GetMap:
 	ret
 
 ; ix = this
+Application_GetSoftsprite:
+	ld de,Application.softsprite
+	add ix,de
+	ret
+
+; ix = this
 Application_EnterMainLoop:
 	ld a,0
 	ld (CLIKSW),a  ; disable key click
@@ -73,6 +81,7 @@ Application_EnterMainLoop:
 Application_MainLoop:
 	call Application_UpdatePosition
 	call Application_DrawTileMap
+	call Application_DrawSoftsprites
 	jp Application_MainLoop
 	ret
 
@@ -100,6 +109,14 @@ Application_DrawTileMap:
 	push ix
 	call Application_GetMap
 	call Map_Draw
+	pop ix
+	ret
+
+; ix = this
+Application_DrawSoftsprites:
+	push ix
+	call Application_GetSoftsprite
+	call Softsprite_Draw
 	pop ix
 	ret
 

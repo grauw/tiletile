@@ -55,6 +55,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "VDP.asm"
 	INCLUDE "VDPCommand.asm"
 	INCLUDE "Map.asm"
+	INCLUDE "Softsprite.asm"
 
 	INCLUDE "TileMap.asm"
 
