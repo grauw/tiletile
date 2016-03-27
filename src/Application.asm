@@ -2,6 +2,8 @@
 ; Top-level program class
 ;
 Application: MACRO
+	input:
+		Input
 	map:
 		Map
 	softsprite:
@@ -46,6 +48,14 @@ Application_Construct:
 	ret
 
 ; ix = this
+Application_GetInput_IY:
+	ld e,ixl
+	ld d,ixh
+	ld iy,Application.input
+	add iy,de
+	ret
+
+; ix = this
 Application_GetMap:
 	ld de,Application.map
 	add ix,de
@@ -87,19 +97,17 @@ Application_MainLoop:
 
 ; ix = this
 Application_UpdatePosition:
+	call Application_GetInput_IY
+	call Input_Update_IY
 	push ix
 	call Application_GetMap
-	ld a,(NEWKEY + 8)
-	bit 4,a
+	bit 4,(iy + Input.newKey + 8)
 	call z,Map_MoveLeft
-	ld a,(NEWKEY + 8)
-	bit 7,a
+	bit 7,(iy + Input.newKey + 8)
 	call z,Map_MoveRight
-	ld a,(NEWKEY + 8)
-	bit 5,a
+	bit 5,(iy + Input.newKey + 8)
 	call z,Map_MoveUp
-	ld a,(NEWKEY + 8)
-	bit 6,a
+	bit 6,(iy + Input.newKey + 8)
 	call z,Map_MoveDown
 	pop ix
 	ret
