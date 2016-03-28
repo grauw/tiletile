@@ -2,6 +2,8 @@
 ; Top-level program class
 ;
 Application: MACRO
+	timiHook:
+		TIMIHook
 	input:
 		Input
 	map:
@@ -45,6 +47,15 @@ Application_Construct:
 	pop de
 	call Map_Construct
 	pop ix
+	ld e,ixl
+	ld d,ixh
+	ld hl,Application_TIMIInterruptEntry
+	push ix
+	push de
+	call Application_GetTIMIHook
+	pop de
+	call TIMIHook_Construct
+	pop ix
 	ret
 
 ; ix = this
@@ -53,6 +64,12 @@ Application_GetInput_IY:
 	ld d,ixh
 	ld iy,Application.input
 	add iy,de
+	ret
+
+; ix = this
+Application_GetTIMIHook:
+	ld de,Application.timiHook
+	add ix,de
 	ret
 
 ; ix = this
@@ -84,7 +101,17 @@ Application_EnterMainLoop:
 
 	call VDP_DisableBlank
 
+	push ix
+	call Application_GetTIMIHook
+	call Hook_Install
+	pop ix
+
 	call Application_MainLoop
+
+	push ix
+	call Application_GetTIMIHook
+	call Hook_Uninstall
+	pop ix
 	ret
 
 ; ix = this
@@ -96,9 +123,14 @@ Application_MainLoop:
 	ret
 
 ; ix = this
-Application_UpdatePosition:
+Application_TIMIInterruptEntry:
 	call Application_GetInput_IY
 	call Input_Update_IY
+	ret
+
+; ix = this
+Application_UpdatePosition:
+	call Application_GetInput_IY
 	push ix
 	call Application_GetMap
 	bit 4,(iy + Input.newKey + 8)
