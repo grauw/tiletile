@@ -8,6 +8,8 @@ Application: MACRO
 		Input
 	map:
 		Map
+	mapView:
+		MapView
 	softsprite:
 		Softsprite
 	ENDM
@@ -46,6 +48,14 @@ Application_Construct:
 	call Application_GetMap
 	pop de
 	call Map_Construct
+	ld e,ixl
+	ld d,ixh
+	pop ix
+	push ix
+	push de
+	call Application_GetMapView
+	pop de
+	call MapView_Construct
 	pop ix
 	ld e,ixl
 	ld d,ixh
@@ -75,6 +85,12 @@ Application_GetTIMIHook:
 ; ix = this
 Application_GetMap:
 	ld de,Application.map
+	add ix,de
+	ret
+
+; ix = this
+Application_GetMapView:
+	ld de,Application.mapView
 	add ix,de
 	ret
 
@@ -117,7 +133,7 @@ Application_EnterMainLoop:
 ; ix = this
 Application_MainLoop:
 	call Application_UpdatePosition
-	call Application_DrawTileMap
+	call Application_DrawMapView
 	call Application_DrawSoftsprites
 	jp Application_MainLoop
 	ret
@@ -132,23 +148,23 @@ Application_TIMIInterruptEntry:
 Application_UpdatePosition:
 	call Application_GetInput_IY
 	push ix
-	call Application_GetMap
+	call Application_GetMapView
 	bit 4,(iy + Input.newKey + 8)
-	call z,Map_MoveLeft
+	call z,MapView_MoveLeft
 	bit 7,(iy + Input.newKey + 8)
-	call z,Map_MoveRight
+	call z,MapView_MoveRight
 	bit 5,(iy + Input.newKey + 8)
-	call z,Map_MoveUp
+	call z,MapView_MoveUp
 	bit 6,(iy + Input.newKey + 8)
-	call z,Map_MoveDown
+	call z,MapView_MoveDown
 	pop ix
 	ret
 
 ; ix = this
-Application_DrawTileMap:
+Application_DrawMapView:
 	push ix
-	call Application_GetMap
-	call Map_Draw
+	call Application_GetMapView
+	call MapView_Draw
 	pop ix
 	ret
 

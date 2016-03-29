@@ -58,6 +58,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "TIMIHook.asm"
 	INCLUDE "Input.asm"
 	INCLUDE "Map.asm"
+	INCLUDE "MapView.asm"
 	INCLUDE "Softsprite.asm"
 
 	INCLUDE "TileMap.asm"
