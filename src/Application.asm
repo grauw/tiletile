@@ -6,6 +6,8 @@ Application: MACRO
 		TIMIHook
 	input:
 		Input
+	sprites:
+		Sprites
 	map:
 		Map
 	mapView:
@@ -36,6 +38,10 @@ Application_Main:
 
 ; ix = this
 Application_Construct:
+	push ix
+	call Application_GetSprites
+	call Sprites_Construct
+	pop ix
 	ld a,(TileMap_dimensions)
 	ld c,a
 	ld b,0
@@ -83,6 +89,12 @@ Application_GetTIMIHook:
 	ret
 
 ; ix = this
+Application_GetSprites:
+	ld de,Application.sprites
+	add ix,de
+	ret
+
+; ix = this
 Application_GetMap:
 	ld de,Application.map
 	add ix,de
@@ -114,6 +126,11 @@ Application_EnterMainLoop:
 	call VDP_EnableBlank
 
 	call Application_LoadTileSet
+
+	push ix
+	call Application_GetSprites
+	call Sprites_Initialize
+	pop ix
 
 	call VDP_DisableBlank
 
