@@ -13,7 +13,7 @@ Softsprite: MACRO
 	index:
 		db 0
 	count:
-		db 2
+		db 16
 	drawCommand: VDPCommand 0, 200H, 0, 0, 16, 32, 0, 0, VDPCommand_LMMM | VDPCommand_TIMP
 	saveCommand: VDPCommand 0, 0, 0, 300H, 16, 32, 0, 0, VDPCommand_HMMM
 	restoreCommand: VDPCommand 0, 300H, 0, 0, 16, 32, 0, 0, VDPCommand_HMMM
@@ -55,9 +55,7 @@ Softsprite_Draw: PROC
 	xor a
 NoWrap:
 	ld (ix + Softsprite.index),a
-	add a,a
-	add a,a
-	add a,a
+	and 11111000B
 	add a,a
 	add a,(ix + Softsprite.sx)
 	ld (ix + Softsprite.drawCommand.sx),a
