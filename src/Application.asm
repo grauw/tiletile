@@ -157,6 +157,8 @@ Application_MainLoop:
 
 ; ix = this
 Application_TIMIInterruptEntry:
+	ld a,0FFH
+	ld (SCNCNT),a
 	call Application_GetInput_IY
 	call Input_Update_IY
 	ret
