@@ -32,6 +32,13 @@ Softsprite_Clear:
 	ret
 
 ; ix = this
+Softsprite_MoveRight:
+	ld a,(ix + Softsprite.x)
+	add a,2
+	ld (ix + Softsprite.x),a
+	ret
+
+; ix = this
 Softsprite_Draw: PROC
 	ld a,(ix + Softsprite.x)
 	ld (ix + Softsprite.drawCommand.dx),a

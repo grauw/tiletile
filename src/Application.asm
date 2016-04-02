@@ -162,6 +162,7 @@ Application_TIMIInterruptEntry:
 	push ix
 	call Application_GetSoftsprite
 	call Softsprite_Clear
+	call Softsprite_MoveRight
 	pop ix
 	call Application_DrawMapView
 	call Application_DrawSoftsprites
