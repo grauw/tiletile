@@ -8,6 +8,10 @@ MapView: MACRO
 		dw 0
 	y:
 		dw 0
+	maxX:
+		dw 0
+	maxY:
+		dw 0
 	width:
 		db 16
 	height:
@@ -22,6 +26,30 @@ MapView: MACRO
 MapView_Construct:
 	ld (ix + MapView.map),e
 	ld (ix + MapView.map + 1),d
+	push ix
+	call MapView_GetMap
+	ld l,(ix + Map.width)
+	ld h,(ix + Map.width + 1)
+	pop ix
+	ld e,(ix + MapView.width)
+	ld d,0
+	and a
+	sbc hl,de
+	call c,System_ThrowException
+	ld (ix + MapView.maxX),l
+	ld (ix + MapView.maxX + 1),h
+	push ix
+	call MapView_GetMap
+	ld l,(ix + Map.height)
+	ld h,(ix + Map.height + 1)
+	pop ix
+	ld e,(ix + MapView.height)
+	ld d,0
+	and a
+	sbc hl,de
+	call c,System_ThrowException
+	ld (ix + MapView.maxY),l
+	ld (ix + MapView.maxY + 1),h
 	ret
 
 ; ix = this
@@ -67,40 +95,6 @@ MapView_GetDataPosition:
 	ret
 
 ; ix = this
-; hl <- max x position
-; Modifies: f, de
-MapView_GetMaxX:
-	push ix
-	call MapView_GetMap
-	ld l,(ix + Map.width)
-	ld h,(ix + Map.width + 1)
-	pop ix
-	ld e,(ix + MapView.width)
-	ld d,0
-	and a
-	sbc hl,de
-	ret nc
-	ld hl,0
-	ret
-
-; ix = this
-; hl <- max y position
-; Modifies: f, de
-MapView_GetMaxY:
-	push ix
-	call MapView_GetMap
-	ld l,(ix + Map.height)
-	ld h,(ix + Map.height + 1)
-	pop ix
-	ld e,(ix + MapView.height)
-	ld d,0
-	and a
-	sbc hl,de
-	ret nc
-	ld hl,0
-	ret
-
-; ix = this
 MapView_MoveLeft:
 	ld l,(ix + MapView.x)
 	ld h,(ix + MapView.x + 1)
@@ -113,7 +107,8 @@ MapView_MoveLeft:
 
 ; ix = this
 MapView_MoveRight:
-	call MapView_GetMaxX
+	ld l,(ix + MapView.maxX)
+	ld h,(ix + MapView.maxX + 1)
 	ld e,(ix + MapView.x)
 	ld d,(ix + MapView.x + 1)
 	inc de
@@ -137,7 +132,8 @@ MapView_MoveUp:
 
 ; ix = this
 MapView_MoveDown:
-	call MapView_GetMaxY
+	ld l,(ix + MapView.maxY)
+	ld h,(ix + MapView.maxY + 1)
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
 	inc de
@@ -151,8 +147,9 @@ MapView_MoveDown:
 ; ix = this
 MapView_Draw: PROC
 	call MapView_GetTileCopyCommand_IY
-	call MapView_GetMaxX
-	push hl
+	ld e,(ix + MapView.maxX)
+	ld d,(ix + MapView.maxX + 1)
+	push de
 	call MapView_GetDataPosition
 	pop de
 	exx
