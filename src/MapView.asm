@@ -162,18 +162,15 @@ RowLoop:
 	ld (iy + VDPCommand.dx),0
 TileLoop:
 	ld a,(hl)
+	inc hl
 	exx
 	cp (hl)
-	ld (hl),a
-	exx
 	call nz,MapView_DrawTile
+	inc hl
+	exx
 	ld a,(iy + VDPCommand.dx)
 	add a,16
 	ld (iy + VDPCommand.dx),a
-	inc hl
-	exx
-	inc hl
-	exx
 	djnz TileLoop
 	ld a,(iy + VDPCommand.dy)
 	add a,16
@@ -185,10 +182,12 @@ TileLoop:
 	ENDP
 
 ; a = tile
+; (hl) = screen tile
 ; ix = this
 ; iy = VDP command
 ; Modifies: af
 MapView_DrawTile:
+	ld (hl),a
 	add a,a
 	add a,a
 	add a,a
