@@ -117,7 +117,7 @@ Application_EnterMainLoop:
 	ld a,0
 	ld (CLIKSW),a  ; disable key click
 	call VDP_InitScreen5
-	call VDP_Enable192Lines
+	call VDP_Enable212Lines
 	call VDP_EnableSprites
 	call VDP_Enable60Hz
 	ld a,0F1H
