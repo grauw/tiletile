@@ -149,9 +149,6 @@ Application_EnterMainLoop:
 
 ; ix = this
 Application_MainLoop:
-	call Application_UpdatePosition
-	call Application_DrawMapView
-	call Application_DrawSoftsprites
 	jp Application_MainLoop
 	ret
 
@@ -161,6 +158,13 @@ Application_TIMIInterruptEntry:
 	ld (SCNCNT),a
 	call Application_GetInput_IY
 	call Input_Update_IY
+	call Application_UpdatePosition
+	push ix
+	call Application_GetSoftsprite
+	call Softsprite_Clear
+	pop ix
+	call Application_DrawMapView
+	call Application_DrawSoftsprites
 	ret
 
 ; ix = this
@@ -183,7 +187,7 @@ Application_UpdatePosition:
 Application_DrawMapView:
 	push ix
 	call Application_GetMapView
-	call MapView_Draw
+	call MapView_Update
 	pop ix
 	ret
 

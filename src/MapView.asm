@@ -1,12 +1,18 @@
 ;
 ; A view on a section of the map.
 ;
+MapView_SCROLLSPEED: equ 1
+
 MapView: MACRO
 	map:
 		dw 0
 	x:
 		dw 0
 	y:
+		dw 0
+	pixelX:
+		dw 0
+	pixelY:
 		dw 0
 	maxX:
 		dw 0
@@ -15,10 +21,10 @@ MapView: MACRO
 	width:
 		db 16
 	height:
-		db 12
+		db 16
 	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 16, 16, 0, 0, VDPCommand_HMMM
 	screen:
-		ds 16 * 12,255
+		ds 16 * 16,255
 	ENDM
 
 ; de = map
@@ -96,6 +102,13 @@ MapView_GetDataPosition:
 
 ; ix = this
 MapView_MoveLeft:
+	ld a,(ix + MapView.pixelX)
+	sub MapView_SCROLLSPEED
+	ld (ix + MapView.pixelX),a
+	bit 4,a
+	ret z
+	and 0FH
+	ld (ix + MapView.pixelX),a
 	ld l,(ix + MapView.x)
 	ld h,(ix + MapView.x + 1)
 	ld de,-1
@@ -107,6 +120,13 @@ MapView_MoveLeft:
 
 ; ix = this
 MapView_MoveRight:
+	ld a,(ix + MapView.pixelX)
+	add a,MapView_SCROLLSPEED
+	ld (ix + MapView.pixelX),a
+	bit 4,a
+	ret z
+	and 0FH
+	ld (ix + MapView.pixelX),a
 	ld l,(ix + MapView.maxX)
 	ld h,(ix + MapView.maxX + 1)
 	ld e,(ix + MapView.x)
@@ -121,6 +141,13 @@ MapView_MoveRight:
 
 ; ix = this
 MapView_MoveUp:
+	ld a,(ix + MapView.pixelY)
+	sub MapView_SCROLLSPEED
+	ld (ix + MapView.pixelY),a
+	bit 4,a
+	ret z
+	and 0FH
+	ld (ix + MapView.pixelY),a
 	ld l,(ix + MapView.y)
 	ld h,(ix + MapView.y + 1)
 	ld de,-1
@@ -132,6 +159,13 @@ MapView_MoveUp:
 
 ; ix = this
 MapView_MoveDown:
+	ld a,(ix + MapView.pixelY)
+	add a,MapView_SCROLLSPEED
+	ld (ix + MapView.pixelY),a
+	bit 4,a
+	ret z
+	and 0FH
+	ld (ix + MapView.pixelY),a
 	ld l,(ix + MapView.maxY)
 	ld h,(ix + MapView.maxY + 1)
 	ld e,(ix + MapView.y)
@@ -145,6 +179,41 @@ MapView_MoveDown:
 	ret
 
 ; ix = this
+MapView_Update:
+	ld a,(VDP_MIRROR_25 + 25)
+	or 00000010B
+	ld (VDP_MIRROR_25 + 25),a
+	ld b,25
+	call VDP_SetRegister
+	ld a,(ix + MapView.y)
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	or (ix + MapView.pixelY)
+	ld b,23
+	call VDP_SetRegister
+	ld a,(ix + MapView.pixelX)
+	neg
+	and 07H
+	ld b,27
+	call VDP_SetRegister
+	ld a,(ix + MapView.x)
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	or (ix + MapView.pixelX)
+	dec a
+	srl a
+	srl a
+	srl a
+	ld b,26
+	call VDP_SetRegister
+	call MapView_Draw
+	ret
+
+; ix = this
 MapView_Draw: PROC
 	call MapView_GetTileCopyCommand_IY
 	ld e,(ix + MapView.maxX)
@@ -154,27 +223,39 @@ MapView_Draw: PROC
 	pop de
 	exx
 	call MapView_GetScreen
+	ex de,hl
+	ld b,(ix + MapView.x)
+	ld c,(ix + MapView.y)
+	sla c
+	sla c
+	sla c
+	sla c
 	exx
 	ld c,(ix + MapView.height)
-	ld (iy + VDPCommand.dy),0
 RowLoop:
 	ld b,(ix + MapView.width)
-	ld (iy + VDPCommand.dx),0
 TileLoop:
+	exx
+	ld a,b
+	or c
+	ld l,a
+	ld h,0
+	add hl,de
+	exx
 	ld a,(hl)
 	inc hl
 	exx
 	cp (hl)
 	call nz,MapView_DrawTile
-	inc hl
+	inc b
+	res 4,b
 	exx
-	ld a,(iy + VDPCommand.dx)
-	add a,16
-	ld (iy + VDPCommand.dx),a
 	djnz TileLoop
-	ld a,(iy + VDPCommand.dy)
+	exx
+	ld a,c
 	add a,16
-	ld (iy + VDPCommand.dy),a
+	ld c,a
+	exx
 	add hl,de
 	dec c
 	jr nz,RowLoop
@@ -183,11 +264,21 @@ TileLoop:
 
 ; a = tile
 ; (hl) = screen tile
+; b = dx >> 16
+; c = dy
 ; ix = this
 ; iy = VDP command
 ; Modifies: af
 MapView_DrawTile:
 	ld (hl),a
+	ld a,b
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld (iy + VDPCommand.dx),a
+	ld (iy + VDPCommand.dy),c
+	ld a,(hl)
 	add a,a
 	add a,a
 	add a,a
