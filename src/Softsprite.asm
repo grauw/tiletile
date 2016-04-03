@@ -7,7 +7,7 @@ Softsprite: MACRO
 	y:
 		db 80
 	sx:
-		db 192
+		db 224
 	sy:
 		db 224
 	index:
