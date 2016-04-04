@@ -113,3 +113,51 @@ VDPCommand_IsReady:
 	ei
 	out (VDP_PORT_1),a
 	ret
+
+; hl = source
+; bc = byte count
+; ix = this
+; Modifies: af, bc, de, hl
+VDPCommand_Transfer_IY: PROC
+	dec bc  ; 16-bit to 2x 8-bit loop
+	inc b
+	inc c
+	ld d,b
+	ld b,c
+	ld c,VDP_PORT_3
+	ld a,44 | 128
+	di
+	out (VDP_PORT_1),a
+	ld a,17 | 128
+	ei
+	out (VDP_PORT_1),a
+Loop:
+	otir
+	dec d
+	jr nz,Loop
+	ret
+	ENDP
+
+; ix = this
+VDPCommand_WaitTransferReady:
+	call VDPCommand_IsTransferReady
+	jr nc,VDPCommand_WaitTransferReady
+	ret
+
+; f <- c: ready (TR=1)
+; ix = this
+; Modifies: af
+VDPCommand_IsTransferReady:
+	ld a,2
+	di
+	out (VDP_PORT_1),a  ; select s#2
+	ld a,15 | 128
+	out (VDP_PORT_1),a
+	in a,(VDP_PORT_1)
+	rla
+	ld a,0
+	out (VDP_PORT_1),a  ; select s#0
+	ld a,15 | 128
+	ei
+	out (VDP_PORT_1),a
+	ret
