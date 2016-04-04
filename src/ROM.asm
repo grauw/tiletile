@@ -11,11 +11,6 @@ DEBUG: equ 1
 ROM_CodeBank1: equ 0
 ROM_CodeBank2: equ 1
 ROM_RAMInitBank: equ 2
-ROM_FieldSetBank1: equ 3
-ROM_FieldSetBank2: equ 4
-ROM_FieldSetBank3: equ 5
-ROM_FieldSetBank4: equ 6
-ROM_FieldSetPaletteBank: equ 7
 
 	org 4000H
 ROM_HEADER: ds 10H
@@ -58,6 +53,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Hook.asm"
 	INCLUDE "TIMIHook.asm"
 	INCLUDE "Input.asm"
+	INCLUDE "TileSet.asm"
 	INCLUDE "Map.asm"
 	INCLUDE "MapView.asm"
 	INCLUDE "Softsprite.asm"

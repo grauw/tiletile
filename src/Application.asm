@@ -8,6 +8,8 @@ Application: MACRO
 		Input
 	sprites:
 		Sprites
+	tileSet:
+		TileSet
 	map:
 		Map
 	mapView:
@@ -91,6 +93,12 @@ Application_GetTIMIHook:
 ; ix = this
 Application_GetSprites:
 	ld de,Application.sprites
+	add ix,de
+	ret
+
+; ix = this
+Application_GetTileSet:
+	ld de,Application.tileSet
 	add ix,de
 	ret
 
@@ -202,36 +210,11 @@ Application_DrawSoftsprites:
 
 ; ix = this
 Application_LoadTileSet:
-	ld a,1
-	ld hl,0
-	call VDP_SetWriteAddress
-	ld hl,(ROM_bank6000)
-	push hl
-	ld (hl),ROM_FieldSetBank1
-	ld bc,2000H
-	ld hl,ROM_TILESET
-	call VDP_Write
-	ld hl,(ROM_bank6000)
-	ld (hl),ROM_FieldSetBank2
-	ld bc,2000H
-	ld hl,ROM_TILESET
-	call VDP_Write
-	ld hl,(ROM_bank6000)
-	ld (hl),ROM_FieldSetBank3
-	ld bc,2000H
-	ld hl,ROM_TILESET
-	call VDP_Write
-	ld hl,(ROM_bank6000)
-	ld (hl),ROM_FieldSetBank4
-	ld bc,2000H
-	ld hl,ROM_TILESET
-	call VDP_Write
-	ld hl,(ROM_bank6000)
-	ld (hl),ROM_FieldSetPaletteBank
-	ld hl,ROM_TILESET
-	call VDP_SetPalette
-	pop hl
-	ld (hl),l
+	push ix
+	call Application_GetTileSet
+	call TileSet_Construct
+	call TileSet_Load
+	pop ix
 	ret
 
 ;
