@@ -62,7 +62,7 @@ VDPCommand_Execute_IY:
 
 ; ix = this
 ; Modifies: af, bc, hl
-VDPCommand_Execute_HL:
+VDPCommand_Execute_HL: PROC
 	ld c,VDP_PORT_3
 	ld a,32
 	di
@@ -88,6 +88,7 @@ WaitReady:
 	outi
 	ENDM
 	ret
+	ENDP
 
 ; ix = this
 VDPCommand_WaitReady:
