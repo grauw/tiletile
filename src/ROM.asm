@@ -1,7 +1,7 @@
 ;
-; Synthesix
+; Tile²
 ;
-; MIDI synthesizer for MSX
+; Scrolling tile engine for MSX
 ;
 
 	INCLUDE "Macros.asm"
