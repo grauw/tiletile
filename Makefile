@@ -1,6 +1,6 @@
 all:
-	node tools/pngtosc5.js res/tileset.png > gen/TileSet.asm TileSet
-	node tools/tmxtomap.js res/tilemap.tmx > gen/TileMap.asm TileMap
+	node tools/pngtosc5.js res/field/tileset.png > gen/FieldSet.asm FieldSet
+	node tools/tmxtomap.js res/field/tilemap.tmx > gen/FieldMap.asm FieldMap
 	java -jar tools/glass.jar -I gen src/ROM.asm bin/tiletile.rom bin/tiletile.sym
 
 run: all

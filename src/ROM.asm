@@ -11,11 +11,11 @@ DEBUG: equ 1
 ROM_CodeBank1: equ 0
 ROM_CodeBank2: equ 1
 ROM_RAMInitBank: equ 2
-ROM_TileSetBank1: equ 3
-ROM_TileSetBank2: equ 4
-ROM_TileSetBank3: equ 5
-ROM_TileSetBank4: equ 6
-ROM_TileSetPaletteBank: equ 7
+ROM_FieldSetBank1: equ 3
+ROM_FieldSetBank2: equ 4
+ROM_FieldSetBank3: equ 5
+ROM_FieldSetBank4: equ 6
+ROM_FieldSetPaletteBank: equ 7
 
 	org 4000H
 ROM_HEADER: ds 10H
@@ -62,7 +62,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "MapView.asm"
 	INCLUDE "Softsprite.asm"
 
-	INCLUDE "TileMap.asm"
+	INCLUDE "FieldMap.asm"
 
 	ENDS
 
@@ -112,7 +112,7 @@ RAM_insufficientTPA:
 
 	SECTION ROM_TILESET
 
-	INCLUDE "TileSet.asm"
+	INCLUDE "FieldSet.asm"
 
 	ENDS
 

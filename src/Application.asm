@@ -42,13 +42,13 @@ Application_Construct:
 	call Application_GetSprites
 	call Sprites_Construct
 	pop ix
-	ld a,(TileMap_dimensions)
+	ld a,(FieldMap_dimensions)
 	ld c,a
 	ld b,0
-	ld a,(TileMap_dimensions + 1)
+	ld a,(FieldMap_dimensions + 1)
 	ld e,a
 	ld d,0
-	ld hl,TileMap_data
+	ld hl,FieldMap_data
 	push ix
 	push de
 	call Application_GetMap
@@ -207,27 +207,27 @@ Application_LoadTileSet:
 	call VDP_SetWriteAddress
 	ld hl,(ROM_bank6000)
 	push hl
-	ld (hl),ROM_TileSetBank1
+	ld (hl),ROM_FieldSetBank1
 	ld bc,2000H
 	ld hl,ROM_TILESET
 	call VDP_Write
 	ld hl,(ROM_bank6000)
-	ld (hl),ROM_TileSetBank2
+	ld (hl),ROM_FieldSetBank2
 	ld bc,2000H
 	ld hl,ROM_TILESET
 	call VDP_Write
 	ld hl,(ROM_bank6000)
-	ld (hl),ROM_TileSetBank3
+	ld (hl),ROM_FieldSetBank3
 	ld bc,2000H
 	ld hl,ROM_TILESET
 	call VDP_Write
 	ld hl,(ROM_bank6000)
-	ld (hl),ROM_TileSetBank4
+	ld (hl),ROM_FieldSetBank4
 	ld bc,2000H
 	ld hl,ROM_TILESET
 	call VDP_Write
 	ld hl,(ROM_bank6000)
-	ld (hl),ROM_TileSetPaletteBank
+	ld (hl),ROM_FieldSetPaletteBank
 	ld hl,ROM_TILESET
 	call VDP_SetPalette
 	pop hl
