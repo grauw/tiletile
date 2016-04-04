@@ -10,13 +10,11 @@ MapView: MACRO
 		dw 0
 	y:
 		dw 0
-	pixelX:
-		dw 0
-	pixelY:
-		dw 0
 	maxX:
 		dw 0
 	maxY:
+		dw 0
+	strideX:
 		dw 0
 	width:
 		db 16
@@ -42,6 +40,12 @@ MapView_Construct:
 	and a
 	sbc hl,de
 	call c,System_ThrowException
+	ld (ix + MapView.strideX),l
+	ld (ix + MapView.strideX + 1),h
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
 	ld (ix + MapView.maxX),l
 	ld (ix + MapView.maxX + 1),h
 	push ix
@@ -54,6 +58,10 @@ MapView_Construct:
 	and a
 	sbc hl,de
 	call c,System_ThrowException
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
 	ld (ix + MapView.maxY),l
 	ld (ix + MapView.maxY + 1),h
 	ret
@@ -90,8 +98,16 @@ MapView_GetScreen:
 MapView_GetDataPosition:
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
+	REPT 4
+	srl b
+	rr c
+	ENDM
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
+	REPT 4
+	srl d
+	rr e
+	ENDM
 	push ix
 	push de
 	call MapView_GetMap
@@ -102,16 +118,9 @@ MapView_GetDataPosition:
 
 ; ix = this
 MapView_MoveLeft:
-	ld a,(ix + MapView.pixelX)
-	sub MapView_SCROLLSPEED
-	ld (ix + MapView.pixelX),a
-	bit 4,a
-	ret z
-	and 0FH
-	ld (ix + MapView.pixelX),a
 	ld l,(ix + MapView.x)
 	ld h,(ix + MapView.x + 1)
-	ld de,-1
+	ld de,-MapView_SCROLLSPEED
 	add hl,de
 	ret nc
 	ld (ix + MapView.x),l
@@ -120,19 +129,13 @@ MapView_MoveLeft:
 
 ; ix = this
 MapView_MoveRight:
-	ld a,(ix + MapView.pixelX)
-	add a,MapView_SCROLLSPEED
-	ld (ix + MapView.pixelX),a
-	bit 4,a
-	ret z
-	and 0FH
-	ld (ix + MapView.pixelX),a
-	ld l,(ix + MapView.maxX)
-	ld h,(ix + MapView.maxX + 1)
-	ld e,(ix + MapView.x)
-	ld d,(ix + MapView.x + 1)
-	inc de
-	and a
+	ld l,(ix + MapView.x)
+	ld h,(ix + MapView.x + 1)
+	ld de,MapView_SCROLLSPEED
+	add hl,de
+	ld e,(ix + MapView.maxX)
+	ld d,(ix + MapView.maxX + 1)
+	ex de,hl
 	sbc hl,de
 	ret c
 	ld (ix + MapView.x),e
@@ -141,16 +144,9 @@ MapView_MoveRight:
 
 ; ix = this
 MapView_MoveUp:
-	ld a,(ix + MapView.pixelY)
-	sub MapView_SCROLLSPEED
-	ld (ix + MapView.pixelY),a
-	bit 4,a
-	ret z
-	and 0FH
-	ld (ix + MapView.pixelY),a
 	ld l,(ix + MapView.y)
 	ld h,(ix + MapView.y + 1)
-	ld de,-1
+	ld de,-MapView_SCROLLSPEED
 	add hl,de
 	ret nc
 	ld (ix + MapView.y),l
@@ -159,19 +155,13 @@ MapView_MoveUp:
 
 ; ix = this
 MapView_MoveDown:
-	ld a,(ix + MapView.pixelY)
-	add a,MapView_SCROLLSPEED
-	ld (ix + MapView.pixelY),a
-	bit 4,a
-	ret z
-	and 0FH
-	ld (ix + MapView.pixelY),a
-	ld l,(ix + MapView.maxY)
-	ld h,(ix + MapView.maxY + 1)
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
-	inc de
-	and a
+	ld l,(ix + MapView.y)
+	ld h,(ix + MapView.y + 1)
+	ld de,MapView_SCROLLSPEED
+	add hl,de
+	ld e,(ix + MapView.maxY)
+	ld d,(ix + MapView.maxY + 1)
+	ex de,hl
 	sbc hl,de
 	ret c
 	ld (ix + MapView.y),e
@@ -186,24 +176,14 @@ MapView_Update:
 	ld b,25
 	call VDP_SetRegister
 	ld a,(ix + MapView.y)
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	or (ix + MapView.pixelY)
 	ld b,23
 	call VDP_SetRegister
-	ld a,(ix + MapView.pixelX)
+	ld a,(ix + MapView.x)
 	neg
 	and 07H
 	ld b,27
 	call VDP_SetRegister
 	ld a,(ix + MapView.x)
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	or (ix + MapView.pixelX)
 	dec a
 	srl a
 	srl a
@@ -216,8 +196,8 @@ MapView_Update:
 ; ix = this
 MapView_Draw: PROC
 	call MapView_GetTileCopyCommand_IY
-	ld e,(ix + MapView.maxX)
-	ld d,(ix + MapView.maxX + 1)
+	ld e,(ix + MapView.strideX)
+	ld d,(ix + MapView.strideX + 1)
 	push de
 	call MapView_GetDataPosition
 	pop de
@@ -225,11 +205,13 @@ MapView_Draw: PROC
 	call MapView_GetScreen
 	ex de,hl
 	ld b,(ix + MapView.x)
-	ld c,(ix + MapView.y)
-	sla c
-	sla c
-	sla c
-	sla c
+	srl b
+	srl b
+	srl b
+	srl b
+	ld a,(ix + MapView.y)
+	and 0F0H
+	ld c,a
 	exx
 	ld c,(ix + MapView.height)
 RowLoop:
