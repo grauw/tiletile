@@ -171,7 +171,10 @@ Application_TIMIInterruptEntry:
 	ld (SCNCNT),a
 	call Application_GetInput_IY
 	call Input_Update_IY
-	call Application_UpdateMapView
+	push ix
+	call Application_GetMapView
+	call MapView_Update
+	pop ix
 	push ix
 	call Application_GetSoftsprite
 	call Softsprite_Clear
@@ -180,8 +183,8 @@ Application_TIMIInterruptEntry:
 	push ix
 	call Application_GetSoftsprite
 	call Softsprite_MoveRight
+	call Softsprite_Draw
 	pop ix
-	call Application_DrawSoftsprites
 	ret
 
 ; ix = this
@@ -203,22 +206,6 @@ Application_UpdatePosition:
 	pop iy
 	bit 6,(iy + Input.newKey + 8)
 	call z,MapView_MoveDown
-	pop ix
-	ret
-
-; ix = this
-Application_UpdateMapView:
-	push ix
-	call Application_GetMapView
-	call MapView_Update
-	pop ix
-	ret
-
-; ix = this
-Application_DrawSoftsprites:
-	push ix
-	call Application_GetSoftsprite
-	call Softsprite_Draw
 	pop ix
 	ret
 
