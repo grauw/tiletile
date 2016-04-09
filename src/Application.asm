@@ -172,10 +172,13 @@ Application_TIMIInterruptEntry:
 	call Application_GetInput_IY
 	call Input_Update_IY
 	call Application_UpdateMapView
-	call Application_UpdatePosition
 	push ix
 	call Application_GetSoftsprite
 	call Softsprite_Clear
+	pop ix
+	call Application_UpdatePosition
+	push ix
+	call Application_GetSoftsprite
 	call Softsprite_MoveRight
 	pop ix
 	call Application_DrawSoftsprites
