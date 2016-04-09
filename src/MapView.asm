@@ -110,11 +110,16 @@ MapView_MoveLeft:
 	ret nc
 	ld (ix + MapView.x),l
 	ld (ix + MapView.x + 1),h
-	ld c,l
-	ld b,h
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
-	call MapView_DrawColumn
+	ld a,l
+	and 0F0H
+	ld h,a  ; dx
+	ld a,l
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld l,a  ; dy
+	call MapView_DrawTile
 	ret
 
 ; ix = this
@@ -130,13 +135,17 @@ MapView_MoveRight:
 	ret c
 	ld (ix + MapView.x),e
 	ld (ix + MapView.x + 1),d
-	ld hl,256 - 1
-	add hl,de
-	ld c,l
-	ld b,h
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
-	call MapView_DrawColumn
+	dec e
+	ld a,e
+	and 0F0H
+	ld h,a  ; dx
+	ld a,e
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld l,a  ; dy
+	call MapView_DrawTile
 	ret
 
 ; ix = this
@@ -148,10 +157,16 @@ MapView_MoveUp:
 	ret nc
 	ld (ix + MapView.y),l
 	ld (ix + MapView.y + 1),h
-	ex de,hl
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
-	call MapView_DrawRow
+	ld a,l
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld h,a  ; dx
+	ld a,l
+	and 0F0H
+	ld l,a  ; dy
+	call MapView_DrawTile
 	ret
 
 ; ix = this
@@ -167,12 +182,17 @@ MapView_MoveDown:
 	ret c
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
-	ld hl,256 - 1
-	add hl,de
-	ex de,hl
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
-	call MapView_DrawRow
+	dec e
+	ld a,e
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld h,a  ; dx
+	ld a,e
+	and 0F0H
+	ld l,a  ; dy
+	call MapView_DrawTile
 	ret
 
 ; ix = this
@@ -202,62 +222,34 @@ MapView_Update:
 
 ; ix = this
 MapView_Draw: PROC
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
-	ld a,(ix + MapView.height)
-RowLoop:
-	push af
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
-	ld a,(ix + MapView.width)
-TileLoop:
-	push af
-	push bc
-	push de
-	ld a,c
-	and 0F0H
-	ld h,a
-	ld a,e
-	and 0F0H
-	ld l,a
+	ld hl,0
+Loop:
 	push hl
-	call MapView_GetDataPosition
-	call MapView_GetTileCopyCommand_IY
-	ld a,(hl)
-	pop hl
 	call MapView_DrawTile
-	pop de
-	pop bc
-	pop af
-	ld hl,16
-	add hl,bc
-	ld c,l
-	ld b,h
-	dec a
-	jr nz,TileLoop
-	pop af
-	ld hl,16
-	add hl,de
-	ex de,hl
-	dec a
-	jr nz,RowLoop
+	pop hl
+	ld a,h
+	add a,16
+	ld h,a
+	jr nc,Loop
+	ld a,l
+	add a,16
+	ld l,a
+	jr nc,Loop
 	ret
 	ENDP
 
-; bc = x
-; de = y
+; h = dx
+; l = dy
 ; ix = this
-MapView_DrawRow: PROC
-	ld a,e
-	and 0F0H
-	ld l,a  ; dy
-	ld a,e
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld h,a  ; dx
-	push hl
+; Modifies: af, bc, hl
+MapView_DrawTile: PROC
+	push de
+	call MapView_GetTileCopyCommand_IY
+	pop de
+	ld (iy + VDPCommand.dx),h
+	ld (iy + VDPCommand.dy),l
+	ld c,(ix + MapView.x)
+	ld b,(ix + MapView.x + 1)
 	ld a,l  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15)
 	rrca
 	rrca
@@ -267,31 +259,11 @@ MapView_DrawRow: PROC
 	sub c
 	add a,c
 	ld c,a
-	jr nc,NoCarry
+	jr nc,NoCarryBC
 	inc b
-NoCarry:
-	call MapView_GetDataPosition
-	ld a,(hl)
-	call MapView_GetTileCopyCommand_IY
-	pop hl
-	call MapView_DrawTile
-	ret
-	ENDP
-
-; bc = x
-; de = y
-; ix = this
-MapView_DrawColumn: PROC
-	ld a,c
-	and 0F0H
-	ld h,a  ; dx
-	ld a,c
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld l,a  ; dy
-	push hl
+NoCarryBC:
+	ld e,(ix + MapView.y)
+	ld d,(ix + MapView.y + 1)
 	ld a,h  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15)
 	rrca
 	rrca
@@ -301,26 +273,11 @@ MapView_DrawColumn: PROC
 	sub e
 	add a,e
 	ld e,a
-	jr nc,NoCarry
+	jr nc,NoCarryDE
 	inc d
-NoCarry:
+NoCarryDE:
 	call MapView_GetDataPosition
 	ld a,(hl)
-	call MapView_GetTileCopyCommand_IY
-	pop hl
-	call MapView_DrawTile
-	ret
-	ENDP
-
-; a = tile
-; h = dx
-; l = dy
-; ix = this
-; iy = VDP command
-; Modifies: af, bc, hl
-MapView_DrawTile:
-	ld (iy + VDPCommand.dx),h
-	ld (iy + VDPCommand.dy),l
 	ld h,a
 	add a,a
 	add a,a
@@ -332,3 +289,4 @@ MapView_DrawTile:
 	ld (iy + VDPCommand.sy),a
 	call VDPCommand_Execute_IY
 	ret
+	ENDP
