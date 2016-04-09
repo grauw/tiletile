@@ -13,9 +13,9 @@ MapView: MACRO
 	maxY:
 		dw 0
 	width:
-		db 16
+		db 248
 	height:
-		db 16
+		db 212
 	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 16, 16, 0, 0, VDPCommand_HMMM
 	ENDM
 
@@ -29,15 +29,15 @@ MapView_Construct:
 	ld l,(ix + Map.width)
 	ld h,(ix + Map.width + 1)
 	pop ix
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
 	ld e,(ix + MapView.width)
 	ld d,0
 	and a
 	sbc hl,de
 	call c,System_ThrowException
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
 	ld (ix + MapView.maxX),l
 	ld (ix + MapView.maxX + 1),h
 	push ix
@@ -45,15 +45,15 @@ MapView_Construct:
 	ld l,(ix + Map.height)
 	ld h,(ix + Map.height + 1)
 	pop ix
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
 	ld e,(ix + MapView.height)
 	ld d,0
 	and a
 	sbc hl,de
 	call c,System_ThrowException
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
 	ld (ix + MapView.maxY),l
 	ld (ix + MapView.maxY + 1),h
 	ret
