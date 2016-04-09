@@ -211,35 +211,27 @@ Loop:
 ; Modifies: af, bc, hl
 MapView_DrawTile: PROC
 	call MapView_GetTileCopyCommand_IY
-	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
-	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
-	ld h,a
-	sub c  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15)
-	add a,c
-	ld c,a
+	ld c,a  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15)
+	cp (ix + MapView.x)
 	jr nc,NoCarryBC
 	inc b
 NoCarryBC:
-	ld a,h
 	rrca
 	rrca
 	rrca
 	rrca
-	ld l,a
-	sub e  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15)
-	add a,e
-	ld e,a
+	ld e,a  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15)
+	cp (ix + MapView.y)
 	jr nc,NoCarryDE
 	inc d
 NoCarryDE:
-	ld a,h
-	and 0F0H
-	ld (iy + VDPCommand.dx),a
-	ld a,l
 	and 0F0H
 	ld (iy + VDPCommand.dy),a
+	ld a,c
+	and 0F0H
+	ld (iy + VDPCommand.dx),a
 	call MapView_GetDataPosition
 	ld a,(hl)
 	ld h,a
