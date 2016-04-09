@@ -1,8 +1,6 @@
 ;
 ; A view on a section of the map.
 ;
-MapView_SCROLLSPEED: equ 1
-
 MapView: MACRO
 	map:
 		dw 0
@@ -105,7 +103,7 @@ MapView_GetDataPosition:
 MapView_MoveLeft:
 	ld l,(ix + MapView.x)
 	ld h,(ix + MapView.x + 1)
-	ld de,-MapView_SCROLLSPEED
+	ld de,-1
 	add hl,de
 	ret nc
 	ld (ix + MapView.x),l
@@ -118,7 +116,7 @@ MapView_MoveLeft:
 MapView_MoveRight:
 	ld l,(ix + MapView.x)
 	ld h,(ix + MapView.x + 1)
-	ld de,MapView_SCROLLSPEED
+	ld de,1
 	add hl,de
 	ld e,(ix + MapView.maxX)
 	ld d,(ix + MapView.maxX + 1)
@@ -136,7 +134,7 @@ MapView_MoveRight:
 MapView_MoveUp:
 	ld l,(ix + MapView.y)
 	ld h,(ix + MapView.y + 1)
-	ld de,-MapView_SCROLLSPEED
+	ld de,-1
 	add hl,de
 	ret nc
 	ld (ix + MapView.y),l
@@ -153,7 +151,7 @@ MapView_MoveUp:
 MapView_MoveDown:
 	ld l,(ix + MapView.y)
 	ld h,(ix + MapView.y + 1)
-	ld de,MapView_SCROLLSPEED
+	ld de,1
 	add hl,de
 	ld e,(ix + MapView.maxY)
 	ld d,(ix + MapView.maxY + 1)
