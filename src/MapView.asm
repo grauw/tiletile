@@ -239,7 +239,7 @@ TileLoop:
 	call MapView_GetDataPosition
 	call MapView_GetTileCopyCommand_IY
 	ld a,(hl)
-	pop de
+	pop hl
 	call MapView_DrawTile
 	pop de
 	pop bc
@@ -288,7 +288,7 @@ NoCarry:
 	call MapView_GetDataPosition
 	ld a,(hl)
 	call MapView_GetTileCopyCommand_IY
-	pop de
+	pop hl
 	call MapView_DrawTile
 	ret
 	ENDP
@@ -322,20 +322,20 @@ NoCarry:
 	call MapView_GetDataPosition
 	ld a,(hl)
 	call MapView_GetTileCopyCommand_IY
-	pop de
+	pop hl
 	call MapView_DrawTile
 	ret
 	ENDP
 
 ; a = tile
-; d = dx
-; e = dy
+; h = dx
+; l = dy
 ; ix = this
 ; iy = VDP command
 ; Modifies: af, bc, hl
 MapView_DrawTile:
-	ld (iy + VDPCommand.dx),d
-	ld (iy + VDPCommand.dy),e
+	ld (iy + VDPCommand.dx),h
+	ld (iy + VDPCommand.dy),l
 	ld h,a
 	add a,a
 	add a,a
