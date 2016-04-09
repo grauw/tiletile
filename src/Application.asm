@@ -143,6 +143,11 @@ Application_EnterMainLoop:
 	call VDP_DisableBlank
 
 	push ix
+	call Application_GetMapView
+	call MapView_Draw
+	pop ix
+
+	push ix
 	call Application_GetTIMIHook
 	call Hook_Install
 	pop ix
@@ -166,13 +171,13 @@ Application_TIMIInterruptEntry:
 	ld (SCNCNT),a
 	call Application_GetInput_IY
 	call Input_Update_IY
+	call Application_UpdateMapView
 	call Application_UpdatePosition
 	push ix
 	call Application_GetSoftsprite
 	call Softsprite_Clear
 	call Softsprite_MoveRight
 	pop ix
-	call Application_DrawMapView
 	call Application_DrawSoftsprites
 	ret
 
@@ -182,18 +187,24 @@ Application_UpdatePosition:
 	push ix
 	call Application_GetMapView
 	bit 4,(iy + Input.newKey + 8)
+	push iy
 	call z,MapView_MoveLeft
+	pop iy
 	bit 7,(iy + Input.newKey + 8)
+	push iy
 	call z,MapView_MoveRight
+	pop iy
 	bit 5,(iy + Input.newKey + 8)
+	push iy
 	call z,MapView_MoveUp
+	pop iy
 	bit 6,(iy + Input.newKey + 8)
 	call z,MapView_MoveDown
 	pop ix
 	ret
 
 ; ix = this
-Application_DrawMapView:
+Application_UpdateMapView:
 	push ix
 	call Application_GetMapView
 	call MapView_Update

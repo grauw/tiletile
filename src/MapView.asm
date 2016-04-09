@@ -14,15 +14,11 @@ MapView: MACRO
 		dw 0
 	maxY:
 		dw 0
-	strideX:
-		dw 0
 	width:
 		db 16
 	height:
 		db 16
 	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 16, 16, 0, 0, VDPCommand_HMMM
-	screen:
-		ds 16 * 16,255
 	ENDM
 
 ; de = map
@@ -40,8 +36,6 @@ MapView_Construct:
 	and a
 	sbc hl,de
 	call c,System_ThrowException
-	ld (ix + MapView.strideX),l
-	ld (ix + MapView.strideX + 1),h
 	add hl,hl
 	add hl,hl
 	add hl,hl
@@ -83,27 +77,16 @@ MapView_GetTileCopyCommand_IY:
 	add iy,de
 	ret
 
-; ix = this
-; hl <- screen
-MapView_GetScreen:
-	ld hl,MapView.screen
-	ld e,ixl
-	ld d,ixh
-	add hl,de
-	ret
-
+; bc = x
+; de = y
 ; ix = this
 ; hl <- position
 ; Modifies: af, bc, de
 MapView_GetDataPosition:
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
 	REPT 4
 	srl b
 	rr c
 	ENDM
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
 	REPT 4
 	srl d
 	rr e
@@ -125,6 +108,11 @@ MapView_MoveLeft:
 	ret nc
 	ld (ix + MapView.x),l
 	ld (ix + MapView.x + 1),h
+	ld c,l
+	ld b,h
+	ld e,(ix + MapView.y)
+	ld d,(ix + MapView.y + 1)
+	call MapView_DrawColumn
 	ret
 
 ; ix = this
@@ -140,6 +128,13 @@ MapView_MoveRight:
 	ret c
 	ld (ix + MapView.x),e
 	ld (ix + MapView.x + 1),d
+	ld hl,240
+	add hl,de
+	ld c,l
+	ld b,h
+	ld e,(ix + MapView.y)
+	ld d,(ix + MapView.y + 1)
+	call MapView_DrawColumn
 	ret
 
 ; ix = this
@@ -151,6 +146,10 @@ MapView_MoveUp:
 	ret nc
 	ld (ix + MapView.y),l
 	ld (ix + MapView.y + 1),h
+	ex de,hl
+	ld c,(ix + MapView.x)
+	ld b,(ix + MapView.x + 1)
+	call MapView_DrawRow
 	ret
 
 ; ix = this
@@ -166,6 +165,12 @@ MapView_MoveDown:
 	ret c
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
+	ld hl,240
+	add hl,de
+	ex de,hl
+	ld c,(ix + MapView.x)
+	ld b,(ix + MapView.x + 1)
+	call MapView_DrawRow
 	ret
 
 ; ix = this
@@ -190,88 +195,132 @@ MapView_Update:
 	srl a
 	ld b,26
 	call VDP_SetRegister
-	call MapView_Draw
 	ret
 
 ; ix = this
 MapView_Draw: PROC
-	call MapView_GetTileCopyCommand_IY
-	ld e,(ix + MapView.strideX)
-	ld d,(ix + MapView.strideX + 1)
-	push de
-	call MapView_GetDataPosition
-	pop de
-	exx
-	call MapView_GetScreen
-	ex de,hl
-	ld b,(ix + MapView.x)
-	srl b
-	srl b
-	srl b
-	srl b
-	ld a,(ix + MapView.y)
-	and 0F0H
-	ld c,a
-	exx
-	ld c,(ix + MapView.height)
+	ld e,(ix + MapView.y)
+	ld d,(ix + MapView.y + 1)
+	ld a,(ix + MapView.height)
 RowLoop:
-	ld b,(ix + MapView.width)
+	push af
+	ld c,(ix + MapView.x)
+	ld b,(ix + MapView.x + 1)
+	ld a,(ix + MapView.width)
 TileLoop:
-	exx
-	ld a,b
-	or c
-	ld l,a
-	ld h,0
-	add hl,de
-	exx
-	ld a,(hl)
-	inc hl
-	exx
-	cp (hl)
-	call nz,MapView_DrawTile
-	inc b
-	res 4,b
-	exx
-	djnz TileLoop
-	exx
+	push af
+	push bc
+	push de
 	ld a,c
-	add a,16
-	ld c,a
-	exx
+	and 0F0H
+	ld h,a
+	ld a,e
+	and 0F0H
+	ld l,a
+	push hl
+	call MapView_GetDataPosition
+	call MapView_GetTileCopyCommand_IY
+	ld a,(hl)
+	pop de
+	call MapView_DrawTile
+	pop de
+	pop bc
+	pop af
+	ld hl,16
+	add hl,bc
+	ld c,l
+	ld b,h
+	dec a
+	jr nz,TileLoop
+	pop af
+	ld hl,16
 	add hl,de
-	dec c
+	ex de,hl
+	dec a
 	jr nz,RowLoop
 	ret
 	ENDP
 
+; bc = x
+; de = y
+; ix = this
+MapView_DrawRow: PROC
+	ld a,c
+	and 0F0H
+	push af
+	ld a,e
+	and 0F0H
+	exx
+	pop de
+	ld e,a
+	exx
+	call MapView_GetDataPosition
+	call MapView_GetTileCopyCommand_IY
+	ld b,(ix + MapView.width)
+TileLoop:
+	ld a,(hl)
+	inc hl
+	exx
+	call MapView_DrawTile
+	ld a,d
+	add a,16
+	ld d,a
+	exx
+	djnz TileLoop
+	ret
+	ENDP
+
+; bc = x
+; de = y
+; ix = this
+MapView_DrawColumn: PROC
+	ld a,c
+	and 0F0H
+	push af
+	ld a,e
+	and 0F0H
+	exx
+	pop de
+	ld e,a
+	exx
+	call MapView_GetDataPosition
+	call MapView_GetTileCopyCommand_IY
+	push ix
+	call MapView_GetMap
+	ld e,(ix + Map.width)
+	ld d,(ix + Map.width + 1)
+	pop ix
+	ld b,(ix + MapView.height)
+TileLoop:
+	ld a,(hl)
+	add hl,de
+	exx
+	call MapView_DrawTile
+	ld a,e
+	add a,16
+	ld e,a
+	exx
+	djnz TileLoop
+	ret
+	ENDP
+
 ; a = tile
-; (hl) = screen tile
-; b = dx >> 16
-; c = dy
+; d = dx
+; e = dy
 ; ix = this
 ; iy = VDP command
-; Modifies: af
+; Modifies: af, bc, hl
 MapView_DrawTile:
-	ld (hl),a
-	ld a,b
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld (iy + VDPCommand.dx),a
-	ld (iy + VDPCommand.dy),c
-	ld a,(hl)
+	ld (iy + VDPCommand.dx),d
+	ld (iy + VDPCommand.dy),e
+	ld h,a
 	add a,a
 	add a,a
 	add a,a
 	add a,a
 	ld (iy + VDPCommand.sx),a
-	ld a,(hl)
+	ld a,h
 	and 0F0H
 	ld (iy + VDPCommand.sy),a
-	push bc
-	push hl
 	call VDPCommand_Execute_IY
-	pop hl
-	pop bc
 	ret
