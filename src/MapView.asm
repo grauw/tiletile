@@ -91,6 +91,8 @@ MapView_GetDataPosition:
 	srl d
 	rr e
 	ENDM
+	dec bc
+	dec de
 	push ix
 	push de
 	call MapView_GetMap
@@ -108,15 +110,10 @@ MapView_MoveLeft:
 	ret nc
 	ld (ix + MapView.x),l
 	ld (ix + MapView.x + 1),h
-	ld de,-16
-	add hl,de
 	ld c,l
 	ld b,h
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
-	ld hl,-16
-	add hl,de
-	ex de,hl
 	call MapView_DrawColumn
 	ret
 
@@ -133,15 +130,12 @@ MapView_MoveRight:
 	ret c
 	ld (ix + MapView.x),e
 	ld (ix + MapView.x + 1),d
-	ld hl,240 - 1
+	ld hl,256 - 1
 	add hl,de
 	ld c,l
 	ld b,h
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
-	ld hl,-16
-	add hl,de
-	ex de,hl
 	call MapView_DrawColumn
 	ret
 
@@ -154,15 +148,9 @@ MapView_MoveUp:
 	ret nc
 	ld (ix + MapView.y),l
 	ld (ix + MapView.y + 1),h
-	ld de,-16
-	add hl,de
 	ex de,hl
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
-	ld hl,-16
-	add hl,bc
-	ld c,l
-	ld b,h
 	call MapView_DrawRow
 	ret
 
@@ -179,15 +167,11 @@ MapView_MoveDown:
 	ret c
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
-	ld hl,240 - 1
+	ld hl,256 - 1
 	add hl,de
 	ex de,hl
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
-	ld hl,-16
-	add hl,bc
-	ld c,l
-	ld b,h
 	call MapView_DrawRow
 	ret
 
@@ -199,6 +183,7 @@ MapView_Update:
 	ld b,25
 	call VDP_SetRegister
 	ld a,(ix + MapView.y)
+	add a,16
 	ld b,23
 	call VDP_SetRegister
 	ld a,(ix + MapView.x)
@@ -207,7 +192,7 @@ MapView_Update:
 	ld b,27
 	call VDP_SetRegister
 	ld a,(ix + MapView.x)
-	dec a
+	add a,15
 	srl a
 	srl a
 	srl a

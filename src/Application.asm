@@ -144,6 +144,7 @@ Application_EnterMainLoop:
 
 	push ix
 	call Application_GetMapView
+	call MapView_Update
 	call MapView_Draw
 	pop ix
 
