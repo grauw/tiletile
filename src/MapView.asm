@@ -108,10 +108,15 @@ MapView_MoveLeft:
 	ret nc
 	ld (ix + MapView.x),l
 	ld (ix + MapView.x + 1),h
+	ld de,-16
+	add hl,de
 	ld c,l
 	ld b,h
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
+	ld hl,-16
+	add hl,de
+	ex de,hl
 	call MapView_DrawColumn
 	ret
 
@@ -128,12 +133,15 @@ MapView_MoveRight:
 	ret c
 	ld (ix + MapView.x),e
 	ld (ix + MapView.x + 1),d
-	ld hl,240
+	ld hl,240 - 1
 	add hl,de
 	ld c,l
 	ld b,h
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
+	ld hl,-16
+	add hl,de
+	ex de,hl
 	call MapView_DrawColumn
 	ret
 
@@ -146,9 +154,15 @@ MapView_MoveUp:
 	ret nc
 	ld (ix + MapView.y),l
 	ld (ix + MapView.y + 1),h
+	ld de,-16
+	add hl,de
 	ex de,hl
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
+	ld hl,-16
+	add hl,bc
+	ld c,l
+	ld b,h
 	call MapView_DrawRow
 	ret
 
@@ -165,11 +179,15 @@ MapView_MoveDown:
 	ret c
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
-	ld hl,240
+	ld hl,240 - 1
 	add hl,de
 	ex de,hl
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
+	ld hl,-16
+	add hl,bc
+	ld c,l
+	ld b,h
 	call MapView_DrawRow
 	ret
 
@@ -245,28 +263,33 @@ TileLoop:
 ; de = y
 ; ix = this
 MapView_DrawRow: PROC
-	ld a,c
-	and 0F0H
-	push af
 	ld a,e
 	and 0F0H
-	exx
-	pop de
-	ld e,a
-	exx
+	ld l,a  ; dy
+	ld a,e
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld h,a  ; dx
+	push hl
+	ld a,l  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15)
+	rrca
+	rrca
+	rrca
+	rrca
+	or h
+	sub c
+	add a,c
+	ld c,a
+	jr nc,NoCarry
+	inc b
+NoCarry:
 	call MapView_GetDataPosition
-	call MapView_GetTileCopyCommand_IY
-	ld b,(ix + MapView.width)
-TileLoop:
 	ld a,(hl)
-	inc hl
-	exx
+	call MapView_GetTileCopyCommand_IY
+	pop de
 	call MapView_DrawTile
-	ld a,d
-	add a,16
-	ld d,a
-	exx
-	djnz TileLoop
 	ret
 	ENDP
 
@@ -276,31 +299,31 @@ TileLoop:
 MapView_DrawColumn: PROC
 	ld a,c
 	and 0F0H
-	push af
-	ld a,e
-	and 0F0H
-	exx
-	pop de
+	ld h,a  ; dx
+	ld a,c
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld l,a  ; dy
+	push hl
+	ld a,h  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15)
+	rrca
+	rrca
+	rrca
+	rrca
+	or l
+	sub e
+	add a,e
 	ld e,a
-	exx
+	jr nc,NoCarry
+	inc d
+NoCarry:
 	call MapView_GetDataPosition
-	call MapView_GetTileCopyCommand_IY
-	push ix
-	call MapView_GetMap
-	ld e,(ix + Map.width)
-	ld d,(ix + Map.width + 1)
-	pop ix
-	ld b,(ix + MapView.height)
-TileLoop:
 	ld a,(hl)
-	add hl,de
-	exx
+	call MapView_GetTileCopyCommand_IY
+	pop de
 	call MapView_DrawTile
-	ld a,e
-	add a,16
-	ld e,a
-	exx
-	djnz TileLoop
 	ret
 	ENDP
 
