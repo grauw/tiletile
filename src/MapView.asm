@@ -111,14 +111,6 @@ MapView_MoveLeft:
 	ld (ix + MapView.x),l
 	ld (ix + MapView.x + 1),h
 	ld a,l
-	and 0F0H
-	ld h,a  ; dx
-	ld a,l
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld l,a  ; dy
 	call MapView_DrawTile
 	ret
 
@@ -137,14 +129,6 @@ MapView_MoveRight:
 	ld (ix + MapView.x + 1),d
 	dec e
 	ld a,e
-	and 0F0H
-	ld h,a  ; dx
-	ld a,e
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld l,a  ; dy
 	call MapView_DrawTile
 	ret
 
@@ -158,14 +142,10 @@ MapView_MoveUp:
 	ld (ix + MapView.y),l
 	ld (ix + MapView.y + 1),h
 	ld a,l
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld h,a  ; dx
-	ld a,l
-	and 0F0H
-	ld l,a  ; dy
+	rlca
+	rlca
+	rlca
+	rlca
 	call MapView_DrawTile
 	ret
 
@@ -184,14 +164,10 @@ MapView_MoveDown:
 	ld (ix + MapView.y + 1),d
 	dec e
 	ld a,e
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld h,a  ; dx
-	ld a,e
-	and 0F0H
-	ld l,a  ; dy
+	rlca
+	rlca
+	rlca
+	rlca
 	call MapView_DrawTile
 	ret
 
@@ -222,60 +198,50 @@ MapView_Update:
 
 ; ix = this
 MapView_Draw: PROC
-	ld hl,0
+	ld a,0
 Loop:
-	push hl
+	push af
 	call MapView_DrawTile
-	pop hl
-	ld a,h
-	add a,16
-	ld h,a
-	jr nc,Loop
-	ld a,l
-	add a,16
-	ld l,a
-	jr nc,Loop
+	pop af
+	inc a
+	jr nz,Loop
 	ret
 	ENDP
 
-; h = dx
-; l = dy
+; a = dx.dy
 ; ix = this
 ; Modifies: af, bc, hl
 MapView_DrawTile: PROC
-	push de
 	call MapView_GetTileCopyCommand_IY
-	pop de
-	ld (iy + VDPCommand.dx),h
-	ld (iy + VDPCommand.dy),l
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
-	ld a,l  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15)
-	rrca
-	rrca
-	rrca
-	rrca
-	or h
-	sub c
+	ld e,(ix + MapView.y)
+	ld d,(ix + MapView.y + 1)
+	ld h,a
+	sub c  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15)
 	add a,c
 	ld c,a
 	jr nc,NoCarryBC
 	inc b
 NoCarryBC:
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
-	ld a,h  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15)
+	ld a,h
 	rrca
 	rrca
 	rrca
 	rrca
-	or l
-	sub e
+	ld l,a
+	sub e  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15)
 	add a,e
 	ld e,a
 	jr nc,NoCarryDE
 	inc d
 NoCarryDE:
+	ld a,h
+	and 0F0H
+	ld (iy + VDPCommand.dx),a
+	ld a,l
+	and 0F0H
+	ld (iy + VDPCommand.dy),a
 	call MapView_GetDataPosition
 	ld a,(hl)
 	ld h,a
