@@ -227,6 +227,16 @@ NoCarryBC:
 	jr nc,NoCarryDE
 	inc d
 NoCarryDE:
+	call MapView_ExecuteDraw
+	ret
+	ENDP
+
+; bc = x
+; de = y
+; ix = this
+; iy = VDP command
+MapView_ExecuteDraw: PROC
+	ld a,e
 	and 0F0H
 	ld (iy + VDPCommand.dy),a
 	ld a,c
