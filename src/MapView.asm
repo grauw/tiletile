@@ -89,8 +89,6 @@ MapView_GetDataPosition:
 	srl d
 	rr e
 	ENDM
-	dec bc
-	dec de
 	push ix
 	push de
 	call MapView_GetMap
@@ -177,7 +175,6 @@ MapView_Update:
 	ld b,25
 	call VDP_SetRegister
 	ld a,(ix + MapView.y)
-	add a,16
 	ld b,23
 	call VDP_SetRegister
 	ld a,(ix + MapView.x)
@@ -186,7 +183,7 @@ MapView_Update:
 	ld b,27
 	call VDP_SetRegister
 	ld a,(ix + MapView.x)
-	add a,15
+	dec a
 	srl a
 	srl a
 	srl a
@@ -227,6 +224,13 @@ NoCarryBC:
 	jr nc,NoCarryDE
 	inc d
 NoCarryDE:
+	ld hl,-16
+	add hl,de
+	ex de,hl
+	ld hl,-16
+	add hl,bc
+	ld c,l
+	ld b,h
 	call MapView_ExecuteDraw
 	ret
 	ENDP
