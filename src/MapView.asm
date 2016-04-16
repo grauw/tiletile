@@ -107,7 +107,7 @@ MapView_MoveLeft:
 	ld (ix + MapView.x),l
 	ld (ix + MapView.x + 1),h
 	ld a,l
-	call MapView_DrawTile
+	call MapView_DrawTileHorizontal
 	ret
 
 ; ix = this
@@ -125,7 +125,7 @@ MapView_MoveRight:
 	ld (ix + MapView.x + 1),d
 	dec e
 	ld a,e
-	call MapView_DrawTile
+	call MapView_DrawTileHorizontal
 	ret
 
 ; ix = this
@@ -205,38 +205,116 @@ Loop:
 
 ; a = dx.dy
 ; ix = this
-; Modifies: af, bc, hl
+; Modifies: af, bc, de, hl
 MapView_DrawTile: PROC
 	call MapView_GetTileCopyCommand_IY
-	ld b,(ix + MapView.x + 1)
+	ld l,a
+	rrca
+	rrca
+	rrca
+	rrca
 	ld d,(ix + MapView.y + 1)
-	ld c,a  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15)
-	cp (ix + MapView.x)
-	jr nc,NoCarryBC
-	inc b
-NoCarryBC:
-	rrca
-	rrca
-	rrca
-	rrca
-	ld e,a  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15)
 	cp (ix + MapView.y)
 	jr nc,NoCarryDE
 	inc d
 NoCarryDE:
-	ld hl,-16
-	add hl,de
-	ex de,hl
-	ld hl,-16
-	add hl,bc
-	ld c,l
-	ld b,h
+	sub 16
+	jr nc,NoCarryDE2
+	dec d
+NoCarryDE2:
+	ld e,a  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15) - 16
+	ld a,l
+	ld h,4
+Loop:
+	push af
+	push de
+	push hl
+	ld b,(ix + MapView.x + 1)
+	cp (ix + MapView.x)
+	jr nc,NoCarryBC
+	inc b
+NoCarryBC:
+	sub 4
+	jr nc,NoCarryBC2
+	dec b
+NoCarryBC2:
+	ld c,a  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15) - 4
+	and 0CH
+	ld h,a
+	ld (iy + VDPCommand.nx),4
 	call MapView_ExecuteDraw
+	ld (iy + VDPCommand.nx),16
+	pop hl
+	pop de
+	pop af
+	rlca
+	rlca
+	rlca
+	rlca
+	add a,4 << 4
+	rlca
+	rlca
+	rlca
+	rlca
+	dec h
+	jr nz,Loop
+	ret
+	ENDP
+
+; a = dx.dy
+; ix = this
+; Modifies: af, bc, de, hl
+MapView_DrawTileHorizontal: PROC
+	call MapView_GetTileCopyCommand_IY
+	ld l,a
+	ld b,(ix + MapView.x + 1)
+	cp (ix + MapView.x)
+	jr nc,NoCarryBC
+	inc b
+NoCarryBC:
+	sub 4
+	jr nc,NoCarryBC2
+	dec b
+NoCarryBC2:
+	ld c,a  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15) - 4
+	ld a,l
+	rrca
+	rrca
+	rrca
+	rrca
+	ld h,4
+Loop:
+	push af
+	push bc
+	push hl
+	ld d,(ix + MapView.y + 1)
+	cp (ix + MapView.y)
+	jr nc,NoCarryDE
+	inc d
+NoCarryDE:
+	sub 16
+	jr nc,NoCarryDE2
+	dec d
+NoCarryDE2:
+	ld e,a  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15) - 16
+	ld a,c
+	and 0CH
+	ld h,a
+	ld (iy + VDPCommand.nx),4
+	call MapView_ExecuteDraw
+	ld (iy + VDPCommand.nx),16
+	pop hl
+	pop bc
+	pop af
+	add a,4 << 4
+	dec h
+	jr nz,Loop
 	ret
 	ENDP
 
 ; bc = x
 ; de = y
+; h = x offset
 ; ix = this
 ; iy = VDP command
 MapView_ExecuteDraw: PROC
@@ -245,7 +323,9 @@ MapView_ExecuteDraw: PROC
 	ld (iy + VDPCommand.dy),a
 	ld a,c
 	and 0F0H
+	or h
 	ld (iy + VDPCommand.dx),a
+	push hl
 	call MapView_GetDataPosition
 	ld a,(hl)
 	ld h,a
@@ -253,6 +333,8 @@ MapView_ExecuteDraw: PROC
 	add a,a
 	add a,a
 	add a,a
+	pop de
+	or d
 	ld (iy + VDPCommand.sx),a
 	ld a,h
 	and 0F0H
