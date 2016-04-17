@@ -215,11 +215,14 @@ MapView_DrawTile: PROC
 	rrca
 	call MapView_GetDrawY
 	ld a,l
-	ld h,4
-Loop:
+	call DrawSlice
+	call DrawSlice
+	call DrawSlice
+	call DrawSlice
+	ret
+DrawSlice:
 	push af
 	push de
-	push hl
 	call MapView_GetDrawX
 	ld a,c
 	and 0CH
@@ -227,7 +230,6 @@ Loop:
 	ld (iy + VDPCommand.nx),4
 	call MapView_ExecuteDraw
 	ld (iy + VDPCommand.nx),16
-	pop hl
 	pop de
 	pop af
 	rlca
@@ -239,8 +241,6 @@ Loop:
 	rlca
 	rlca
 	rlca
-	dec h
-	jr nz,Loop
 	ret
 	ENDP
 
@@ -256,11 +256,14 @@ MapView_DrawTileHorizontal: PROC
 	rrca
 	rrca
 	rrca
-	ld h,4
-Loop:
+	call DrawSlice
+	call DrawSlice
+	call DrawSlice
+	call DrawSlice
+	ret
+DrawSlice:
 	push af
 	push bc
-	push hl
 	call MapView_GetDrawY
 	ld a,c
 	and 0CH
@@ -268,12 +271,9 @@ Loop:
 	ld (iy + VDPCommand.nx),4
 	call MapView_ExecuteDraw
 	ld (iy + VDPCommand.nx),16
-	pop hl
 	pop bc
 	pop af
 	add a,4 << 4
-	dec h
-	jr nz,Loop
 	ret
 	ENDP
 
