@@ -215,6 +215,7 @@ MapView_DrawTile: PROC
 	rrca
 	call MapView_GetDrawY
 	ld a,l
+	and 0F3H
 	call DrawSlice
 	call DrawSlice
 	call DrawSlice
@@ -232,15 +233,7 @@ DrawSlice:
 	ld (iy + VDPCommand.nx),16
 	pop de
 	pop af
-	rlca
-	rlca
-	rlca
-	rlca
-	add a,4 << 4
-	rlca
-	rlca
-	rlca
-	rlca
+	add a,4
 	ret
 	ENDP
 
