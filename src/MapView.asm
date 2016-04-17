@@ -213,32 +213,15 @@ MapView_DrawTile: PROC
 	rrca
 	rrca
 	rrca
-	ld d,(ix + MapView.y + 1)
-	cp (ix + MapView.y)
-	jr nc,NoCarryDE
-	inc d
-NoCarryDE:
-	sub 16
-	jr nc,NoCarryDE2
-	dec d
-NoCarryDE2:
-	ld e,a  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15) - 16
+	call MapView_GetDrawY
 	ld a,l
 	ld h,4
 Loop:
 	push af
 	push de
 	push hl
-	ld b,(ix + MapView.x + 1)
-	cp (ix + MapView.x)
-	jr nc,NoCarryBC
-	inc b
-NoCarryBC:
-	sub 4
-	jr nc,NoCarryBC2
-	dec b
-NoCarryBC2:
-	ld c,a  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15) - 4
+	call MapView_GetDrawX
+	ld a,c
 	and 0CH
 	ld h,a
 	ld (iy + VDPCommand.nx),4
@@ -267,16 +250,7 @@ NoCarryBC2:
 MapView_DrawTileHorizontal: PROC
 	call MapView_GetTileCopyCommand_IY
 	ld l,a
-	ld b,(ix + MapView.x + 1)
-	cp (ix + MapView.x)
-	jr nc,NoCarryBC
-	inc b
-NoCarryBC:
-	sub 4
-	jr nc,NoCarryBC2
-	dec b
-NoCarryBC2:
-	ld c,a  ; x.stepx + ((dx.dy - x&15.stepx) & 15.15) - 4
+	call MapView_GetDrawX
 	ld a,l
 	rrca
 	rrca
@@ -287,16 +261,7 @@ Loop:
 	push af
 	push bc
 	push hl
-	ld d,(ix + MapView.y + 1)
-	cp (ix + MapView.y)
-	jr nc,NoCarryDE
-	inc d
-NoCarryDE:
-	sub 16
-	jr nc,NoCarryDE2
-	dec d
-NoCarryDE2:
-	ld e,a  ; y.stepy + ((dy.dx - y&15.stepy) & 15.15) - 16
+	call MapView_GetDrawY
 	ld a,c
 	and 0CH
 	ld h,a
@@ -309,6 +274,36 @@ NoCarryDE2:
 	add a,4 << 4
 	dec h
 	jr nz,Loop
+	ret
+	ENDP
+
+; a = screen position (dx.dy)
+; bc <- x: x.stepx + ((dx.dy - x&15.stepx) & 15.15) - 4
+MapView_GetDrawX: PROC
+	ld b,(ix + MapView.x + 1)
+	cp (ix + MapView.x)
+	jr nc,NoCarry
+	inc b
+NoCarry:
+	sub 4
+	ld c,a
+	ret nc
+	dec b
+	ret
+	ENDP
+
+; a = screen position (dy.dx)
+; de <- y: y.stepy + ((dy.dx - y&15.stepy) & 15.15) - 16
+MapView_GetDrawY: PROC
+	ld d,(ix + MapView.y + 1)
+	cp (ix + MapView.y)
+	jr nc,NoCarry
+	inc d
+NoCarry:
+	sub 16
+	ld e,a
+	ret nc
+	dec d
 	ret
 	ENDP
 
