@@ -305,7 +305,7 @@ NoCarry:
 ; h = x offset
 ; ix = this
 ; iy = VDP command
-MapView_ExecuteDraw: PROC
+MapView_ExecuteDraw:
 	ld a,e
 	and 0F0H
 	ld (iy + VDPCommand.dy),a
@@ -329,4 +329,3 @@ MapView_ExecuteDraw: PROC
 	ld (iy + VDPCommand.sy),a
 	call VDPCommand_Execute_IY
 	ret
-	ENDP
