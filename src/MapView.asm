@@ -225,9 +225,6 @@ DrawSlice:
 	push af
 	push de
 	call MapView_GetDrawX
-	ld a,c
-	and 0CH
-	ld h,a
 	ld (iy + VDPCommand.nx),4
 	call MapView_ExecuteDraw
 	ld (iy + VDPCommand.nx),16
@@ -258,9 +255,6 @@ DrawSlice:
 	push af
 	push bc
 	call MapView_GetDrawY
-	ld a,c
-	and 0CH
-	ld h,a
 	ld (iy + VDPCommand.nx),4
 	call MapView_ExecuteDraw
 	ld (iy + VDPCommand.nx),16
@@ -302,7 +296,6 @@ NoCarry:
 
 ; bc = x
 ; de = y
-; h = x offset
 ; ix = this
 ; iy = VDP command
 MapView_ExecuteDraw:
@@ -310,10 +303,10 @@ MapView_ExecuteDraw:
 	and 0F0H
 	ld (iy + VDPCommand.dy),a
 	ld a,c
-	and 0F0H
-	or h
+	and 0FCH
 	ld (iy + VDPCommand.dx),a
-	push hl
+	and 0CH
+	push af
 	call MapView_GetDataPosition
 	ld a,(hl)
 	ld h,a
