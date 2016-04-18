@@ -1,0 +1,26 @@
+;
+;
+;
+SpriteColor: MACRO ?0, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15
+	data:
+		db ?0, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15
+	ENDM
+
+; iy = this
+SpriteColor_Draw_IY:
+	ld e,iyl
+	ld d,iyh
+	ld hl,SpriteColor.data
+	add hl,de
+	ld c,VDP_PORT_0
+	REPT 16
+	outi
+	ENDM
+	ret
+
+;
+SpriteColor_solid0:
+	SpriteColor 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+
+SpriteColor_solid15:
+	SpriteColor 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15

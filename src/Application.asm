@@ -137,7 +137,8 @@ Application_EnterMainLoop:
 
 	push ix
 	call Application_GetSprites
-	call Sprites_Initialize
+	call Sprites_InitializeTableAddresses
+	call Sprites_Draw
 	pop ix
 
 	call VDP_DisableBlank

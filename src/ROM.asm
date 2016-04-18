@@ -49,7 +49,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Memory.asm"
 	INCLUDE "VDP.asm"
 	INCLUDE "VDPCommand.asm"
-	INCLUDE "Sprites.asm"
+	INCLUDE "sprites/Sprites.asm"
 	INCLUDE "Hook.asm"
 	INCLUDE "TIMIHook.asm"
 	INCLUDE "Input.asm"
