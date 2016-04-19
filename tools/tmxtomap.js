@@ -16,7 +16,7 @@ fs.readFile(filename, function(err, data) {
 
 		console.log(prefix + "_instance:");
 		console.log("\tMap " + map.$.width + ", " + map.$.height + ", " +
-				prefix + "_data");
+				prefix + "_data, " + prefix + "_dataRows");
 
 		console.log();
 		console.log(prefix + "_data:");
@@ -24,6 +24,12 @@ fs.readFile(filename, function(err, data) {
 		let data = dataCSV.split(",").map(Number).map(i => i == 0 ? 255 : i - 1);
 		for (let i = 0; i < data.length; i += 16) {
 			console.log("\tdb " + data.slice(i, i + 16).join(", "));
+		}
+
+		console.log();
+		console.log(prefix + "_dataRows:");
+		for (let y = 0; y < map.$.height; y++) {
+			console.log("\tdw " + prefix + "_data + " + y * map.$.width);
 		}
 	});
 });
