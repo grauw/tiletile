@@ -167,12 +167,12 @@ Found:
 	ld iyl,e
 	ld iyh,d
 	call SpritePattern_SetNumber_IY
+	call Sprites_DrawPattern
 	ret
 	ENDP
 
 ; ix = this
 Sprites_Draw:
-	call Sprites_DrawPatterns
 	call Sprites_DrawColors
 	call Sprites_DrawSprites
 	ret
@@ -223,25 +223,21 @@ Loop:
 	ret
 	ENDP
 
+; iy = pattern
 ; ix = this
-Sprites_DrawPatterns: PROC
-	ld l,(ix + Sprites.patternTable)
-	ld h,(ix + Sprites.patternTable + 1)
+Sprites_DrawPattern:
+	call SpritePattern_GetNumber_IY
+	add a,a
+	add a,a
+	ld l,a
+	ld h,0
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	ld e,(ix + Sprites.patternTable)
+	ld d,(ix + Sprites.patternTable + 1)
+	add hl,de
 	ld a,(ix + Sprites.patternTable + 2)
 	call VDP_SetWriteAddress
-	ld b,64
-	push ix
-Loop:
-	push bc
-	ld e,(ix + Sprites.patterns)
-	ld d,(ix + Sprites.patterns + 1)
-	ld iyl,e
-	ld iyh,d
 	call SpritePattern_Draw_IY
-	inc ix
-	inc ix
-	pop bc
-	djnz Loop
-	pop ix
 	ret
-	ENDP
