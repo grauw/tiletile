@@ -138,6 +138,8 @@ Application_EnterMainLoop:
 	push ix
 	call Application_GetSprites
 	call Sprites_InitializeTableAddresses
+	ld de,Sprite_block
+	call Sprites_AddSprite
 	call Sprites_Draw
 	pop ix
 
@@ -186,6 +188,14 @@ Application_TIMIInterruptEntry:
 	call Application_GetSoftsprite
 	call Softsprite_MoveRight
 	call Softsprite_Draw
+	pop ix
+
+	ld iy,Sprite_block
+	ld (iy + Sprite.x),100
+	inc (iy + Sprite.y)
+	push ix
+	call Application_GetSprites
+	call Sprites_Draw
 	pop ix
 	ret
 
