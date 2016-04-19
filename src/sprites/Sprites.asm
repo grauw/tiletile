@@ -184,19 +184,23 @@ Sprites_DrawSprites: PROC
 	ld a,(ix + Sprites.attributeTable + 2)
 	call VDP_SetWriteAddress
 	ld b,32
-	push ix
+	ld hl,Sprites.sprites
+	ld e,ixl
+	ld d,ixh
+	add hl,de
 Loop:
 	push bc
-	ld e,(ix + Sprites.sprites)
-	ld d,(ix + Sprites.sprites + 1)
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	inc hl
 	ld iyl,e
 	ld iyh,d
+	push hl
 	call Sprite_Draw_IY
-	inc ix
-	inc ix
+	pop hl
 	pop bc
 	djnz Loop
-	pop ix
 	ret
 	ENDP
 
@@ -207,19 +211,23 @@ Sprites_DrawColors: PROC
 	ld a,(ix + Sprites.colorTable + 2)
 	call VDP_SetWriteAddress
 	ld b,32
-	push ix
+	ld hl,Sprites.sprites
+	ld e,ixl
+	ld d,ixh
+	add hl,de
 Loop:
 	push bc
-	ld e,(ix + Sprites.sprites)
-	ld d,(ix + Sprites.sprites + 1)
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	inc hl
 	ld iyl,e
 	ld iyh,d
+	push hl
 	call Sprite_DrawColor_IY
-	inc ix
-	inc ix
+	pop hl
 	pop bc
 	djnz Loop
-	pop ix
 	ret
 	ENDP
 
