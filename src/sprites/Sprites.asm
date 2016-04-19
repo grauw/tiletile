@@ -19,16 +19,16 @@ Sprites: MACRO
 		db 1H
 	sprites:
 		REPT 32
-		dw 0
+		dw Sprite_unused
 		ENDM
 	patterns:
 		REPT 64
-		dw 0
+		dw SpritePattern_unused
 		ENDM
 	ENDM
 
 ; ix = this
-Sprites_Construct: PROC
+Sprites_Construct:
 	ld a,(ix + Sprites.patternTable)
 	and a
 	call nz,System_ThrowException
@@ -56,15 +56,7 @@ Sprites_Construct: PROC
 	call nz,System_ThrowException
 	and 11111110B
 	call nz,System_ThrowException
-	ld b,32
-Loop:
-	push bc
-	ld de,Sprite_empty
-	call Sprites_AddSprite
-	pop bc
-	djnz Loop
 	ret
-	ENDP
 
 ; ix = this
 Sprites_InitializeTableAddresses:
@@ -102,8 +94,12 @@ Sprites_AddSprite: PROC
 	ld b,32
 Loop:
 	ld a,(ix + Sprites.sprites)
-	or (ix + Sprites.sprites + 1)
+	cp Sprite_unused
+	jr nz,NotFound
+	ld a,(ix + Sprites.sprites + 1)
+	cp Sprite_unused >> 8
 	jr z,Found
+NotFound:
 	inc ix
 	inc ix
 	djnz Loop
@@ -111,12 +107,10 @@ Loop:
 Found:
 	ld (ix + Sprites.sprites),e
 	ld (ix + Sprites.sprites + 1),d
-	ld ixl,e
-	ld ixh,d
-	ld e,(ix + Sprite.pattern)
-	ld d,(ix + Sprite.pattern + 1)
 	pop ix
-	call Sprites_AddPattern
+	ld iyl,e
+	ld iyh,d
+	call Sprite_Register_IY
 	ret
 	ENDP
 
@@ -136,56 +130,43 @@ Loop:
 	djnz Loop
 	call System_ThrowException
 Found:
-	ld (ix + Sprites.sprites),0
-	ld (ix + Sprites.sprites + 1),0
-	ld ixl,e
-	ld ixh,d
-	ld e,(ix + Sprite.pattern)
-	ld d,(ix + Sprite.pattern + 1)
+	ld (ix + Sprites.sprites),Sprite_unused
+	ld (ix + Sprites.sprites + 1),Sprite_unused >> 8
 	pop ix
-	call Sprites_RemovePattern
+	ld iyl,e
+	ld iyh,d
+	call Sprite_Unregister_IY
 	ret
 	ENDP
 
 ; de = pattern
 ; ix = this
+; de <- pattern
+; iy <- pattern
 Sprites_AddPattern: PROC
 	push ix
 	ld b,64
 Loop:
-	ld a,(ix + Sprites.patterns)
-	or (ix + Sprites.patterns + 1)
+	ld c,(ix + Sprites.patterns)
+	ld a,(ix + Sprites.patterns + 1)
+	ld iyl,c
+	ld iyh,a
+	call SpritePattern_IsReferenced_IY
 	jr z,Found
 	inc ix
 	inc ix
 	djnz Loop
 	call System_ThrowException
 Found:
+	call SpritePattern_ClearNumber_IY
 	ld (ix + Sprites.patterns),e
 	ld (ix + Sprites.patterns + 1),d
 	pop ix
-	ret
-	ENDP
-
-; de = pattern
-; ix = this
-Sprites_RemovePattern: PROC
-	push ix
-	ld b,64
-Loop:
-	ld l,(ix + Sprites.patterns)
-	ld h,(ix + Sprites.patterns + 1)
-	and a
-	sbc hl,de
-	jr z,Found
-	inc ix
-	inc ix
-	djnz Loop
-	call System_ThrowException
-Found:
-	ld (ix + Sprites.patterns),0
-	ld (ix + Sprites.patterns + 1),0
-	pop ix
+	ld a,64
+	sub b
+	ld iyl,e
+	ld iyh,d
+	call SpritePattern_SetNumber_IY
 	ret
 	ENDP
 
@@ -256,9 +237,7 @@ Loop:
 	ld d,(ix + Sprites.patterns + 1)
 	ld iyl,e
 	ld iyh,d
-	ld a,e
-	or d
-	call nz,SpritePattern_Draw_IY
+	call SpritePattern_Draw_IY
 	inc ix
 	inc ix
 	pop bc
