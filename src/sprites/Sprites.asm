@@ -173,8 +173,8 @@ Found:
 
 ; ix = this
 Sprites_Draw:
-	call Sprites_DrawColors
 	call Sprites_DrawSprites
+	call Sprites_DrawColors
 	ret
 
 ; ix = this
