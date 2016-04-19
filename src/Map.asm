@@ -1,26 +1,17 @@
 ;
 ; A tile map
 ;
-Map: MACRO
+Map: MACRO ?width, ?height, ?data
 	width:
-		dw 0
+		dw ?width
 	height:
-		dw 0
+		dw ?height
 	data:
-		dw 0
+		dw ?data
 	ENDM
 
-; bc = width
-; de = height
-; hl = data
 ; ix = this
 Map_Construct:
-	ld (ix + Map.width),c
-	ld (ix + Map.width + 1),b
-	ld (ix + Map.height),e
-	ld (ix + Map.height + 1),d
-	ld (ix + Map.data),l
-	ld (ix + Map.data + 1),h
 	ret
 
 ; bc = x

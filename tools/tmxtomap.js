@@ -14,8 +14,9 @@ fs.readFile(filename, function(err, data) {
 	xml2js.parseString(data, function (err, result) {
 		let map = result.map;
 
-		console.log(prefix + "_dimensions:");
-		console.log("\tdb " + map.$.width + ", " + map.$.height);
+		console.log(prefix + "_instance:");
+		console.log("\tMap " + map.$.width + ", " + map.$.height + ", " +
+				prefix + "_data");
 
 		console.log();
 		console.log(prefix + "_data:");

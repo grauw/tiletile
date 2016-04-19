@@ -2,6 +2,8 @@
 ; Top-level program class
 ;
 Application: MACRO
+	map:
+		dw FieldMap_instance
 	timiHook:
 		TIMIHook
 	input:
@@ -10,8 +12,6 @@ Application: MACRO
 		Sprites
 	tileSet:
 		TileSet
-	map:
-		Map
 	mapView:
 		MapView
 	softsprite:
@@ -44,17 +44,8 @@ Application_Construct:
 	call Application_GetSprites
 	call Sprites_Construct
 	pop ix
-	ld a,(FieldMap_dimensions)
-	ld c,a
-	ld b,0
-	ld a,(FieldMap_dimensions + 1)
-	ld e,a
-	ld d,0
-	ld hl,FieldMap_data
 	push ix
-	push de
 	call Application_GetMap
-	pop de
 	call Map_Construct
 	ld e,ixl
 	ld d,ixh
@@ -104,8 +95,10 @@ Application_GetTileSet:
 
 ; ix = this
 Application_GetMap:
-	ld de,Application.map
-	add ix,de
+	ld e,(ix + Application.map)
+	ld d,(ix + Application.map + 1)
+	ld ixl,e
+	ld ixh,d
 	ret
 
 ; ix = this
