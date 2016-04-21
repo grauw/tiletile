@@ -8,6 +8,10 @@
 	INCLUDE "SpritePattern.asm"
 
 Sprites: MACRO
+	x:
+		dw 0
+	y:
+		dw 0
 	patternTable:
 		dw 0F800H
 		db 1H
@@ -56,6 +60,20 @@ Sprites_Construct:
 	call nz,System_ThrowException
 	and 11111110B
 	call nz,System_ThrowException
+	ret
+
+; bc = x
+; de = y
+; ix = this
+Sprites_SetPosition:
+	ld hl,-8
+	add hl,bc
+	ld (ix + Sprites.x),l
+	ld (ix + Sprites.x + 1),h
+	ld hl,-15
+	add hl,de
+	ld (ix + Sprites.y),l
+	ld (ix + Sprites.y + 1),h
 	ret
 
 ; ix = this

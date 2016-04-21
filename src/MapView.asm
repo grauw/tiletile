@@ -75,6 +75,16 @@ MapView_GetTileCopyCommand_IY:
 	add iy,de
 	ret
 
+; ix = this
+; bc <- x
+; de <- y
+MapView_GetPosition:
+	ld c,(ix + MapView.x)
+	ld b,(ix + MapView.x + 1)
+	ld e,(ix + MapView.y)
+	ld d,(ix + MapView.y + 1)
+	ret
+
 ; bc = x
 ; de = y
 ; ix = this

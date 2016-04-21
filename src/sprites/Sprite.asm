@@ -5,7 +5,7 @@ Sprite: MACRO ?pattern, ?color
 	x:
 		dw 0
 	y:
-		dw 216
+		dw ?pattern = 0 && -100H || 0
 	patternNumber:
 		db 0
 	pattern:
@@ -41,16 +41,40 @@ Sprite_Unregister_IY:
 	ret
 
 ; iy = this
-Sprite_Draw_IY:
+; ix = sprite system
+Sprite_Draw_IY: PROC
 	ld a,(iy + Sprite.y)
-	out (VDP_PORT_0),a
+	ld h,a
+	sub (ix + Sprites.y)
+	ld a,(iy + Sprite.y + 1)
+	sbc a,(ix + Sprites.y + 1)
+	jr nz,Hide
+
 	ld a,(iy + Sprite.x)
+	sub (ix + Sprites.x)
+	ld l,a
+	ld a,(iy + Sprite.x + 1)
+	sbc a,(ix + Sprites.x + 1)
+	jr nz,Hide
+
+	ld a,h
+	dec a
+	out (VDP_PORT_0),a
+	ld a,l
 	out (VDP_PORT_0),a
 	ld a,(iy + Sprite.patternNumber)
 	out (VDP_PORT_0),a
-	xor a
 	out (VDP_PORT_0),a
 	ret
+Hide:
+	ld a,(ix + Sprites.y)
+	add a,232
+	out (VDP_PORT_0),a
+	out (VDP_PORT_0),a
+	out (VDP_PORT_0),a
+	out (VDP_PORT_0),a
+	ret
+	ENDP
 
 ; iy = this
 Sprite_DrawColor_IY:

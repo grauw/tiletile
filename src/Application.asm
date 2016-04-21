@@ -187,7 +187,14 @@ Application_TIMIInterruptEntry:
 	ld (iy + Sprite.x),100
 	inc (iy + Sprite.y)
 	push ix
+	push ix
+	call Application_GetMapView
+	call MapView_GetPosition
+	pop ix
+	push de
 	call Application_GetSprites
+	pop de
+	call Sprites_SetPosition
 	call Sprites_Draw
 	pop ix
 	ret
