@@ -27,7 +27,7 @@ Softsprite_Clear:
 	push ix
 	ld de,Softsprite.restoreCommand
 	add ix,de
-	call VDPCommand_Execute
+	call VDPCommand_ExecuteWrapDX
 	pop ix
 	ret
 
@@ -64,12 +64,12 @@ NoWrap:
 	push ix
 	ld de,Softsprite.saveCommand
 	add ix,de
-	call VDPCommand_Execute
+	call VDPCommand_ExecuteWrapSX
 	pop ix
 	push ix
 	ld de,Softsprite.drawCommand
 	add ix,de
-	call VDPCommand_Execute
+	call VDPCommand_ExecuteWrapDX
 	pop ix
 	ret
 	ENDP
