@@ -1,11 +1,11 @@
 ;
 ;
 ;
-Sprite: MACRO ?pattern, ?color
+Sprite: MACRO ?pattern, ?color, ?x = 0, ?y = 0
 	x:
-		dw 0
+		dw ?x
 	y:
-		dw ?pattern = 0 && -100H || 0
+		dw ?y
 	patternNumber:
 		db 0
 	pattern:
@@ -89,7 +89,7 @@ Sprite_DrawColor_IY:
 	SECTION RAM
 
 Sprite_unused:
-	Sprite 0, SpriteColor_solid0
+	Sprite 0, SpriteColor_solid0, 0, -100H
 
 Sprite_block:
 	Sprite SpritePattern_filled, SpriteColor_solid15
