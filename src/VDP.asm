@@ -322,17 +322,3 @@ VDP_Write_Loop:
 	dec a
 	jp nz,VDP_Write_Loop
 	ret
-
-; hl = palette
-VDP_SetPalette:
-	xor a             ;Set p#pointer to zero.
-	di
-	out (VDP_PORT_1),a
-	ld a,16 | VDP_REGISTER
-	ei
-	out (VDP_PORT_1),a
-	ld c,VDP_PORT_2
-	REPT 32
-	outi
-	ENDM
-	ret

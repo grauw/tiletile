@@ -4,13 +4,21 @@
 TileSet: MACRO
 	tilesBank:
 		db 3
-	paletteBank:
-		db 7
+	palette:
+		dw FieldSet_palette
 	tileLoadCommand: VDPCommand 0, 0, 0, 200H, 16, 16, 0, 0, VDPCommand_HMMC
 	ENDM
 
 ; ix = this
 TileSet_Construct:
+	ret
+
+; ix = this
+TileSet_GetPalette:
+	ld e,(ix + TileSet.palette)
+	ld d,(ix + TileSet.palette + 1)
+	ld ixl,e
+	ld ixh,d
 	ret
 
 ; ix = this
@@ -24,7 +32,10 @@ TileSet_GetTileLoadCommand_IY:
 ; ix = this
 TileSet_Load:
 	call TileSet_LoadTiles
-	call TileSet_LoadPalette
+	push ix
+	call TileSet_GetPalette
+	call Palette_Set
+	pop ix
 	ret
 
 ; ix = this
@@ -77,18 +88,6 @@ TileSet_LoadTile:
 	pop hl
 	ld bc,127
 	call VDPCommand_Transfer_IY
-	pop hl
-	ld (hl),l
-	ret
-
-; ix = this
-TileSet_LoadPalette:
-	ld hl,(ROM_bank6000)
-	push hl
-	ld a,(ix + TileSet.paletteBank)
-	ld (hl),a
-	ld hl,6000H
-	call VDP_SetPalette
 	pop hl
 	ld (hl),l
 	ret

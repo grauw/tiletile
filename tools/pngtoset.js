@@ -45,18 +45,19 @@ png.decodePixels(function(pixels) {
 	}
 
 	console.log();
-	console.log(prefix + "_palette:");
+	console.log("\tENDS");
 
+	let paletteWords = [];
 	let palette = quantisePalette(png.palette);
 	for (let i = 0; i < 16; i++) {
 		let r = palette[i * 3] || 0;
 		let g = palette[i * 3 + 1] || 0;
 		let b = palette[i * 3 + 2] || 0;
-		console.log("\tdb " + (r << 4 | b) + ", " + g);
+		paletteWords.push(("00" + (g << 8 | r << 4 | b).toString(16)).substr(-3) + "H");
 	}
 
 	console.log();
-	console.log("\tENDS");
+	console.log(prefix + "_palette: Palette " + paletteWords.join(", "));
 });
 
 function to4bpp(pixels) {

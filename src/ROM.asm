@@ -24,9 +24,8 @@ RAM: ds 1800H
 RAM_endAddress:
 	ds 800H
 	org 06000H
-ROM_FieldSet: ds 08020H
+ROM_FieldSet: ds 8000H
 	org 06000H
-	ds 3FE0H
 
 ROM_BANK_4000_CHANGE: equ 5000H
 ROM_BANK_6000_CHANGE: equ 7000H
@@ -49,6 +48,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Memory.asm"
 	INCLUDE "VDP.asm"
 	INCLUDE "VDPCommand.asm"
+	INCLUDE "Palette.asm"
 	INCLUDE "sprites/Sprites.asm"
 	INCLUDE "Hook.asm"
 	INCLUDE "TIMIHook.asm"
