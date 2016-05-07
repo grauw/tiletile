@@ -8,10 +8,10 @@ Scene: MACRO ?tileset, ?tilemap
 		dw ?tilemap
 	input:
 		dw 0
-	sprites:
-		Sprites
 	mapView:
 		MapView
+	sprites:
+		Sprites
 	ENDM
 
 ; de = input
@@ -61,14 +61,14 @@ Scene_GetInput_IY:
 	ret
 
 ; ix = this
-Scene_GetSprites:
-	ld de,Scene.sprites
+Scene_GetMapView:
+	ld de,Scene.mapView
 	add ix,de
 	ret
 
 ; ix = this
-Scene_GetMapView:
-	ld de,Scene.mapView
+Scene_GetSprites:
+	ld de,Scene.sprites
 	add ix,de
 	ret
 
