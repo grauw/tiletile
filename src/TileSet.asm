@@ -1,11 +1,11 @@
 ;
 ; A tile set
 ;
-TileSet: MACRO
+TileSet: MACRO ?bank, ?palette
 	tilesBank:
-		db 3
+		db ?bank
 	palette:
-		dw FieldSet_palette
+		dw ?palette
 	tileLoadCommand: VDPCommand 0, 0, 0, 200H, 16, 16, 0, 0, VDPCommand_HMMC
 	ENDM
 

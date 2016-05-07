@@ -28,6 +28,12 @@ if (png.palette.length > 16 * 3) {
 }
 
 png.decodePixels(function(pixels) {
+	console.log("\tSECTION RAM");
+	console.log();
+	console.log(prefix + "_instance: TileSet ROM_" + prefix + "_BANK, " + prefix + "_palette");
+	console.log();
+	console.log("\tENDS");
+	console.log();
 	console.log("\tSECTION ROM_" + prefix);
 	console.log();
 	console.log(prefix + "_pixelData:");

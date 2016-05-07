@@ -4,12 +4,12 @@
 Scene: MACRO
 	map:
 		dw FieldMap_instance
+	tileSet:
+		dw FieldSet_instance
 	input:
 		dw 0
 	sprites:
 		Sprites
-	tileSet:
-		TileSet
 	mapView:
 		MapView
 	softsprite:
@@ -55,8 +55,10 @@ Scene_GetSprites:
 
 ; ix = this
 Scene_GetTileSet:
-	ld de,Scene.tileSet
-	add ix,de
+	ld e,(ix + Scene.tileSet)
+	ld d,(ix + Scene.tileSet + 1)
+	ld ixl,e
+	ld ixh,d
 	ret
 
 ; ix = this

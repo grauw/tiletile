@@ -24,6 +24,7 @@ RAM: ds 1800H
 RAM_endAddress:
 	ds 800H
 	org 06000H
+ROM_FieldSet_BANK: equ 3
 ROM_FieldSet: ds 8000H
 	org 06000H
 
