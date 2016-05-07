@@ -82,8 +82,6 @@ Scene_GetSoftsprite:
 
 ; ix = this
 Scene_Start:
-	call VDP_EnableBlank
-
 	push ix
 	call Scene_GetTileSet
 	call TileSet_Load
@@ -96,8 +94,6 @@ Scene_Start:
 	call Sprites_AddSprite
 	call Sprites_Draw
 	pop ix
-
-	call VDP_DisableBlank
 
 	push ix
 	call Scene_GetMapView

@@ -81,10 +81,14 @@ Application_EnterMainLoop:
 	ld a,0F1H
 	call VDP_SetColor
 
+	call VDP_EnableBlank
+
 	push ix
 	call Application_GetScene
 	call Scene_Start
 	pop ix
+
+	call VDP_DisableBlank
 
 	push ix
 	call Application_GetTIMIHook
