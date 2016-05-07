@@ -10,10 +10,6 @@ TileSet: MACRO ?bank, ?palette
 	ENDM
 
 ; ix = this
-TileSet_Construct:
-	ret
-
-; ix = this
 TileSet_GetPalette:
 	ld e,(ix + TileSet.palette)
 	ld d,(ix + TileSet.palette + 1)

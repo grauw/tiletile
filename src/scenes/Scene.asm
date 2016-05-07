@@ -27,7 +27,6 @@ Scene_Construct:
 	pop ix
 	push ix
 	call Scene_GetMap
-	call Map_Construct
 	ld e,ixl
 	ld d,ixh
 	pop ix
@@ -163,7 +162,6 @@ Scene_UpdatePosition:
 Scene_LoadTileSet:
 	push ix
 	call Scene_GetTileSet
-	call TileSet_Construct
 	call TileSet_Load
 	pop ix
 	ret

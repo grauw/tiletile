@@ -12,10 +12,6 @@ Map: MACRO ?width, ?height, ?data, ?dataRows
 		dw ?dataRows
 	ENDM
 
-; ix = this
-Map_Construct:
-	ret
-
 ; bc = x
 ; de = y
 ; ix = this
