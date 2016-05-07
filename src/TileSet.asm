@@ -6,8 +6,6 @@ TileSet: MACRO
 		db 3
 	paletteBank:
 		db 7
-	baseAddress:
-		dw ROM_TILESET
 	tileLoadCommand: VDPCommand 0, 0, 0, 200H, 16, 16, 0, 0, VDPCommand_HMMC
 	ENDM
 
@@ -69,8 +67,7 @@ TileSet_LoadTile:
 	ld l,0
 	ld h,a
 	rr l
-	ld e,(ix + TileSet.baseAddress)
-	ld d,(ix + TileSet.baseAddress + 1)
+	ld de,6000H
 	add hl,de
 	ld a,(hl)
 	inc hl
@@ -90,8 +87,7 @@ TileSet_LoadPalette:
 	push hl
 	ld a,(ix + TileSet.paletteBank)
 	ld (hl),a
-	ld l,(ix + TileSet.baseAddress)
-	ld h,(ix + TileSet.baseAddress + 1)
+	ld hl,6000H
 	call VDP_SetPalette
 	pop hl
 	ld (hl),l

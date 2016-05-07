@@ -24,7 +24,7 @@ RAM: ds 1800H
 RAM_endAddress:
 	ds 800H
 	org 06000H
-ROM_TILESET: ds 8020H
+ROM_FieldSet: ds 08020H
 	org 06000H
 	ds 3FE0H
 
@@ -59,6 +59,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Softsprite.asm"
 	INCLUDE "scenes/Scene.asm"
 
+	INCLUDE "FieldSet.asm"
 	INCLUDE "FieldMap.asm"
 
 	ENDS
@@ -104,12 +105,6 @@ RAM_Init:
 
 RAM_insufficientTPA:
 	db "Insufficient TPA memory.",0
-
-	ENDS
-
-	SECTION ROM_TILESET
-
-	INCLUDE "FieldSet.asm"
 
 	ENDS
 

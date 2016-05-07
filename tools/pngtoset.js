@@ -28,6 +28,8 @@ if (png.palette.length > 16 * 3) {
 }
 
 png.decodePixels(function(pixels) {
+	console.log("\tSECTION ROM_" + prefix);
+	console.log();
 	console.log(prefix + "_pixelData:");
 
 	let pixels4bpp = to4bpp(pixels);
@@ -52,6 +54,9 @@ png.decodePixels(function(pixels) {
 		let b = palette[i * 3 + 2] || 0;
 		console.log("\tdb " + (r << 4 | b) + ", " + g);
 	}
+
+	console.log();
+	console.log("\tENDS");
 });
 
 function to4bpp(pixels) {
