@@ -1,7 +1,7 @@
 ;
 ; A tile map
 ;
-Map: MACRO ?width, ?height, ?data, ?dataRows
+TileMap: MACRO ?width, ?height, ?data, ?dataRows
 	width:
 		dw ?width
 	height:
@@ -17,17 +17,17 @@ Map: MACRO ?width, ?height, ?data, ?dataRows
 ; ix = this
 ; hl <- data position
 ; Modifies: af, bc, de
-Map_GetDataPosition: PROC
-	ld l,(ix + Map.height)
-	ld h,(ix + Map.height + 1)
+TileMap_GetDataPosition: PROC
+	ld l,(ix + TileMap.height)
+	ld h,(ix + TileMap.height + 1)
 	and a
 	sbc hl,de
 	jr nc,NoClip
 	ld de,0
 NoClip:
 	ex de,hl
-	ld e,(ix + Map.dataRows)
-	ld d,(ix + Map.dataRows + 1)
+	ld e,(ix + TileMap.dataRows)
+	ld d,(ix + TileMap.dataRows + 1)
 	add hl,hl
 	add hl,de
 	ld a,(hl)

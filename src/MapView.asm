@@ -2,7 +2,7 @@
 ; A view on a section of the map.
 ;
 MapView: MACRO
-	map:
+	tileMap:
 		dw 0
 	x:
 		dw 0
@@ -22,12 +22,12 @@ MapView: MACRO
 ; de = map
 ; ix = this
 MapView_Construct:
-	ld (ix + MapView.map),e
-	ld (ix + MapView.map + 1),d
+	ld (ix + MapView.tileMap),e
+	ld (ix + MapView.tileMap + 1),d
 	push ix
-	call MapView_GetMap
-	ld l,(ix + Map.width)
-	ld h,(ix + Map.width + 1)
+	call MapView_GetTileMap
+	ld l,(ix + TileMap.width)
+	ld h,(ix + TileMap.width + 1)
 	pop ix
 	add hl,hl
 	add hl,hl
@@ -41,9 +41,9 @@ MapView_Construct:
 	ld (ix + MapView.maxX),l
 	ld (ix + MapView.maxX + 1),h
 	push ix
-	call MapView_GetMap
-	ld l,(ix + Map.height)
-	ld h,(ix + Map.height + 1)
+	call MapView_GetTileMap
+	ld l,(ix + TileMap.height)
+	ld h,(ix + TileMap.height + 1)
 	pop ix
 	add hl,hl
 	add hl,hl
@@ -59,10 +59,10 @@ MapView_Construct:
 	ret
 
 ; ix = this
-; ix <- map
-MapView_GetMap:
-	ld e,(ix + MapView.map)
-	ld d,(ix + MapView.map + 1)
+; ix <- tile map
+MapView_GetTileMap:
+	ld e,(ix + MapView.tileMap)
+	ld d,(ix + MapView.tileMap + 1)
 	ld ixl,e
 	ld ixh,d
 	ret
@@ -101,9 +101,9 @@ MapView_GetDataPosition:
 	ENDM
 	push ix
 	push de
-	call MapView_GetMap
+	call MapView_GetTileMap
 	pop de
-	call Map_GetDataPosition
+	call TileMap_GetDataPosition
 	pop ix
 	ret
 

@@ -2,7 +2,7 @@
 ; A scene.
 ;
 Scene: MACRO
-	map:
+	tileMap:
 		dw FieldMap_instance
 	tileSet:
 		dw FieldSet_instance
@@ -26,7 +26,7 @@ Scene_Construct:
 	call Sprites_Construct
 	pop ix
 	push ix
-	call Scene_GetMap
+	call Scene_GetTileMap
 	ld e,ixl
 	ld d,ixh
 	pop ix
@@ -61,9 +61,9 @@ Scene_GetTileSet:
 	ret
 
 ; ix = this
-Scene_GetMap:
-	ld e,(ix + Scene.map)
-	ld d,(ix + Scene.map + 1)
+Scene_GetTileMap:
+	ld e,(ix + Scene.tileMap)
+	ld d,(ix + Scene.tileMap + 1)
 	ld ixl,e
 	ld ixh,d
 	ret

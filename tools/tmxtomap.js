@@ -15,7 +15,7 @@ fs.readFile(filename, function(err, data) {
 		let map = result.map;
 
 		console.log(prefix + "_instance:");
-		console.log("\tMap " + map.$.width + ", " + map.$.height + ", " +
+		console.log("\tTileMap " + map.$.width + ", " + map.$.height + ", " +
 				prefix + "_data, " + prefix + "_dataRows");
 
 		console.log();
