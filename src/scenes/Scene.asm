@@ -84,7 +84,10 @@ Scene_GetSoftsprite:
 Scene_Start:
 	call VDP_EnableBlank
 
-	call Scene_LoadTileSet
+	push ix
+	call Scene_GetTileSet
+	call TileSet_Load
+	pop ix
 
 	push ix
 	call Scene_GetSprites
@@ -155,13 +158,5 @@ Scene_UpdatePosition:
 	pop iy
 	bit 6,(iy + Input.newKey + 8)
 	call z,MapView_MoveDown
-	pop ix
-	ret
-
-; ix = this
-Scene_LoadTileSet:
-	push ix
-	call Scene_GetTileSet
-	call TileSet_Load
 	pop ix
 	ret
