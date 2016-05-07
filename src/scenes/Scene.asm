@@ -1,19 +1,17 @@
 ;
 ; A scene.
 ;
-Scene: MACRO
+Scene: MACRO ?tileset, ?tilemap
 	tileSet:
-		dw FieldSet_instance
+		dw ?tileset
 	tileMap:
-		dw FieldMap_instance
+		dw ?tilemap
 	input:
 		dw 0
 	sprites:
 		Sprites
 	mapView:
 		MapView
-	softsprite:
-		Softsprite
 	ENDM
 
 ; de = input
@@ -75,12 +73,6 @@ Scene_GetMapView:
 	ret
 
 ; ix = this
-Scene_GetSoftsprite:
-	ld de,Scene.softsprite
-	add ix,de
-	ret
-
-; ix = this
 Scene_Start:
 	push ix
 	call Scene_GetTileSet
@@ -90,8 +82,6 @@ Scene_Start:
 	push ix
 	call Scene_GetSprites
 	call Sprites_InitializeTableAddresses
-	ld de,Sprite_block
-	call Sprites_AddSprite
 	call Sprites_Draw
 	pop ix
 
@@ -108,20 +98,7 @@ Scene_Update:
 	call Scene_GetMapView
 	call MapView_Update
 	pop ix
-	push ix
-	call Scene_GetSoftsprite
-	call Softsprite_Clear
-	pop ix
 	call Scene_UpdatePosition
-	push ix
-	call Scene_GetSoftsprite
-	call Softsprite_MoveRight
-	call Softsprite_Draw
-	pop ix
-
-	ld iy,Sprite_block
-	ld (iy + Sprite.x),100
-	inc (iy + Sprite.y)
 	push ix
 	push ix
 	call Scene_GetMapView

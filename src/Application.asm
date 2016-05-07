@@ -7,7 +7,7 @@ Application: MACRO
 	input:
 		Input
 	scene:
-		Scene
+		TestScene
 	ENDM
 
 Application_Main:
@@ -85,7 +85,7 @@ Application_EnterMainLoop:
 
 	push ix
 	call Application_GetScene
-	call Scene_Start
+	call TestScene_Start
 	pop ix
 
 	call VDP_DisableBlank
@@ -116,7 +116,7 @@ Application_TIMIInterruptEntry:
 	call Input_Update_IY
 	push ix
 	call Application_GetScene
-	call Scene_Update
+	call TestScene_Update
 	pop ix
 	ret
 
