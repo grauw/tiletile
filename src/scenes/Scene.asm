@@ -2,10 +2,10 @@
 ; A scene.
 ;
 Scene: MACRO
-	tileMap:
-		dw FieldMap_instance
 	tileSet:
 		dw FieldSet_instance
+	tileMap:
+		dw FieldMap_instance
 	input:
 		dw 0
 	sprites:
@@ -39,20 +39,6 @@ Scene_Construct:
 	ret
 
 ; ix = this
-Scene_GetInput_IY:
-	ld e,(ix + Scene.input)
-	ld d,(ix + Scene.input + 1)
-	ld iyl,e
-	ld iyh,d
-	ret
-
-; ix = this
-Scene_GetSprites:
-	ld de,Scene.sprites
-	add ix,de
-	ret
-
-; ix = this
 Scene_GetTileSet:
 	ld e,(ix + Scene.tileSet)
 	ld d,(ix + Scene.tileSet + 1)
@@ -66,6 +52,20 @@ Scene_GetTileMap:
 	ld d,(ix + Scene.tileMap + 1)
 	ld ixl,e
 	ld ixh,d
+	ret
+
+; ix = this
+Scene_GetInput_IY:
+	ld e,(ix + Scene.input)
+	ld d,(ix + Scene.input + 1)
+	ld iyl,e
+	ld iyh,d
+	ret
+
+; ix = this
+Scene_GetSprites:
+	ld de,Scene.sprites
+	add ix,de
 	ret
 
 ; ix = this
