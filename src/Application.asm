@@ -2,20 +2,12 @@
 ; Top-level program class
 ;
 Application: MACRO
-	map:
-		dw FieldMap_instance
 	timiHook:
 		TIMIHook
 	input:
 		Input
-	sprites:
-		Sprites
-	tileSet:
-		TileSet
-	mapView:
-		MapView
-	softsprite:
-		Softsprite
+	scene:
+		Scene
 	ENDM
 
 Application_Main:
@@ -40,21 +32,12 @@ Application_Main:
 
 ; ix = this
 Application_Construct:
+	call Application_GetInput_IY
 	push ix
-	call Application_GetSprites
-	call Sprites_Construct
-	pop ix
-	push ix
-	call Application_GetMap
-	call Map_Construct
-	ld e,ixl
-	ld d,ixh
-	pop ix
-	push ix
-	push de
-	call Application_GetMapView
-	pop de
-	call MapView_Construct
+	call Application_GetScene
+	ld e,iyl
+	ld d,iyh
+	call Scene_Construct
 	pop ix
 	ld e,ixl
 	ld d,ixh
@@ -82,34 +65,8 @@ Application_GetTIMIHook:
 	ret
 
 ; ix = this
-Application_GetSprites:
-	ld de,Application.sprites
-	add ix,de
-	ret
-
-; ix = this
-Application_GetTileSet:
-	ld de,Application.tileSet
-	add ix,de
-	ret
-
-; ix = this
-Application_GetMap:
-	ld e,(ix + Application.map)
-	ld d,(ix + Application.map + 1)
-	ld ixl,e
-	ld ixh,d
-	ret
-
-; ix = this
-Application_GetMapView:
-	ld de,Application.mapView
-	add ix,de
-	ret
-
-; ix = this
-Application_GetSoftsprite:
-	ld de,Application.softsprite
+Application_GetScene:
+	ld de,Application.scene
 	add ix,de
 	ret
 
@@ -124,24 +81,9 @@ Application_EnterMainLoop:
 	ld a,0F1H
 	call VDP_SetColor
 
-	call VDP_EnableBlank
-
-	call Application_LoadTileSet
-
 	push ix
-	call Application_GetSprites
-	call Sprites_InitializeTableAddresses
-	ld de,Sprite_block
-	call Sprites_AddSprite
-	call Sprites_Draw
-	pop ix
-
-	call VDP_DisableBlank
-
-	push ix
-	call Application_GetMapView
-	call MapView_Update
-	call MapView_Draw
+	call Application_GetScene
+	call Scene_Start
 	pop ix
 
 	push ix
@@ -169,64 +111,8 @@ Application_TIMIInterruptEntry:
 	call Application_GetInput_IY
 	call Input_Update_IY
 	push ix
-	call Application_GetMapView
-	call MapView_Update
-	pop ix
-	push ix
-	call Application_GetSoftsprite
-	call Softsprite_Clear
-	pop ix
-	call Application_UpdatePosition
-	push ix
-	call Application_GetSoftsprite
-	call Softsprite_MoveRight
-	call Softsprite_Draw
-	pop ix
-
-	ld iy,Sprite_block
-	ld (iy + Sprite.x),100
-	inc (iy + Sprite.y)
-	push ix
-	push ix
-	call Application_GetMapView
-	call MapView_GetPosition
-	pop ix
-	push de
-	call Application_GetSprites
-	pop de
-	call Sprites_SetPosition
-	call Sprites_Draw
-	pop ix
-	ret
-
-; ix = this
-Application_UpdatePosition:
-	call Application_GetInput_IY
-	push ix
-	call Application_GetMapView
-	bit 4,(iy + Input.newKey + 8)
-	push iy
-	call z,MapView_MoveLeft
-	pop iy
-	bit 7,(iy + Input.newKey + 8)
-	push iy
-	call z,MapView_MoveRight
-	pop iy
-	bit 5,(iy + Input.newKey + 8)
-	push iy
-	call z,MapView_MoveUp
-	pop iy
-	bit 6,(iy + Input.newKey + 8)
-	call z,MapView_MoveDown
-	pop ix
-	ret
-
-; ix = this
-Application_LoadTileSet:
-	push ix
-	call Application_GetTileSet
-	call TileSet_Construct
-	call TileSet_Load
+	call Application_GetScene
+	call Scene_Update
 	pop ix
 	ret
 
