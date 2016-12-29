@@ -28,6 +28,9 @@ ROM_FieldSet_BANK: equ 3
 ROM_FieldSet: ds 8000H
 	org 06000H
 
+TPA_PAGE1: equ ROM
+RAM_RESIDENT: equ RAM
+
 ROM_BANK_4000_CHANGE: equ 5000H
 ROM_BANK_6000_CHANGE: equ 7000H
 ROM_BANK_8000_CHANGE: equ 9000H
@@ -47,6 +50,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "BIOS.asm"
 	INCLUDE "System.asm"
 	INCLUDE "Memory.asm"
+	INCLUDE "MemoryTest.asm"
 	INCLUDE "VDP.asm"
 	INCLUDE "VDPCommand.asm"
 	INCLUDE "Palette.asm"
