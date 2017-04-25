@@ -17,8 +17,6 @@ Application_Main:
 
 ;	call System_EnableTurbo
 
-	call Memory_GetSlotPage1
-	call Memory_SetSlotPage2
 	call ROM_Init
 	call RAM_Init
 
