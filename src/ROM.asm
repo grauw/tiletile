@@ -10,41 +10,35 @@ DEBUG: equ 1
 
 ROM_CodeBank1: equ 0
 ROM_CodeBank2: equ 1
-ROM_RAMInitBank: equ 2
+ROM_FieldMapBank: equ 2
+ROM_RAMInitBank: equ 3
 
 	org 4000H
-ROM_HEADER: ds 10H
-ROM_BANK0: ds 1F0H
-ROM: ds 3E00H
-	org 06000H
-RAM_sourceAddress:
-	org 0C000H
-RAM_startAddress:
-RAM: ds 1800H
-RAM_endAddress:
-	ds 800H
-	org 06000H
-ROM_FieldSet_BANK: equ 3
-ROM_FieldSet: ds 8000H
-	org 06000H
 
-TPA_PAGE1: equ ROM
+ROM_BANK0: ds 2000H
+ROM_BANK1: ds 2000H
+ROM_BANK2: ds 2000H
+ROM_BANK3: ds 2000H
+
+	org 4000H
+
+ROM_BANK4567: ds 8000H
+
+TPA_PAGE1: equ ROM_BANK1
 RAM_RESIDENT: equ RAM
+ROM_FieldSet: equ ROM_BANK4567
+ROM_FieldSet_BANK: equ 4
 
 ROM_BANK_4000_CHANGE: equ 5000H
 ROM_BANK_6000_CHANGE: equ 7000H
 ROM_BANK_8000_CHANGE: equ 9000H
 ROM_BANK_A000_CHANGE: equ 0B000H
 
-	SECTION ROM_HEADER
+	SECTION ROM_BANK0
 
 	db "AB"
 	dw Application_Main
 	dw 0, 0, 0, 0, 0, 0
-
-	ENDS
-
-	SECTION ROM
 
 	INCLUDE "Application.asm"
 	INCLUDE "BIOS.asm"
@@ -65,8 +59,22 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "scenes/Scene.asm"
 	INCLUDE "scenes/TestScene.asm"
 
+	ENDS
+
+	SECTION ROM_BANK2
+
 	INCLUDE "FieldSet.asm"
 	INCLUDE "FieldMap.asm"
+
+	ENDS
+
+	SECTION ROM_BANK3
+
+RAM_sourceAddress:
+	org 0C000H
+RAM_startAddress:
+RAM: ds 1800H
+RAM_endAddress:
 
 	ENDS
 
@@ -77,9 +85,9 @@ ROM_Init:
 	ld (ROM_BANK_4000_CHANGE),a
 	ld a,ROM_CodeBank2
 	ld (ROM_BANK_6000_CHANGE),a
-	ld a,ROM_CodeBank1
+	ld a,ROM_FieldMapBank
 	ld (ROM_BANK_8000_CHANGE),a
-	ld a,ROM_CodeBank2
+	ld a,ROM_RAMInitBank
 	ld (ROM_BANK_A000_CHANGE),a
 	ret
 
@@ -94,20 +102,11 @@ RAM_Init:
 	sbc hl,bc
 	ld hl,RAM_insufficientTPA
 	call c,System_ThrowExceptionWithMessage
-
-	ld a,ROM_RAMInitBank
-	ld (ROM_BANK_6000_CHANGE),a
 	ld hl,RAM_sourceAddress
 	ld de,RAM_startAddress
 	ld bc,RAM_endAddress - RAM_startAddress
 	ldir
-	ld a,ROM_CodeBank2
-	ld (ROM_BANK_6000_CHANGE),a
 	ret
-
-	ENDS
-
-	SECTION ROM
 
 RAM_insufficientTPA:
 	db "Insufficient TPA memory.",0
@@ -124,8 +123,8 @@ ROM_bank4000:
 ROM_bank6000:
 	dw ROM_BANK_6000_CHANGE | ROM_CodeBank2
 ROM_bank8000:
-	dw ROM_BANK_8000_CHANGE | ROM_CodeBank1
+	dw ROM_BANK_8000_CHANGE | ROM_FieldMapBank
 ROM_bankA000:
-	dw ROM_BANK_A000_CHANGE | ROM_CodeBank2
+	dw ROM_BANK_A000_CHANGE | ROM_RAMInitBank
 
 	ENDS
