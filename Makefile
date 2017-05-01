@@ -1,4 +1,5 @@
 all:
+	mkdir -p gen bin
 	node tools/pngtoset.js res/field/tileset.png > gen/FieldSet.asm FieldSet
 	node tools/tmxtomap.js res/field/tilemap.tmx > gen/FieldMap.asm FieldMap
 	java -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/tiletile.rom bin/tiletile.sym
