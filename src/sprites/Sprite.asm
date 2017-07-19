@@ -78,11 +78,12 @@ Hide:
 
 ; iy = this
 Sprite_DrawColor_IY:
-	ld e,(iy + Sprite.color)
-	ld d,(iy + Sprite.color + 1)
-	ld iyl,e
-	ld iyh,d
-	call SpriteColor_Draw_IY
+	ld l,(iy + Sprite.color)
+	ld h,(iy + Sprite.color + 1)
+	ld c,VDP_PORT_0
+	REPT 16
+	outi
+	ENDM
 	ret
 
 ;
