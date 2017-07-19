@@ -7,6 +7,9 @@
 	INCLUDE "SpriteColor.asm"
 	INCLUDE "SpritePattern.asm"
 
+Sprites_MAX_SPRITES: equ 32
+Sprites_MAX_PATTERNS: equ 64
+
 Sprites: MACRO
 	x:
 		dw 0
@@ -22,11 +25,11 @@ Sprites: MACRO
 		dw 0F400H
 		db 1H
 	sprites:
-		REPT 32
+		REPT Sprites_MAX_SPRITES
 		dw Sprite_unused
 		ENDM
 	patterns:
-		REPT 64
+		REPT Sprites_MAX_PATTERNS
 		dw SpritePattern_unused
 		ENDM
 	ENDM
@@ -109,7 +112,7 @@ Sprites_InitializeTableAddresses:
 ; ix = this
 Sprites_AddSprite: PROC
 	push ix
-	ld b,32
+	ld b,Sprites_MAX_SPRITES
 Loop:
 	ld a,(ix + Sprites.sprites)
 	cp Sprite_unused
@@ -136,7 +139,7 @@ Found:
 ; ix = this
 Sprites_RemoveSprite: PROC
 	push ix
-	ld b,32
+	ld b,Sprites_MAX_SPRITES
 Loop:
 	ld l,(ix + Sprites.sprites)
 	ld h,(ix + Sprites.sprites + 1)
@@ -163,7 +166,7 @@ Found:
 ; iy <- pattern
 Sprites_AddPattern: PROC
 	push ix
-	ld b,64
+	ld b,Sprites_MAX_PATTERNS
 Loop:
 	ld c,(ix + Sprites.patterns)
 	ld a,(ix + Sprites.patterns + 1)
@@ -180,7 +183,7 @@ Found:
 	ld (ix + Sprites.patterns),e
 	ld (ix + Sprites.patterns + 1),d
 	pop ix
-	ld a,64
+	ld a,Sprites_MAX_PATTERNS
 	sub b
 	ld iyl,e
 	ld iyh,d
@@ -201,7 +204,7 @@ Sprites_DrawSprites: PROC
 	ld h,(ix + Sprites.attributeTable + 1)
 	ld a,(ix + Sprites.attributeTable + 2)
 	call VDP_SetWriteAddress
-	ld bc,32 << 8 | VDP_PORT_0
+	ld bc,Sprites_MAX_SPRITES << 8 | VDP_PORT_0
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh
@@ -228,7 +231,7 @@ Sprites_DrawColors: PROC
 	ld h,(ix + Sprites.colorTable + 1)
 	ld a,(ix + Sprites.colorTable + 2)
 	call VDP_SetWriteAddress
-	ld bc,32 << 8 | VDP_PORT_0
+	ld bc,Sprites_MAX_SPRITES << 8 | VDP_PORT_0
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh
