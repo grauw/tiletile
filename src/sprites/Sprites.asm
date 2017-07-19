@@ -201,7 +201,7 @@ Sprites_DrawSprites: PROC
 	ld h,(ix + Sprites.attributeTable + 1)
 	ld a,(ix + Sprites.attributeTable + 2)
 	call VDP_SetWriteAddress
-	ld b,32
+	ld bc,32 << 8 | VDP_PORT_0
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh
@@ -228,7 +228,7 @@ Sprites_DrawColors: PROC
 	ld h,(ix + Sprites.colorTable + 1)
 	ld a,(ix + Sprites.colorTable + 2)
 	call VDP_SetWriteAddress
-	ld b,32
+	ld bc,32 << 8 | VDP_PORT_0
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh

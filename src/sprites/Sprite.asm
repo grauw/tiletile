@@ -40,6 +40,7 @@ Sprite_Unregister_IY:
 	call SpritePattern_DecreaseReferenceCount_IY
 	ret
 
+; c = VDP write port
 ; iy = this
 ; ix = sprite system
 Sprite_Draw_IY: PROC
@@ -57,30 +58,28 @@ Sprite_Draw_IY: PROC
 	sbc a,(ix + Sprites.x + 1)
 	jr nz,Hide
 
-	ld a,h
-	dec a
-	out (VDP_PORT_0),a
-	ld a,l
-	out (VDP_PORT_0),a
+	dec h
+	out (c),h
+	out (c),l
 	ld a,(iy + Sprite.patternNumber)
-	out (VDP_PORT_0),a
-	out (VDP_PORT_0),a
+	out (c),a
+	out (c),a
 	ret
 Hide:
 	ld a,(ix + Sprites.y)
 	add a,232
-	out (VDP_PORT_0),a
-	out (VDP_PORT_0),a
-	out (VDP_PORT_0),a
-	out (VDP_PORT_0),a
+	out (c),a
+	out (c),a
+	out (c),a
+	out (c),a
 	ret
 	ENDP
 
+; c = VDP write port
 ; iy = this
 Sprite_DrawColor_IY:
 	ld l,(iy + Sprite.color)
 	ld h,(iy + Sprite.color + 1)
-	ld c,VDP_PORT_0
 	REPT 16
 	outi
 	ENDM
