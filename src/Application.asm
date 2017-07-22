@@ -81,6 +81,11 @@ Application_EnterMainLoop:
 	call VDP_Enable60Hz
 	ld a,0F1H
 	call VDP_SetColor
+	ld a,(VDP_MIRROR_8 + 8)
+	or 00100000B  ; TP
+	ld (VDP_MIRROR_8 + 8),a
+	ld b,8
+	call VDP_SetRegister
 
 	call VDP_EnableBlank
 
