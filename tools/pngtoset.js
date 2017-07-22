@@ -22,10 +22,10 @@ if (png.colorType != 3) {
 	process.exit(1);
 }
 
-if (png.palette.length > 16 * 3) {
-	console.error("More than 16 colours.");
-	process.exit(1);
-}
+//if (png.palette.length > 16 * 3) {
+//	console.error("More than 16 colours.");
+//	process.exit(1);
+//}
 
 png.decodePixels(function(pixels) {
 	console.log("\tSECTION RAM");
@@ -68,7 +68,7 @@ png.decodePixels(function(pixels) {
 
 function to4bpp(pixels) {
 	return new Array(pixels.length / 2).fill(0).map(
-		(v, i) => pixels[i * 2] << 4 | pixels[i * 2 + 1]
+		(v, i) => (pixels[i * 2] & 15) << 4 | (pixels[i * 2 + 1] & 15)
 	);
 }
 
