@@ -12,3 +12,15 @@ SpriteColor_solid0:
 
 SpriteColor_solid15:
 	SpriteColor 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15
+
+SpriteColor_solid1:
+	SpriteColor 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+
+SpriteColor_solid2CC:
+	SpriteColor 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66
+
+SpriteColor_solid4CC:
+	SpriteColor 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68
+
+SpriteColor_solid8CC:
+	SpriteColor 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72, 72

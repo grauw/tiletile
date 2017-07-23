@@ -11,12 +11,14 @@ TestScene: MACRO
 TestScene_Construct:
 	call Scene_Construct
 	push ix
+	call Scene_GetSpritesIY
 	call TestScene_GetPlayer
 	call Player_Construct
 	pop ix
 	ret
 
 ; ix = this
+; ix <- player
 TestScene_GetPlayer:
 	ld de,TestScene.player
 	add ix,de
@@ -28,11 +30,6 @@ TestScene_Start:
 	push ix
 	call TestScene_GetPlayer
 	call Player_Start
-	pop ix
-	push ix
-	call Scene_GetSprites
-	ld de,Sprite_block
-	call Sprites_AddSprite
 	pop ix
 	ret
 
@@ -49,8 +46,4 @@ TestScene_Update:
 	call TestScene_GetPlayer
 	call Player_Update
 	pop ix
-
-	ld iy,Sprite_block
-	ld (iy + Sprite.x),100
-	inc (iy + Sprite.y)
 	ret

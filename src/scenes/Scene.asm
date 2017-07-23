@@ -67,9 +67,19 @@ Scene_GetMapView:
 	ret
 
 ; ix = this
+; ix <- sprites
 Scene_GetSprites:
 	ld de,Scene.sprites
 	add ix,de
+	ret
+
+; ix = this
+; iy <- sprites
+Scene_GetSpritesIY:
+	ld e,ixl
+	ld d,ixh
+	ld iy,Scene.sprites
+	add iy,de
 	ret
 
 ; ix = this

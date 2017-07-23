@@ -12,6 +12,7 @@ Sprite: MACRO ?pattern, ?color, ?x = 0, ?y = 0
 		dw ?pattern
 	color:
 		dw ?color
+	_size:
 	ENDM
 
 ; iy = this
