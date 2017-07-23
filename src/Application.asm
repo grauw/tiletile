@@ -38,7 +38,7 @@ Application_Construct:
 	call Application_GetScene
 	ld e,iyl
 	ld d,iyh
-	call Scene_Construct
+	call TestScene_Construct
 	pop ix
 	ld e,ixl
 	ld d,ixh
