@@ -27,6 +27,8 @@ Sprite_Register_IY:
 	call z,Sprites_AddPattern
 	call SpritePattern_GetNumber_IY
 	pop iy
+	add a,a
+	add a,a
 	ld (iy + Sprite.patternNumber),a
 	ret
 
