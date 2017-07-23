@@ -81,8 +81,7 @@ Scene_Start:
 
 	push ix
 	call Scene_GetSprites
-	call Sprites_InitializeTableAddresses
-	call Sprites_Draw
+	call Sprites_InitializeTables
 	pop ix
 
 	push ix
@@ -98,6 +97,12 @@ Scene_Update:
 	call Scene_GetMapView
 	call MapView_Update
 	pop ix
+
+	push ix
+	call Scene_GetSprites
+	call Sprites_SwapTables
+	pop ix
+
 	call Scene_UpdatePosition
 	push ix
 	push ix

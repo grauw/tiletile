@@ -19,10 +19,10 @@ Sprites: MACRO
 		dw 0F800H
 		db 1H
 	attributeTable:
-		dw 0F600H
+		dw 0F600H  ; colour table: F200H
 		db 1H
-	colorTable:
-		dw 0F400H
+	attributeTableAlt:
+		dw 0F200H  ; colour table: F000H
 		db 1H
 	sprites:
 		REPT Sprites_MAX_SPRITES
@@ -46,21 +46,23 @@ Sprites_Construct:
 	and 11111110B
 	call nz,System_ThrowException
 	ld a,(ix + Sprites.attributeTable)
-	cp (ix + Sprites.colorTable)
-	call nz,System_ThrowException
 	and a
 	call nz,System_ThrowException
 	ld a,(ix + Sprites.attributeTable + 1)
-	sub 2
-	cp (ix + Sprites.colorTable + 1)
-	call nz,System_ThrowException
-	add a,2
 	and 00000011B
 	cp 00000010B
 	call nz,System_ThrowException
 	ld a,(ix + Sprites.attributeTable + 2)
-	cp (ix + Sprites.colorTable + 2)
+	and 11111110B
 	call nz,System_ThrowException
+	ld a,(ix + Sprites.attributeTableAlt)
+	and a
+	call nz,System_ThrowException
+	ld a,(ix + Sprites.attributeTableAlt + 1)
+	and 00000011B
+	cp 00000010B
+	call nz,System_ThrowException
+	ld a,(ix + Sprites.attributeTableAlt + 2)
 	and 11111110B
 	call nz,System_ThrowException
 	ret
@@ -80,7 +82,8 @@ Sprites_SetPosition:
 	ret
 
 ; ix = this
-Sprites_InitializeTableAddresses:
+Sprites_InitializeTables:
+	call Sprites_Draw
 	ld a,(VDP_MIRROR_0 + 1)
 	res 0,a  ; MAG
 	set 1,a  ; SI
@@ -95,14 +98,31 @@ Sprites_InitializeTableAddresses:
 	rra
 	ld b,6
 	call VDP_SetRegister
-	ld a,(ix + Sprites.attributeTable + 1)
+	call Sprites_SwapTables
+	ret
+
+; ix = this
+Sprites_SwapTables:
+	ld l,(ix + Sprites.attributeTable)
+	ld h,(ix + Sprites.attributeTable + 1)
+	ld e,(ix + Sprites.attributeTable + 2)
+	ld d,(ix + Sprites.attributeTableAlt)
+	ld c,(ix + Sprites.attributeTableAlt + 1)
+	ld b,(ix + Sprites.attributeTableAlt + 2)
+	ld (ix + Sprites.attributeTableAlt),l
+	ld (ix + Sprites.attributeTableAlt + 1),h
+	ld (ix + Sprites.attributeTableAlt + 2),e
+	ld (ix + Sprites.attributeTable),d
+	ld (ix + Sprites.attributeTable + 1),c
+	ld (ix + Sprites.attributeTable + 2),b
+	ld a,h
 	rla
 	push af
 	or 00000011B
 	ld b,5
 	call VDP_SetRegister
 	pop af
-	ld a,(ix + Sprites.attributeTable + 2)
+	ld a,e
 	rla
 	ld b,11
 	call VDP_SetRegister
@@ -227,9 +247,11 @@ Loop:
 
 ; ix = this
 Sprites_DrawColors: PROC
-	ld l,(ix + Sprites.colorTable)
-	ld h,(ix + Sprites.colorTable + 1)
-	ld a,(ix + Sprites.colorTable + 2)
+	ld l,(ix + Sprites.attributeTable)
+	ld h,(ix + Sprites.attributeTable + 1)
+	ld a,(ix + Sprites.attributeTable + 2)
+	ld de,-200H
+	add hl,de
 	call VDP_SetWriteAddress
 	ld bc,Sprites_MAX_SPRITES << 8 | VDP_PORT_0
 	ld hl,Sprites.sprites
