@@ -96,8 +96,7 @@ Scene_Start:
 
 	push ix
 	call Scene_GetMapView
-	call MapView_Update
-	call MapView_Draw
+	call MapView_Start
 	pop ix
 	ret
 

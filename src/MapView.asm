@@ -178,6 +178,34 @@ MapView_MoveDown:
 	ret
 
 ; ix = this
+MapView_Start:
+	call MapView_Recenter
+	call MapView_Update
+	call MapView_Draw
+	ret
+
+; ix = this
+MapView_Recenter: PROC
+	ld a,(VDP_MIRROR_8 + 18)
+	ld b,a
+	and 0FH
+	sub 8
+	add a,4
+	jr nc,NoOverflow
+	ld a,255
+NoOverflow:
+	add a,8
+	and 0FH
+	ld c,a
+	ld a,b
+	and 0F0H
+	or c
+	ld b,18
+	call VDP_SetRegister
+	ret
+	ENDP
+
+; ix = this
 MapView_Update:
 	ld a,(VDP_MIRROR_25 + 25)
 	or 00000010B
