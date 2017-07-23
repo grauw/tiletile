@@ -11,8 +11,13 @@ TestScene: MACRO
 TestScene_Construct:
 	call Scene_Construct
 	push ix
+	call Scene_GetTileSet
+	pop ix
+	push ix
+	push de
 	call Scene_GetSpritesIY
 	call TestScene_GetPlayer
+	pop de
 	call Player_Construct
 	pop ix
 	ret
