@@ -49,6 +49,10 @@ Sprite_Unregister_IY:
 Sprite_Draw_IY: PROC
 	ld a,(iy + Sprite.y)
 	ld h,a
+	cp 217
+	jr z,DontHide
+	dec h
+DontHide:
 	sub (ix + Sprites.y)
 	ld a,(iy + Sprite.y + 1)
 	sbc a,(ix + Sprites.y + 1)
@@ -61,7 +65,6 @@ Sprite_Draw_IY: PROC
 	sbc a,(ix + Sprites.x + 1)
 	jr nz,Hide
 
-	dec h
 	out (c),h
 	out (c),l
 	ld a,(iy + Sprite.patternNumber)
