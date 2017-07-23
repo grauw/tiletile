@@ -3,9 +3,9 @@
 ;
 Softsprite: MACRO
 	x:
-		db 112
+		db 0
 	y:
-		db 80
+		db 0
 	sx:
 		db 224
 	sy:
@@ -31,11 +31,12 @@ Softsprite_Clear:
 	pop ix
 	ret
 
+; e = x
+; d = y
 ; ix = this
-Softsprite_MoveRight:
-	ld a,(ix + Softsprite.x)
-	add a,2
-	ld (ix + Softsprite.x),a
+Softsprite_SetPosition:
+	ld (ix + Softsprite.x),e
+	ld (ix + Softsprite.y),d
 	ret
 
 ; ix = this
