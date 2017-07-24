@@ -66,17 +66,22 @@ DontHide:
 	jr nz,Hide
 
 	out (c),h
+	nop
 	out (c),l
 	ld a,(iy + Sprite.patternNumber)
 	out (c),a
+	nop
 	out (c),a
 	ret
 Hide:
 	ld a,(ix + Sprites.y)
 	add a,232
 	out (c),a
+	nop
 	out (c),a
+	nop
 	out (c),a
+	nop
 	out (c),a
 	ret
 	ENDP
