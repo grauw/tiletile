@@ -137,7 +137,13 @@ Scene_Update:
 	call Sprites_SwapTables
 	pop ix
 
+	push ix
+	call Scene_GetPlayer
+	call Player_Update
+	pop ix
+
 	call Scene_UpdatePosition
+
 	push ix
 	push ix
 	call Scene_GetMapView
@@ -148,11 +154,6 @@ Scene_Update:
 	pop de
 	call Sprites_SetPosition
 	call Sprites_Draw
-	pop ix
-
-	push ix
-	call Scene_GetPlayer
-	call Player_Update
 	pop ix
 	ret
 
