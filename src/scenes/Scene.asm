@@ -12,6 +12,8 @@ Scene: MACRO ?tileset, ?tilemap
 		MapView
 	sprites:
 		Sprites
+	player:
+		Player
 	ENDM
 
 ; de = input
@@ -33,6 +35,17 @@ Scene_Construct:
 	call Scene_GetMapView
 	pop de
 	call MapView_Construct
+	pop ix
+
+	push ix
+	call Scene_GetTileSet
+	pop ix
+	push ix
+	push de
+	call Scene_GetSpritesIY
+	call Scene_GetPlayer
+	pop de
+	call Player_Construct
 	pop ix
 	ret
 
@@ -83,6 +96,13 @@ Scene_GetSpritesIY:
 	ret
 
 ; ix = this
+; ix <- player
+Scene_GetPlayer:
+	ld de,Scene.player
+	add ix,de
+	ret
+
+; ix = this
 Scene_Start:
 	push ix
 	call Scene_GetTileSet
@@ -97,6 +117,11 @@ Scene_Start:
 	push ix
 	call Scene_GetMapView
 	call MapView_Start
+	pop ix
+
+	push ix
+	call Scene_GetPlayer
+	call Player_Start
 	pop ix
 	ret
 
@@ -123,6 +148,11 @@ Scene_Update:
 	pop de
 	call Sprites_SetPosition
 	call Sprites_Draw
+	pop ix
+
+	push ix
+	call Scene_GetPlayer
+	call Player_Update
 	pop ix
 	ret
 

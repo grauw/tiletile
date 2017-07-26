@@ -58,7 +58,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Softsprite.asm"
 	INCLUDE "Player.asm"
 	INCLUDE "scenes/Scene.asm"
-	INCLUDE "scenes/TestScene.asm"
 
 	ENDS
 

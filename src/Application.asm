@@ -7,7 +7,7 @@ Application: MACRO
 	input:
 		Input
 	scene:
-		TestScene
+		Scene FieldSet_instance, FieldMap_instance
 	ENDM
 
 Application_Main:
@@ -38,7 +38,7 @@ Application_Construct:
 	call Application_GetScene
 	ld e,iyl
 	ld d,iyh
-	call TestScene_Construct
+	call Scene_Construct
 	pop ix
 	ld e,ixl
 	ld d,ixh
@@ -91,7 +91,7 @@ Application_EnterMainLoop:
 
 	push ix
 	call Application_GetScene
-	call TestScene_Start
+	call Scene_Start
 	pop ix
 
 	call VDP_DisableBlank
@@ -122,7 +122,7 @@ Application_TIMIInterruptEntry:
 	call Input_Update_IY
 	push ix
 	call Application_GetScene
-	call TestScene_Update
+	call Scene_Update
 	pop ix
 	ret
 
