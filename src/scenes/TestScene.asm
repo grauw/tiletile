@@ -40,11 +40,6 @@ TestScene_Start:
 
 ; ix = this
 TestScene_Update:
-	push ix
-	call TestScene_GetPlayer
-	call Player_PreUpdate
-	pop ix
-
 	call Scene_Update
 
 	push ix

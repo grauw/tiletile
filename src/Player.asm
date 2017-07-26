@@ -76,10 +76,6 @@ Loop:
 	ENDP
 
 ; ix = this
-Player_PreUpdate:
-	ret
-
-; ix = this
 Player_Update:
 	call Player_MoveRight
 	ret
