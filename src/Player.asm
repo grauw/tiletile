@@ -8,18 +8,18 @@ Player_MOVE_SPEED: equ 1
 
 Player: MACRO
 	x:
-		dw 112
+		dw 124
 	y:
-		dw 80
+		dw 106
 	sprites:
-		Sprite Player_pattern0, SpriteColor_solid1, 0, 0
-		Sprite Player_pattern1, SpriteColor_solid2CC, 0, 0
-		Sprite Player_pattern2, SpriteColor_solid4CC, 0, 0
-		Sprite Player_pattern3, SpriteColor_solid8CC, 0, 0
-		Sprite Player_pattern4, SpriteColor_solid1, 0, 16
-		Sprite Player_pattern5, SpriteColor_solid2CC, 0, 16
-		Sprite Player_pattern6, SpriteColor_solid4CC, 0, 16
-		Sprite Player_pattern7, SpriteColor_solid8CC, 0, 16
+		Sprite Player_pattern0, SpriteColor_solid1, -8, -24
+		Sprite Player_pattern1, SpriteColor_solid2CC, -8, -24
+		Sprite Player_pattern2, SpriteColor_solid4CC, -8, -24
+		Sprite Player_pattern3, SpriteColor_solid8CC, -8, -24
+		Sprite Player_pattern4, SpriteColor_solid1, -8, -8
+		Sprite Player_pattern5, SpriteColor_solid2CC, -8, -8
+		Sprite Player_pattern6, SpriteColor_solid4CC, -8, -8
+		Sprite Player_pattern7, SpriteColor_solid8CC, -8, -8
 	ENDM
 
 ; de = tile set

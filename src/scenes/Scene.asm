@@ -202,7 +202,9 @@ Scene_UpdateMapViewPosition: PROC
 LeftRight:
 	ld l,(ix + MapView.x)
 	ld h,(ix + MapView.x + 1)
-	ld bc,112
+	ld c,(ix + MapView.width)
+	ld b,0
+	srl c
 	add hl,bc
 	sbc hl,de
 	ret z
@@ -211,7 +213,9 @@ LeftRight:
 UpDown:
 	ld l,(ix + MapView.y)
 	ld h,(ix + MapView.y + 1)
-	ld bc,80
+	ld c,(ix + MapView.height)
+	ld b,0
+	srl c
 	add hl,bc
 	sbc hl,de
 	ret z
