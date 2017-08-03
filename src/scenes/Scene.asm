@@ -142,7 +142,8 @@ Scene_Update:
 	call Player_Update
 	pop ix
 
-	call Scene_UpdatePosition
+	call Scene_UpdatePlayerPosition
+	call Scene_UpdateMapViewPosition
 
 	push ix
 	push ix
@@ -158,23 +159,62 @@ Scene_Update:
 	ret
 
 ; ix = this
-Scene_UpdatePosition:
+Scene_UpdatePlayerPosition:
 	call Scene_GetInput_IY
 	push ix
-	call Scene_GetMapView
+	call Scene_GetPlayer
 	bit 4,(iy + Input.newKey + 8)
 	push iy
-	call z,MapView_MoveLeft
+	call z,Player_MoveLeft
 	pop iy
 	bit 7,(iy + Input.newKey + 8)
 	push iy
-	call z,MapView_MoveRight
+	call z,Player_MoveRight
 	pop iy
 	bit 5,(iy + Input.newKey + 8)
 	push iy
-	call z,MapView_MoveUp
+	call z,Player_MoveUp
 	pop iy
 	bit 6,(iy + Input.newKey + 8)
-	call z,MapView_MoveDown
+	call z,Player_MoveDown
 	pop ix
 	ret
+
+; ix = this
+Scene_UpdateMapViewPosition: PROC
+	push ix
+	call Scene_GetPlayer
+	ld e,(ix + Player.x)
+	ld d,(ix + Player.x + 1)
+	ld l,(ix + Player.y)
+	ld h,(ix + Player.y + 1)
+	pop ix
+	push ix
+	push hl
+	push de
+	call Scene_GetMapView
+	pop de
+	call LeftRight
+	pop de
+	call UpDown
+	pop ix
+	ret
+LeftRight:
+	ld l,(ix + MapView.x)
+	ld h,(ix + MapView.x + 1)
+	ld bc,112
+	add hl,bc
+	sbc hl,de
+	ret z
+	jp m,MapView_MoveRight
+	jp MapView_MoveLeft
+UpDown:
+	ld l,(ix + MapView.y)
+	ld h,(ix + MapView.y + 1)
+	ld bc,80
+	add hl,bc
+	sbc hl,de
+	ret z
+	jp m,MapView_MoveDown
+	jp MapView_MoveUp
+	ENDP
