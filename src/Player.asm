@@ -58,19 +58,29 @@ Loop:
 
 ; ix = this
 Player_Start: PROC
-	ld l,(ix + Player.x)
-	ld h,(ix + Player.y)
+	ld e,(ix + Player.x)
+	ld d,(ix + Player.x + 1)
+	ld l,(ix + Player.y)
+	ld h,(ix + Player.y + 1)
 	push ix
 	ld b,Player_SPRITE_COUNT
 Loop:
+	push bc
 	ld a,(ix + Player.sprites + Sprite.x)
-	add a,l
+	add a,e
 	ld (ix + Player.sprites + Sprite.x),a
+	ld a,(ix + Player.sprites + Sprite.x + 1)
+	adc a,d
+	ld (ix + Player.sprites + Sprite.x + 1),a
 	ld a,(ix + Player.sprites + Sprite.y)
-	add a,h
+	add a,l
 	ld (ix + Player.sprites + Sprite.y),a
-	ld de,Sprite._size
-	add ix,de
+	ld a,(ix + Player.sprites + Sprite.y + 1)
+	adc a,h
+	ld (ix + Player.sprites + Sprite.y + 1),a
+	ld bc,Sprite._size
+	add ix,bc
+	pop bc
 	djnz Loop
 	pop ix
 	ret
