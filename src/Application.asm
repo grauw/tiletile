@@ -75,7 +75,8 @@ Application_GetScene:
 Application_EnterMainLoop:
 	ld a,0
 	ld (CLIKSW),a  ; disable key click
-	call VDP_InitScreen5
+	ld a,5
+	call VDP_InitScreen
 	call VDP_Enable212Lines
 	call VDP_EnableSprites
 	call VDP_Enable60Hz
