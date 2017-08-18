@@ -20,7 +20,7 @@ TileMap: MACRO ?width, ?height, ?data, ?dataRows
 TileMap_GetDataPosition: PROC
 	ld l,(ix + TileMap.height)
 	ld h,(ix + TileMap.height + 1)
-	and a
+	scf
 	sbc hl,de
 	jr nc,NoClip
 	ld de,0
