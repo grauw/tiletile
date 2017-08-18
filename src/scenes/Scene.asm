@@ -142,8 +142,23 @@ Scene_Update:
 	call Player_Update
 	pop ix
 
+	IF DEBUG
+	ld a,1
+	in a,(2ch)
+	ENDIF
+
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
+
+	IF DEBUG
+	ld a,1
+	out (2ch),a
+	ENDIF
+
+	IF DEBUG
+	xor a
+	in a,(2ch)
+	ENDIF
 
 	push ix
 	push ix
@@ -156,6 +171,11 @@ Scene_Update:
 	call Sprites_SetPosition
 	call Sprites_Draw
 	pop ix
+
+	IF DEBUG
+	xor a
+	out (2ch),a
+	ENDIF
 	ret
 
 ; ix = this

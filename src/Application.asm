@@ -117,6 +117,10 @@ Application_MainLoop:
 
 ; ix = this
 Application_TIMIInterruptEntry:
+	IF DEBUG
+	in a,(2dh)
+	ENDIF
+
 	ld a,0FFH
 	ld (SCNCNT),a
 	call Application_GetInput_IY
@@ -125,6 +129,10 @@ Application_TIMIInterruptEntry:
 	call Application_GetScene
 	call Scene_Update
 	pop ix
+
+	IF DEBUG
+	out (2dh),a
+	ENDIF
 	ret
 
 ;
