@@ -15,12 +15,12 @@ Application_Main:
 	cp 2
 	ret c
 
-;	call System_EnableTurbo
-
 	call ROM_Init
 	call RAM_Init
 
 	call System_SetDirectBIOSHandlers
+
+;	call System_EnableTurbo
 
 	call MemoryTest_Test
 
