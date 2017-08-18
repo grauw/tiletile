@@ -22,6 +22,7 @@ function main() {
 
 class TileMap {
 	constructor(name, width, height) {
+		checkTypes(arguments, "string", "number", "number");
 		this.name = name;
 		this.width = width;
 		this.height = height;
@@ -29,13 +30,15 @@ class TileMap {
 	}
 
 	addTileInstance(tile) {
+		checkTypes(arguments, TileInstance);
 		this.tiles.push(tile);
 	}
 
 	static fromTmx(name, mapXml) {
-		var tileMap = new TileMap(name, mapXml.$.width, mapXml.$.height);
+		checkTypes(arguments, "string", Object);
+		var tileMap = new TileMap(name, ~~mapXml.$.width, ~~mapXml.$.height);
 		let indicesCSV = mapXml.layer[0].data[0]._.replace(/\s/g, "");
-		let indices = indicesCSV.split(",").map(Number).map(i => i == 0 ? 255 : i - 1);
+		let indices = indicesCSV.split(",").map(i => ~~i - 1);
 		for (let index of indices) {
 			tileMap.addTileInstance(new TileInstance(index));
 		}
@@ -62,7 +65,34 @@ class TileMap {
 
 class TileInstance {
 	constructor(index) {
+		checkTypes(arguments, "number");
 		this.index = index;
+	}
+}
+
+/**
+ * Type checker, intended for use at the start of any function.
+ * Primitive types are checked by a string, objects by their constructor.
+ * Use an array to denote optionality. Example:
+ * 
+ * function myFunction(aNumber, aFunction, anOptionalString) {
+ *     checkTypes(arguments, "number", Function, ["string"])
+ * }
+ * 
+ * @param {Array} args An array-like list of arguments.
+ * @param {string|Function|Array} types... The types to check against.
+ */
+function checkTypes(args) {
+	for (var i = 1; i < arguments.length; i++) {
+		var type = arguments[i], arg = args[i - 1];
+		if (!(type instanceof Array && (type = type[0]) && arg == null) &&
+				!(typeof type == "string" && typeof arg == type && arg == arg) &&
+				!(type instanceof Function && arg instanceof type)) {
+			if (typeof type != "string" && !(type instanceof Function))
+				throw new Error("Unsupported type " + type + ".");
+			throw new Error("Argument of type " + (typeof type != "string" && type.constructor.name || type) + " expected at index " + (i - 1) + ". " +
+					"Was: " + (arg && typeof arg != "string" && arg.constructor && arg.constructor.name || arg) + ".");
+		}
 	}
 }
 
