@@ -4,7 +4,7 @@
 Player_SPRITE_COUNT: equ 8
 Player_TILE_TOP: equ 0EDH
 Player_TILE_BOTTOM: equ 0FDH
-Player_MOVE_SPEED: equ 1
+Player_MOVE_SPEED: equ 2
 
 Player: MACRO
 	x:

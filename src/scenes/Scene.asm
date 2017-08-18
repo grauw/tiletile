@@ -149,6 +149,7 @@ Scene_Update:
 
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
+	call Scene_UpdateMapViewPosition
 
 	IF DEBUG
 	ld a,1
