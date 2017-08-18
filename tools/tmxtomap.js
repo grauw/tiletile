@@ -2,34 +2,68 @@
 let fs = require('fs');
 let xml2js = require('xml2js');
 
-if (process.argv.length < 4) {
-	console.log("Usage: node " + process.argv[1] + " TILEMAP.TMX PREFIX");
-	process.exit(1);
+function main() {
+	if (process.argv.length < 4) {
+		console.log("Usage: node " + process.argv[1] + " TILEMAP.TMX NAME");
+		process.exit(1);
+	}
+
+	let filename = process.argv[2];
+	let name = process.argv[3];
+
+	fs.readFile(filename, function(err, data) {
+		xml2js.parseString(data, function (err, result) {
+			var tileMap = TileMap.fromTmx(name, result.map);
+
+			console.log(tileMap.toAsm());
+		});
+	});
 }
 
-let filename = process.argv[2];
-let prefix = process.argv[3];
+class TileMap {
+	constructor(name, width, height) {
+		this.name = name;
+		this.width = width;
+		this.height = height;
+		this.tiles = [];
+	}
 
-fs.readFile(filename, function(err, data) {
-	xml2js.parseString(data, function (err, result) {
-		let map = result.map;
+	addTileInstance(tile) {
+		this.tiles.push(tile);
+	}
 
-		console.log(prefix + "_instance:");
-		console.log("\tTileMap " + map.$.width + ", " + map.$.height + ", " +
-				prefix + "_data, " + prefix + "_dataRows");
-
-		console.log();
-		console.log(prefix + "_data:");
-		let dataCSV = map.layer[0].data[0]._.replace(/\s/g, "");
-		let data = dataCSV.split(",").map(Number).map(i => i == 0 ? 255 : i - 1);
-		for (let i = 0; i < data.length; i += 16) {
-			console.log("\tdb " + data.slice(i, i + 16).join(", "));
+	static fromTmx(name, mapXml) {
+		var tileMap = new TileMap(name, mapXml.$.width, mapXml.$.height);
+		let indicesCSV = mapXml.layer[0].data[0]._.replace(/\s/g, "");
+		let indices = indicesCSV.split(",").map(Number).map(i => i == 0 ? 255 : i - 1);
+		for (let index of indices) {
+			tileMap.addTileInstance(new TileInstance(index));
 		}
-
-		console.log();
-		console.log(prefix + "_dataRows:");
-		for (let y = 0; y < map.$.height; y++) {
-			console.log("\tdw " + prefix + "_data + " + y * map.$.width);
+		return tileMap;
+	}
+	
+	toAsm() {
+		var lines = [];
+		lines.push(`${this.name}_instance:`)
+		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.name}_data, ${this.name}_dataRows`);
+		lines.push("");
+		lines.push(`${this.name}_data:`);
+		for (let i = 0; i < this.tiles.length; i += 16) {
+			lines.push("\tdb " + this.tiles.slice(i, i + 16).map(ti => ti.index).join(", "));
 		}
-	});
-});
+		lines.push("");
+		lines.push(`${this.name}_dataRows:`);
+		for (let y = 0; y < this.height; y++) {
+			lines.push(`\tdw ${this.name}_data + ${y * this.width}`);
+		}
+		return lines.join("\n");
+	}
+}
+
+class TileInstance {
+	constructor(index) {
+		this.index = index;
+	}
+}
+
+main();
