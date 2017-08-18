@@ -11,10 +11,8 @@ function main() {
 	let filename = process.argv[2];
 	let name = process.argv[3];
 
-	fs.readFile(filename, function(err, data) {
-		xml2js.parseString(data, function (err, result) {
-			var tileMap = TileMap.fromTmx(name, result.map);
-
+	fs.readFile(filename, (err, data) => {
+		new Tmx(name, data.toString()).parse((tileMap) => {
 			console.log(tileMap.toAsm());
 		});
 	});
@@ -32,17 +30,6 @@ class TileMap {
 	addTileInstance(tile) {
 		checkTypes(arguments, TileInstance);
 		this.tiles.push(tile);
-	}
-
-	static fromTmx(name, mapXml) {
-		checkTypes(arguments, "string", Object);
-		var tileMap = new TileMap(name, ~~mapXml.$.width, ~~mapXml.$.height);
-		let indicesCSV = mapXml.layer[0].data[0]._.replace(/\s/g, "");
-		let indices = indicesCSV.split(",").map(i => ~~i - 1);
-		for (let index of indices) {
-			tileMap.addTileInstance(new TileInstance(index));
-		}
-		return tileMap;
 	}
 	
 	toAsm() {
@@ -67,6 +54,33 @@ class TileInstance {
 	constructor(index) {
 		checkTypes(arguments, "number");
 		this.index = index;
+	}
+}
+
+class Tmx {
+	constructor(name, xml) {
+		checkTypes(arguments, "string", "string");
+		this.name = name;
+		this.xml = xml;
+	}
+
+	parse(callback) {
+		checkTypes(arguments, Function);
+		new xml2js.Parser().parseString(this.xml, (err, result) => {
+			var tileMap = this.parseMap(result.map);
+			callback(tileMap);
+		});
+	}
+
+	parseMap(mapXml) {
+		checkTypes(arguments, Object);
+		var tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height);
+		let indicesCSV = mapXml.layer[0].data[0]._.replace(/\s/g, "");
+		let indices = indicesCSV.split(",").map(i => ~~i - 1);
+		for (let index of indices) {
+			tileMap.addTileInstance(new TileInstance(index));
+		}
+		return tileMap;
 	}
 }
 
