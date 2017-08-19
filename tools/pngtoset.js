@@ -8,7 +8,6 @@ if (process.argv.length < 4) {
 
 let filename = process.argv[2];
 let prefix = process.argv[3];
-let palette = [];
 
 let png = PNG.load(filename);
 
