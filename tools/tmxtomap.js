@@ -19,19 +19,22 @@ function main() {
 }
 
 class TileMap {
-	constructor(name, width, height) {
-		checkTypes(arguments, "string", "number", "number");
+	constructor(name, width, height, tileSet) {
+		checkTypes(arguments, "string", "number", "number", TileSet);
 		this.name = name;
 		this.width = width;
 		this.height = height;
+		this.tileSet = tileSet;
 		this.tiles = [];
 	}
 
-	addTileInstance(tile) {
-		checkTypes(arguments, TileInstance);
-		this.tiles.push(tile);
+	addTileIndices(tileIndices) {
+		checkTypes(arguments, Array);
+		for (let index of tileIndices) {
+			this.tiles.push(this.tileSet.getTile(index));
+		}
 	}
-	
+
 	toAsm() {
 		var lines = [];
 		lines.push(`${this.name}_instance:`)
@@ -39,7 +42,7 @@ class TileMap {
 		lines.push("");
 		lines.push(`${this.name}_data:`);
 		for (let i = 0; i < this.tiles.length; i += 16) {
-			lines.push("\tdb " + this.tiles.slice(i, i + 16).map(ti => ti.index).join(", "));
+			lines.push("\tdb " + this.tiles.slice(i, i + 16).map(tile => tile.index).join(", "));
 		}
 		lines.push("");
 		lines.push(`${this.name}_dataRows:`);
@@ -50,7 +53,25 @@ class TileMap {
 	}
 }
 
-class TileInstance {
+class TileSet {
+	constructor(name, count) {
+		checkTypes(arguments, "string", "number");
+		this.name = name;
+		this.tiles = [];
+		for (let i = 0; i < count; i++) {
+			this.tiles.push(new Tile(i));
+		}
+	}
+
+	getTile(index) {
+		checkTypes(arguments, "number");
+		if (index < 0 || index >= this.tiles.length)
+			throw new Error(`Tile not found: ${index}`);
+		return this.tiles[index];
+	}
+}
+
+class Tile {
 	constructor(index) {
 		checkTypes(arguments, "number");
 		this.index = index;
@@ -74,13 +95,18 @@ class Tmx {
 
 	parseMap(mapXml) {
 		checkTypes(arguments, Object);
-		var tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height);
+		var tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height,
+			this.parseSet(mapXml.tileset[0]));
 		let indicesCSV = mapXml.layer[0].data[0]._.replace(/\s/g, "");
 		let indices = indicesCSV.split(",").map(i => ~~i - 1);
-		for (let index of indices) {
-			tileMap.addTileInstance(new TileInstance(index));
-		}
+		tileMap.addTileIndices(indices);
 		return tileMap;
+	}
+
+	parseSet(setXml) {
+		checkTypes(arguments, Object);
+		let tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilecount);
+		return tileSet;
 	}
 }
 
