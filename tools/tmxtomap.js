@@ -76,18 +76,18 @@ class TileSet {
 	toAsm() {
 		var lines = [];
 		lines.push("\tSECTION RAM");
-		lines.push();
+		lines.push("");
 		lines.push(`${this.name}_instance: TileSet ROM_${this.name}_BANK, ${this.name}_palette`);
-		lines.push();
+		lines.push("");
 		lines.push("\tENDS");
-		lines.push();
+		lines.push("");
 		lines.push(`\tSECTION ROM_${this.name}`);
-		lines.push();
+		lines.push("");
 		lines.push(`${this.name}_pixelData:`);
 		lines.push(...this.tiles.map(tile => tile.toAsm()));
-		lines.push();
+		lines.push("");
 		lines.push("\tENDS");
-		lines.push();
+		lines.push("");
 		lines.push(`${this.name}_palette: Palette ` + this.palette.getWords()
 			.slice(0, 16).map(word => `00${word.toString(16)}H`.substr(-4)).join(", "));
 		return lines.join("\n");
