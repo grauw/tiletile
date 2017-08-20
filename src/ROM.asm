@@ -63,7 +63,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 
 	SECTION ROM_BANK2
 
-	INCLUDE "FieldSet.asm"
 	INCLUDE "FieldMap.asm"
 
 	ENDS
