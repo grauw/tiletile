@@ -88,9 +88,9 @@ MapView_GetPosition:
 ; bc = x
 ; de = y
 ; ix = this
-; hl <- position
+; ix <- tile
 ; Modifies: af, bc, de
-MapView_GetDataPosition:
+MapView_GetTile:
 	REPT 4
 	srl b
 	rr c
@@ -99,12 +99,10 @@ MapView_GetDataPosition:
 	srl d
 	rr e
 	ENDM
-	push ix
 	push de
 	call MapView_GetTileMap
 	pop de
-	call TileMap_GetDataPosition
-	pop ix
+	call TileMap_GetTile
 	ret
 
 ; ix = this
@@ -337,6 +335,7 @@ NoCarry:
 ; ix = this
 ; iy = VDP command
 MapView_ExecuteDraw:
+	push ix
 	ld a,e
 	and 0F0H
 	ld (iy + VDPCommand.dy),a
@@ -345,18 +344,13 @@ MapView_ExecuteDraw:
 	ld (iy + VDPCommand.dx),a
 	and 0CH
 	push af
-	call MapView_GetDataPosition
-	ld a,(hl)
-	ld h,a
-	add a,a
-	add a,a
-	add a,a
-	add a,a
+	call MapView_GetTile
+	ld a,(ix + Tile.x)
 	pop de
 	or d
 	ld (iy + VDPCommand.sx),a
-	ld a,h
-	and 0F0H
+	ld a,(ix + Tile.y)
 	ld (iy + VDPCommand.sy),a
 	call VDPCommand_Execute_IY
+	pop ix
 	ret

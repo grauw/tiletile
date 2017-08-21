@@ -26,6 +26,7 @@ ROM_BANK4567: ds 8000H
 
 TPA_PAGE1: equ ROM_BANK1
 RAM_RESIDENT: equ RAM
+ROM_FieldMap: equ ROM_BANK2
 ROM_FieldSet: equ ROM_BANK4567
 ROM_FieldSet_BANK: equ 4
 
@@ -52,6 +53,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Hook.asm"
 	INCLUDE "TIMIHook.asm"
 	INCLUDE "Input.asm"
+	INCLUDE "Tile.asm"
 	INCLUDE "TileSet.asm"
 	INCLUDE "TileMap.asm"
 	INCLUDE "MapView.asm"
@@ -61,7 +63,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 
 	ENDS
 
-	SECTION ROM_BANK2
+	SECTION ROM_BANK1
 
 	INCLUDE "FieldMap.asm"
 

@@ -40,14 +40,16 @@ class TileMap {
 		lines.push(`${this.name}_instance:`)
 		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.name}_data, ${this.name}_dataRows`);
 		lines.push("");
+		lines.push(`\tSECTION ROM_${this.name}`);
 		lines.push(`${this.name}_data:`);
-		for (let i = 0; i < this.tiles.length; i += 16) {
-			lines.push("\tdb " + this.tiles.slice(i, i + 16).map(tile => tile.index).join(", "));
+		for (let tile of this.tiles) {
+			lines.push(`\tdw ${this.tileSet.name}_tile${tile.index}`);
 		}
+		lines.push("\tENDS");
 		lines.push("");
 		lines.push(`${this.name}_dataRows:`);
 		for (let y = 0; y < this.height; y++) {
-			lines.push(`\tdw ${this.name}_data + ${y * this.width}`);
+			lines.push(`\tdw ${this.name}_data + ${y * this.width << 1}`);
 		}
 		lines.push("");
 		lines.push(this.tileSet.toAsm());
@@ -75,17 +77,15 @@ class TileSet {
 
 	toAsm() {
 		var lines = [];
-		lines.push("\tSECTION RAM");
+		lines.push(`${this.name}_instance: TileSet ${this.name}_tiles, ${this.tiles.length}, ROM_${this.name}_BANK, ${this.name}_palette`);
 		lines.push("");
-		lines.push(`${this.name}_instance: TileSet ROM_${this.name}_BANK, ${this.name}_palette`);
-		lines.push("");
-		lines.push("\tENDS");
+		lines.push(`${this.name}_tiles:`);
+		for (let tile of this.tiles)
+			lines.push(`${this.name}_tile${tile.index}: Tile ${tile.index}, ROM_${this.name}_BANK`);
 		lines.push("");
 		lines.push(`\tSECTION ROM_${this.name}`);
-		lines.push("");
 		lines.push(`${this.name}_pixelData:`);
 		lines.push(...this.tiles.map(tile => tile.toAsm()));
-		lines.push("");
 		lines.push("\tENDS");
 		lines.push("");
 		lines.push(`${this.name}_palette: Palette ` + this.palette.getWords()
