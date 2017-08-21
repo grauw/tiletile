@@ -49,3 +49,35 @@ Tile_Load:
 	pop hl
 	ld (hl),l
 	ret
+
+; iy = 4 patterns
+; ix = this
+; iy <- next pattern
+Tile_LoadToSpritePatterns:
+	ld a,(ix + Tile.imageBank)
+	ld hl,(ROM_bankA000)
+	push hl
+	ld (hl),a
+	ld l,(ix + Tile.image)
+	ld h,(ix + Tile.image + 1)
+	push hl
+	call SpritePattern_LoadFromTileBit0_IY
+	ld de,SpritePattern._size
+	add iy,de
+	pop hl
+	push hl
+	call SpritePattern_LoadFromTileBit1_IY
+	ld de,SpritePattern._size
+	add iy,de
+	pop hl
+	push hl
+	call SpritePattern_LoadFromTileBit2_IY
+	ld de,SpritePattern._size
+	add iy,de
+	pop hl
+	call SpritePattern_LoadFromTileBit3_IY
+	ld de,SpritePattern._size
+	add iy,de
+	pop hl
+	ld (hl),l
+	ret

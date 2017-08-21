@@ -28,6 +28,22 @@ TileSet_GetPalette:
 	ld ixh,d
 	ret
 
+; a = tile index
+; ix = this
+; ix <- tile
+TileSet_GetTile:
+	ld l,a
+	ld h,0
+	ld e,l
+	ld d,h
+	add hl,hl
+	add hl,hl
+	add hl,de
+	call TileSet_GetTiles
+	ex de,hl
+	add ix,de
+	ret
+
 ; ix = this
 TileSet_Load:
 	call TileSet_LoadTiles
@@ -52,46 +68,3 @@ Loop:
 	pop ix
 	ret
 	ENDP
-
-; b = tile nr
-; iy = 4 patterns
-; ix = this
-; iy <- next pattern
-TileSet_LoadTileToSpritePatterns:
-	ld a,b
-	and 11000000B
-	rlca
-	rlca
-	add a,(ix + TileSet.tilesBank)
-	ld hl,(ROM_bank6000)
-	push hl
-	ld (hl),a
-	ld a,b
-	and 00111111B
-	rra
-	ld l,0
-	ld h,a
-	rr l
-	ld de,6000H
-	add hl,de
-	push hl
-	call SpritePattern_LoadFromTileBit0_IY
-	ld de,SpritePattern._size
-	add iy,de
-	pop hl
-	push hl
-	call SpritePattern_LoadFromTileBit1_IY
-	ld de,SpritePattern._size
-	add iy,de
-	pop hl
-	push hl
-	call SpritePattern_LoadFromTileBit2_IY
-	ld de,SpritePattern._size
-	add iy,de
-	pop hl
-	call SpritePattern_LoadFromTileBit3_IY
-	ld de,SpritePattern._size
-	add iy,de
-	pop hl
-	ld (hl),l
-	ret

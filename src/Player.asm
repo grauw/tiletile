@@ -32,10 +32,14 @@ Player_Construct: PROC
 	ld ixl,e
 	ld ixh,d
 	ld iy,Player_pattern0
-	ld b,Player_TILE_TOP
-	call TileSet_LoadTileToSpritePatterns
-	ld b,Player_TILE_BOTTOM
-	call TileSet_LoadTileToSpritePatterns
+	push ix
+	ld a,Player_TILE_TOP
+	call TileSet_GetTile
+	call Tile_LoadToSpritePatterns
+	pop ix
+	ld a,Player_TILE_BOTTOM
+	call TileSet_GetTile
+	call Tile_LoadToSpritePatterns
 	pop ix
 	pop de
 	ld hl,Player.sprites
