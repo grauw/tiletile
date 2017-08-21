@@ -2,8 +2,8 @@
 ;
 ;
 Player_SPRITE_COUNT: equ 8
-Player_TILE_TOP: equ 0EDH
-Player_TILE_BOTTOM: equ 0FDH
+Player_TILE_TOP: equ FieldSet_tile237
+Player_TILE_BOTTOM: equ FieldSet_tile253
 Player_MOVE_SPEED: equ 2
 
 Player: MACRO
@@ -22,23 +22,16 @@ Player: MACRO
 		Sprite Player_pattern7, SpriteColor_solid8CC, -8, -8
 	ENDM
 
-; de = tile set
 ; iy = sprite system
 ; ix = this
 Player_Construct: PROC
 	push ix
 	push ix
 	push iy
-	ld ixl,e
-	ld ixh,d
 	ld iy,Player_pattern0
-	push ix
-	ld a,Player_TILE_TOP
-	call TileSet_GetTile
+	ld ix,Player_TILE_TOP
 	call Tile_LoadToSpritePatterns
-	pop ix
-	ld a,Player_TILE_BOTTOM
-	call TileSet_GetTile
+	ld ix,Player_TILE_BOTTOM
 	call Tile_LoadToSpritePatterns
 	pop ix
 	pop de

@@ -38,13 +38,8 @@ Scene_Construct:
 	pop ix
 
 	push ix
-	call Scene_GetTileSet
-	pop ix
-	push ix
-	push de
 	call Scene_GetSpritesIY
 	call Scene_GetPlayer
-	pop de
 	call Player_Construct
 	pop ix
 	ret
