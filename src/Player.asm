@@ -2,8 +2,8 @@
 ;
 ;
 Player_SPRITE_COUNT: equ 8
-Player_TILE_TOP: equ FieldSet_tile237
-Player_TILE_BOTTOM: equ FieldSet_tile253
+Player_TILE_TOP: equ FieldSet_ben0
+Player_TILE_BOTTOM: equ FieldSet_ben1
 Player_MOVE_SPEED: equ 2
 
 Player: MACRO

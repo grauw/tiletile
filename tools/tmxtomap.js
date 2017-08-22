@@ -41,7 +41,7 @@ class TileMap {
 		lines.push(`\tSECTION ROM_${this.name}`);
 		lines.push(`${this.name}_data:`);
 		for (let tile of this.tiles) {
-			lines.push(`\tdw ${this.tileSet.name}_tile${tile.index}`);
+			lines.push(`\tdw ${this.tileSet.name}_${tile.getName()}`);
 		}
 		lines.push("\tENDS");
 		lines.push("");
@@ -83,7 +83,7 @@ class TileSet {
 		lines.push("");
 		lines.push(`${this.name}_tiles:`);
 		for (let tile of this.tiles) {
-			lines.push(`${this.name}_tile${tile.index}: Tile ${tile.index}, ROM_${this.name}_BANK, ${tile.collision}`);
+			lines.push(`${this.name}_${tile.getName()}: Tile ${tile.index}, ROM_${this.name}_BANK, ${tile.collision}`);
 		}
 		lines.push("");
 		lines.push(`\tSECTION ROM_${this.name}`);
@@ -100,11 +100,16 @@ class TileSet {
 }
 
 class Tile {
-	constructor(index, image, collision) {
-		checkTypes(arguments, "number", Image, "number");
+	constructor(index, name, image, collision) {
+		checkTypes(arguments, "number", ["string"], Image, "number");
 		this.index = index;
+		this.name = name;
 		this.image = image;
 		this.collision = collision;
+	}
+
+	getName() {
+		return this.name || this.index.toString();
 	}
 
 	toAsm() {
@@ -239,9 +244,9 @@ class Tmx {
 
 	parseTile(tileXml, image) {
 		checkTypes(arguments, Object, Image);
-		let objectGroup = (tileXml.objectgroup || [])[0] || {};
+		let objectGroup = (tileXml.objectgroup || [])[0] || { $: {} };
 		let collision = ~~this.parseProperty(objectGroup, "collision", 0);
-		return new Tile(~~tileXml.$.id, image, collision);
+		return new Tile(~~tileXml.$.id, objectGroup.$.name || null, image, collision);
 	}
 
 	parseProperty(xml, name, default_) {
