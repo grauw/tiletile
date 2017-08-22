@@ -85,7 +85,7 @@ class TileSet {
 		lines.push("");
 		lines.push(`${this.name}_tiles:`);
 		for (let tile of this.tiles)
-			lines.push(`${this.name}_tile${tile.index}: Tile ${tile.index}, ROM_${this.name}_BANK`);
+			lines.push(`${this.name}_tile${tile.index}: Tile ${tile.index}, ROM_${this.name}_BANK, ${tile.collision}`);
 		lines.push("");
 		lines.push(`\tSECTION ROM_${this.name}`);
 		lines.push(`${this.name}_pixelData:`);
@@ -99,10 +99,11 @@ class TileSet {
 }
 
 class Tile {
-	constructor(index, image) {
-		checkTypes(arguments, "number", Image);
+	constructor(index, image, collision) {
+		checkTypes(arguments, "number", Image, "number");
 		this.index = index;
 		this.image = image;
+		this.collision = collision;
 	}
 
 	toAsm() {
@@ -227,10 +228,25 @@ class Tmx {
 			let tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
 			let tileImages = image.toTiles(tileSet.width, tileSet.height);
 			for (let i = 0; i < tileImages.length; i++) {
-				tileSet.addTile(new Tile(i, tileImages[i]));
+				let tileXml = (setXml.tile || []).find(t => t.$.id == i) || { $: { id: i } };
+				tileSet.addTile(this.parseTile(tileXml, tileImages[i]));
 			}
 			callback(tileSet);
 		});
+	}
+
+	parseTile(tileXml, image) {
+		checkTypes(arguments, Object, Image);
+		let objectGroup = (tileXml.objectgroup || [])[0] || {};
+		let collision = ~~this.parseProperty(objectGroup, "collision", 0);
+		return new Tile(~~tileXml.$.id, image, collision);
+	}
+
+	parseProperty(xml, name, default_) {
+		checkTypes(arguments, Object, "string");
+		let properties = (xml.properties || [])[0] || {};
+		let property = (properties.property || []).find(p => p.$.name == name);
+		return property !== undefined ? property.$.value : default_;
 	}
 }
 

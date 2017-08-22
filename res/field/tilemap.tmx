@@ -2,6 +2,117 @@
 <map version="1.0" tiledversion="1.0.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="16" tileheight="16" nextobjectid="1">
  <tileset firstgid="1" name="FieldSet" tilewidth="16" tileheight="16" tilecount="256" columns="16">
   <image source="tileset.png" width="256" height="256"/>
+  <tile id="66">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="67">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="68">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="69">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="82">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="83">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="84">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="85">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="98">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="99">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="114">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="115">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="128">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="129">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="144">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="collision" type="int" value="128"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="204">
+   <objectgroup draworder="index" name="May_top"/>
+  </tile>
+  <tile id="220">
+   <objectgroup draworder="index" name="May_bottom"/>
+  </tile>
  </tileset>
  <layer name="Tilelaag 1" width="64" height="64">
   <data encoding="csv">

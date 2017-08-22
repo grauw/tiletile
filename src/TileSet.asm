@@ -34,9 +34,9 @@ TileSet_GetPalette:
 TileSet_GetTile:
 	ld l,a
 	ld h,0
+	add hl,hl
 	ld e,l
 	ld d,h
-	add hl,hl
 	add hl,hl
 	add hl,de
 	call TileSet_GetTiles

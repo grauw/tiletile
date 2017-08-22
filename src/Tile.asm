@@ -3,7 +3,7 @@
 ;
 Tile_PAGE: equ 2
 
-Tile: MACRO ?index, ?tilesbank
+Tile: MACRO ?index, ?tilesbank, ?collision
 	image:
 		dw 0A000H + (?index << 7 & 1FFFH)
 	imageBank:
@@ -12,6 +12,8 @@ Tile: MACRO ?index, ?tilesbank
 		db (?index & 0FH) << 4
 	y:
 		db ?index & 0F0H
+	collision:
+		db ?collision
 	_size:
 	ENDM
 
