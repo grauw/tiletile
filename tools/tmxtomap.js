@@ -58,14 +58,18 @@ class TileMap {
 }
 
 class TileSet {
-	constructor(name, width, height, image) {
-		checkTypes(arguments, "string", "number", "number", ImageIndexed);
+	constructor(name, width, height, palette) {
+		checkTypes(arguments, "string", "number", "number", Palette);
 		this.name = name;
 		this.width = width;
 		this.height = height;
-		this.palette = image.palette;
-		this.tiles = image.toTiles(width, height).map(
-			(tileimage, index) => new Tile(index, tileimage));
+		this.palette = palette;
+		this.tiles = [];
+	}
+
+	addTile(tile) {
+		checkTypes(arguments, Tile);
+		this.tiles.push(tile);
 	}
 
 	getTile(index) {
@@ -220,8 +224,11 @@ class Tmx {
 		checkTypes(arguments, Object, Function);
 		let imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
 		new PNGLoader(imagepath).loadImage(image => {
-			let tileSet = new TileSet(setXml.$.name,
-				~~setXml.$.tilewidth, ~~setXml.$.tileheight, image);
+			let tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
+			let tileImages = image.toTiles(tileSet.width, tileSet.height);
+			for (let i = 0; i < tileImages.length; i++) {
+				tileSet.addTile(new Tile(i, tileImages[i]));
+			}
 			callback(tileSet);
 		});
 	}
