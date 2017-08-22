@@ -100,7 +100,7 @@ class TileSet {
 
 class Tile {
 	constructor(index, image) {
-		checkTypes(arguments, "number", ImageIndexed);
+		checkTypes(arguments, "number", Image);
 		this.index = index;
 		this.image = image;
 	}
@@ -110,7 +110,7 @@ class Tile {
 	}
 }
 
-class ImageIndexed {
+class Image {
 	constructor(width, height, palette) {
 		checkTypes(arguments, "number", "number", Palette);
 		this.width = width;
@@ -131,7 +131,7 @@ class ImageIndexed {
 		if (this.pixels.length != this.width * this.height)
 			throw new Error("Image incomplete.");
 
-		let image = new ImageIndexed(width, height, this.palette);
+		let image = new Image(width, height, this.palette);
 		for (let cy = y; cy < y + height; cy++)
 			for (let cx = x; cx < x + width; cx++)
 				image.addPixel(this.pixels[cy * this.width + cx].index);
@@ -247,7 +247,7 @@ class PNGLoader {
 		if (png.colorType != 3)
 			throw new Error("Not indexed RGB.");
 
-		let image = new ImageIndexed(png.width, png.height, this.toPalette(png.palette));
+		let image = new Image(png.width, png.height, this.toPalette(png.palette));
 
 		png.decodePixels(pixels => {
 			for (let index of pixels)
