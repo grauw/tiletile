@@ -28,11 +28,9 @@ class TileMap {
 		this.tiles = [];
 	}
 
-	addTileIndices(tileIndices) {
-		checkTypes(arguments, Array);
-		for (let index of tileIndices) {
-			this.tiles.push(this.tileSet.getTile(index));
-		}
+	addTileByIndex(index) {
+		checkTypes(arguments, "number");
+		this.tiles.push(this.tileSet.getTileByIndex(index));
 	}
 
 	toAsm() {
@@ -72,7 +70,7 @@ class TileSet {
 		this.tiles.push(tile);
 	}
 
-	getTile(index) {
+	getTileByIndex(index) {
 		checkTypes(arguments, "number");
 		if (index < 0 || index >= this.tiles.length)
 			throw new Error(`Tile not found: ${index}`);
@@ -84,12 +82,15 @@ class TileSet {
 		lines.push(`${this.name}_instance: TileSet ${this.name}_tiles, ${this.tiles.length}, ROM_${this.name}_BANK, ${this.name}_palette`);
 		lines.push("");
 		lines.push(`${this.name}_tiles:`);
-		for (let tile of this.tiles)
+		for (let tile of this.tiles) {
 			lines.push(`${this.name}_tile${tile.index}: Tile ${tile.index}, ROM_${this.name}_BANK, ${tile.collision}`);
+		}
 		lines.push("");
 		lines.push(`\tSECTION ROM_${this.name}`);
 		lines.push(`${this.name}_pixelData:`);
-		lines.push(...this.tiles.map(tile => tile.toAsm()));
+		for (let tile of this.tiles) {
+			lines.push(tile.toAsm());
+		}
 		lines.push("\tENDS");
 		lines.push("");
 		lines.push(`${this.name}_palette: Palette ` + this.palette.getWords()
@@ -214,9 +215,10 @@ class Tmx {
 		checkTypes(arguments, Object, Function);
 		this.parseSet(mapXml.tileset[0], tileSet => {
 			var tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height, tileSet);
-			let indicesCSV = mapXml.layer[0].data[0]._.replace(/\s/g, "");
-			let indices = indicesCSV.split(",").map(i => ~~i - 1);
-			tileMap.addTileIndices(indices);
+			let indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
+			for (let index of indices) {
+				tileMap.addTileByIndex(index);
+			}
 			callback(tileMap);
 		});
 	}
