@@ -82,8 +82,10 @@ RAM_endAddress:
 	SECTION ROM_BANK0
 
 ROM_Init:
-	call Memory_GetSlotPage1
-	call Memory_SetSlotPage2
+	ld h,40H
+	call Memory_GetSlot
+	ld h,80H
+	call Memory_SetSlot
 	ld a,ROM_CodeBank1
 	ld (ROM_BANK_4000_CHANGE),a
 	ld a,ROM_CodeBank2
