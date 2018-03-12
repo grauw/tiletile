@@ -1,7 +1,9 @@
 ;
 ; A drawing context
 ;
-DrawContext: MACRO ?spriteColorAddress, ?spritePatternAddress
+DrawContext: MACRO ?patternNameAddress, ?spriteColorAddress, ?spritePatternAddress
+	patternNameTable:
+		PatternNameTable ?patternNameAddress
 	spriteColorTable:
 		SpriteColorTable ?spriteColorAddress
 	spriteAttributeTable:
@@ -12,6 +14,10 @@ DrawContext: MACRO ?spriteColorAddress, ?spritePatternAddress
 
 ; ix = this
 DrawContext_Construct:
+	push ix
+	call DrawContext_GetPatternNameTable
+	call PatternNameTable_Construct
+	pop ix
 	push ix
 	call DrawContext_GetSpriteColorTable
 	call SpriteColorTable_Construct
@@ -24,6 +30,13 @@ DrawContext_Construct:
 	call DrawContext_GetSpritePatternTable
 	call SpritePatternTable_Construct
 	pop ix
+	ret
+
+; ix = this
+; ix <- pattern name table
+DrawContext_GetPatternNameTable:
+	ld de,DrawContext.patternNameTable
+	add ix,de
 	ret
 
 ; ix = this
@@ -50,12 +63,29 @@ DrawContext_GetSpritePatternTable:
 ; ix = this
 DrawContext_Select:
 	push ix
+	call DrawContext_GetPatternNameTable
+	call PatternNameTable_Select
+	pop ix
+	push ix
 	call DrawContext_GetSpriteAttributeTable
 	call SpriteAttributeTable_Select
 	pop ix
 	push ix
 	call DrawContext_GetSpritePatternTable
 	call SpritePatternTable_Select
+	pop ix
+	ret
+
+; hl = offset
+; ix = this
+; c <- write port
+DrawContext_SetPatternNameWriteIY:
+	push ix
+	ld e,iyl
+	ld d,iyh
+	ld ix,DrawContext.patternNameTable
+	add ix,de
+	call PatternNameTable_SetPatternNameWrite
 	pop ix
 	ret
 

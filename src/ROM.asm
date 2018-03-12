@@ -51,6 +51,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Palette.asm"
 	INCLUDE "vdp/DrawContext.asm"
 	INCLUDE "vdp/VRAMTable.asm"
+	INCLUDE "vdp/PatternNameTable.asm"
 	INCLUDE "vdp/SpriteColorTable.asm"
 	INCLUDE "vdp/SpriteAttributeTable.asm"
 	INCLUDE "vdp/SpritePatternTable.asm"

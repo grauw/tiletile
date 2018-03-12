@@ -11,9 +11,9 @@ Scene: MACRO ?tileset, ?tilemap
 	currentDrawContext:
 		dw drawContextEven
 	drawContextEven:
-		DrawContext 1F400H, 1F800H
+		DrawContext 0H, 1F400H, 1F800H
 	drawContextOdd:
-		DrawContext 1F000H, 1F800H
+		DrawContext 0H, 1F000H, 1F800H
 	mapView:
 		MapView
 	sprites:
