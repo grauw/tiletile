@@ -15,15 +15,14 @@ Sprites: MACRO
 		dw 0
 	y:
 		dw 0
+	currentAttributeTable:
+		dw attributeTable
 	patternTable:
-		dw 0F800H
-		db 1H
+		SpritePatternTable 1F800H
 	attributeTable:
-		dw 0F600H  ; colour table: F200H
-		db 1H
+		SpriteAttributeTable 1F600H  ; colour table: 1F200H
 	attributeTableAlt:
-		dw 0F200H  ; colour table: F000H
-		db 1H
+		SpriteAttributeTable 1F200H  ; colour table: 1F000H
 	sprites:
 		REPT Sprites_MAX_SPRITES
 		dw Sprite_unused
@@ -36,35 +35,48 @@ Sprites: MACRO
 
 ; ix = this
 Sprites_Construct:
-	ld a,(ix + Sprites.patternTable)
-	and a
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.patternTable + 1)
-	and 00000111B
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.patternTable + 2)
-	and 11111110B
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.attributeTable)
-	and a
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.attributeTable + 1)
-	and 00000011B
-	cp 00000010B
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.attributeTable + 2)
-	and 11111110B
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.attributeTableAlt)
-	and a
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.attributeTableAlt + 1)
-	and 00000011B
-	cp 00000010B
-	call nz,System_ThrowException
-	ld a,(ix + Sprites.attributeTableAlt + 2)
-	and 11111110B
-	call nz,System_ThrowException
+	push ix
+	call Sprites_GetPatternTable
+	call SpritePatternTable_Construct
+	pop ix
+	push ix
+	call Sprites_GetAttributeTable
+	call SpriteAttributeTable_Construct
+	pop ix
+	push ix
+	call Sprites_GetAttributeTableAlt
+	call SpriteAttributeTable_Construct
+	pop ix
+	ret
+
+; ix = this
+; ix <- sprite attribute table
+Sprites_GetCurrentAttributeTable:
+	ld e,(ix + Sprites.currentAttributeTable)
+	ld d,(ix + Sprites.currentAttributeTable + 1)
+	ld ixl,e
+	ld ixh,d
+	ret
+
+; ix = this
+; ix <- sprite pattern table
+Sprites_GetPatternTable:
+	ld de,Sprites.patternTable
+	add ix,de
+	ret
+
+; ix = this
+; ix <- sprite attribute table
+Sprites_GetAttributeTable:
+	ld de,Sprites.attributeTable
+	add ix,de
+	ret
+
+; ix = this
+; ix <- sprite attribute table (alt)
+Sprites_GetAttributeTableAlt:
+	ld de,Sprites.attributeTableAlt
+	add ix,de
 	ret
 
 ; bc = x
@@ -90,43 +102,42 @@ Sprites_InitializeTables:
 	ld (VDP_MIRROR_0 + 1),a
 	ld b,1
 	call VDP_SetRegister
-	ld a,(ix + Sprites.patternTable + 2)
-	rra
-	ld a,(ix + Sprites.patternTable + 1)
-	rra
-	rra
-	rra
-	ld b,6
-	call VDP_SetRegister
+	push ix
+	call Sprites_GetPatternTable
+	call SpritePatternTable_Select
+	pop ix
 	call Sprites_SwapTables
 	ret
 
 ; ix = this
-Sprites_SwapTables:
-	ld l,(ix + Sprites.attributeTable)
-	ld h,(ix + Sprites.attributeTable + 1)
-	ld e,(ix + Sprites.attributeTable + 2)
-	ld d,(ix + Sprites.attributeTableAlt)
-	ld c,(ix + Sprites.attributeTableAlt + 1)
-	ld b,(ix + Sprites.attributeTableAlt + 2)
-	ld (ix + Sprites.attributeTableAlt),l
-	ld (ix + Sprites.attributeTableAlt + 1),h
-	ld (ix + Sprites.attributeTableAlt + 2),e
-	ld (ix + Sprites.attributeTable),d
-	ld (ix + Sprites.attributeTable + 1),c
-	ld (ix + Sprites.attributeTable + 2),b
-	ld a,h
-	rla
-	push af
-	or 00000011B
-	ld b,5
-	call VDP_SetRegister
-	pop af
+Sprites_SwapTables: PROC
+	push ix
+	call Sprites_GetCurrentAttributeTable
+	push de
+	call SpriteAttributeTable_Select
+	pop bc
+	pop ix
+	push ix
+	call Sprites_GetAttributeTable
+	ld e,ixl
+	ld d,ixh
+	pop ix
 	ld a,e
-	rla
-	ld b,11
-	call VDP_SetRegister
+	cp c
+	jr nz,NoAlt
+	ld a,d
+	cp b
+	jr nz,NoAlt
+	push ix
+	call Sprites_GetAttributeTableAlt
+	ld e,ixl
+	ld d,ixh
+	pop ix
+NoAlt:
+	ld (ix + Sprites.currentAttributeTable),e
+	ld (ix + Sprites.currentAttributeTable + 1),d
 	ret
+	ENDP
 
 ; de = sprite
 ; ix = this
@@ -220,11 +231,12 @@ Sprites_Draw:
 
 ; ix = this
 Sprites_DrawSprites: PROC
-	ld l,(ix + Sprites.attributeTable)
-	ld h,(ix + Sprites.attributeTable + 1)
-	ld a,(ix + Sprites.attributeTable + 2)
-	call VDP_SetWriteAddress
-	ld bc,Sprites_MAX_SPRITES << 8 | VDP_PORT_0
+	push ix
+	call Sprites_GetCurrentAttributeTable
+	ld a,0
+	call SpriteAttributeTable_SetAttributeWrite
+	pop ix
+	ld b,Sprites_MAX_SPRITES
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh
@@ -247,13 +259,12 @@ Loop:
 
 ; ix = this
 Sprites_DrawColors: PROC
-	ld l,(ix + Sprites.attributeTable)
-	ld h,(ix + Sprites.attributeTable + 1)
-	ld a,(ix + Sprites.attributeTable + 2)
-	ld de,-200H
-	add hl,de
-	call VDP_SetWriteAddress
-	ld bc,Sprites_MAX_SPRITES << 8 | VDP_PORT_0
+	push ix
+	call Sprites_GetCurrentAttributeTable
+	ld a,0
+	call SpriteAttributeTable_SetColorWrite
+	pop ix
+	ld b,Sprites_MAX_SPRITES
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh
@@ -278,17 +289,9 @@ Loop:
 ; ix = this
 Sprites_DrawPattern:
 	call SpritePattern_GetNumber_IY
-	add a,a
-	add a,a
-	ld l,a
-	ld h,0
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ld e,(ix + Sprites.patternTable)
-	ld d,(ix + Sprites.patternTable + 1)
-	add hl,de
-	ld a,(ix + Sprites.patternTable + 2)
-	call VDP_SetWriteAddress
+	push ix
+	call Sprites_GetPatternTable
+	call SpritePatternTable_SetPatternWrite
+	pop ix
 	call SpritePattern_Draw_IY
 	ret
