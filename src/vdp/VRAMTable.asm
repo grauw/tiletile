@@ -11,13 +11,11 @@ VRAMTable: MACRO ?address
 ; ix = this
 ; c <- write port
 VRAMTable_SetWrite:
-	rl h
-	sbc a,a
-	rr h
 	ld e,(ix + VRAMTable.address)
 	ld d,(ix + VRAMTable.address + 1)
 	add hl,de
-	adc a,(ix + VRAMTable.address + 2)
+	ld a,(ix + VRAMTable.address + 2)
+	adc a,0
 	call VDP_SetWriteAddress
 	ld c,VDP_PORT_0
 	ret

@@ -8,6 +8,12 @@ Scene: MACRO ?tileset, ?tilemap
 		dw ?tilemap
 	input:
 		dw 0
+	currentDrawContext:
+		dw drawContextEven
+	drawContextEven:
+		DrawContext 1F400H, 1F800H
+	drawContextOdd:
+		DrawContext 1F000H, 1F800H
 	mapView:
 		MapView
 	sprites:
@@ -21,6 +27,16 @@ Scene: MACRO ?tileset, ?tilemap
 Scene_Construct:
 	ld (ix + Scene.input),e
 	ld (ix + Scene.input + 1),d
+
+	ld de,Scene.drawContextEven
+	add ix,de
+	call DrawContext_Construct
+	ld de,Scene.drawContextOdd - Scene.drawContextEven
+	add ix,de
+	call DrawContext_Construct
+	ld de,-Scene.drawContextOdd
+	add ix,de
+
 	push ix
 	call Scene_GetSprites
 	call Sprites_Construct
@@ -69,6 +85,22 @@ Scene_GetInput_IY:
 	ret
 
 ; ix = this
+Scene_GetCurrentDrawContext:
+	ld e,(ix + Scene.currentDrawContext)
+	ld d,(ix + Scene.currentDrawContext + 1)
+	ld ixl,e
+	ld ixh,d
+	ret
+
+; ix = this
+Scene_GetCurrentDrawContext_IY:
+	ld e,(ix + Scene.currentDrawContext)
+	ld d,(ix + Scene.currentDrawContext + 1)
+	ld iyl,e
+	ld iyh,d
+	ret
+
+; ix = this
 Scene_GetMapView:
 	ld de,Scene.mapView
 	add ix,de
@@ -96,6 +128,28 @@ Scene_GetPlayer:
 	ld de,Scene.player
 	add ix,de
 	ret
+
+; ix = this
+Scene_SwapTables: PROC
+	ld c,(ix + Scene.currentDrawContext)
+	ld b,(ix + Scene.currentDrawContext + 1)
+	ld e,ixl
+	ld d,ixh
+	ld hl,Scene.drawContextEven
+	add hl,de
+	ld a,l
+	cp c
+	jr nz,Even
+	ld a,h
+	cp b
+	jr nz,Even
+	ld hl,Scene.drawContextOdd
+	add hl,de
+Even:
+	ld (ix + Scene.currentDrawContext),l
+	ld (ix + Scene.currentDrawContext + 1),h
+	ret
+	ENDP
 
 ; ix = this
 Scene_Start:
@@ -128,9 +182,11 @@ Scene_Update:
 	pop ix
 
 	push ix
-	call Scene_GetSprites
-	call Sprites_SwapTables
+	call Scene_GetCurrentDrawContext
+	call DrawContext_Select
 	pop ix
+
+	call Scene_SwapTables
 
 	push ix
 	call Scene_GetPlayer
@@ -165,6 +221,11 @@ Scene_Update:
 	call Scene_GetSprites
 	pop de
 	call Sprites_SetPosition
+	pop ix
+
+	call Scene_GetCurrentDrawContext_IY
+	push ix
+	call Scene_GetSprites
 	call Sprites_Draw
 	pop ix
 

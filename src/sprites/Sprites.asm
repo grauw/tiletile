@@ -15,14 +15,8 @@ Sprites: MACRO
 		dw 0
 	y:
 		dw 0
-	currentAttributeTable:
-		dw attributeTable
 	patternTable:
 		SpritePatternTable 1F800H
-	attributeTable:
-		SpriteAttributeTable 1F600H  ; colour table: 1F200H
-	attributeTableAlt:
-		SpriteAttributeTable 1F200H  ; colour table: 1F000H
 	sprites:
 		REPT Sprites_MAX_SPRITES
 		dw Sprite_unused
@@ -39,43 +33,12 @@ Sprites_Construct:
 	call Sprites_GetPatternTable
 	call SpritePatternTable_Construct
 	pop ix
-	push ix
-	call Sprites_GetAttributeTable
-	call SpriteAttributeTable_Construct
-	pop ix
-	push ix
-	call Sprites_GetAttributeTableAlt
-	call SpriteAttributeTable_Construct
-	pop ix
-	ret
-
-; ix = this
-; ix <- sprite attribute table
-Sprites_GetCurrentAttributeTable:
-	ld e,(ix + Sprites.currentAttributeTable)
-	ld d,(ix + Sprites.currentAttributeTable + 1)
-	ld ixl,e
-	ld ixh,d
 	ret
 
 ; ix = this
 ; ix <- sprite pattern table
 Sprites_GetPatternTable:
 	ld de,Sprites.patternTable
-	add ix,de
-	ret
-
-; ix = this
-; ix <- sprite attribute table
-Sprites_GetAttributeTable:
-	ld de,Sprites.attributeTable
-	add ix,de
-	ret
-
-; ix = this
-; ix <- sprite attribute table (alt)
-Sprites_GetAttributeTableAlt:
-	ld de,Sprites.attributeTableAlt
 	add ix,de
 	ret
 
@@ -95,7 +58,6 @@ Sprites_SetPosition:
 
 ; ix = this
 Sprites_InitializeTables:
-	call Sprites_Draw
 	ld a,(VDP_MIRROR_0 + 1)
 	res 0,a  ; MAG
 	set 1,a  ; SI
@@ -106,38 +68,7 @@ Sprites_InitializeTables:
 	call Sprites_GetPatternTable
 	call SpritePatternTable_Select
 	pop ix
-	call Sprites_SwapTables
 	ret
-
-; ix = this
-Sprites_SwapTables: PROC
-	push ix
-	call Sprites_GetCurrentAttributeTable
-	push de
-	call SpriteAttributeTable_Select
-	pop bc
-	pop ix
-	push ix
-	call Sprites_GetAttributeTable
-	ld e,ixl
-	ld d,ixh
-	pop ix
-	ld a,e
-	cp c
-	jr nz,NoAlt
-	ld a,d
-	cp b
-	jr nz,NoAlt
-	push ix
-	call Sprites_GetAttributeTableAlt
-	ld e,ixl
-	ld d,ixh
-	pop ix
-NoAlt:
-	ld (ix + Sprites.currentAttributeTable),e
-	ld (ix + Sprites.currentAttributeTable + 1),d
-	ret
-	ENDP
 
 ; de = sprite
 ; ix = this
@@ -224,23 +155,23 @@ Found:
 	ENDP
 
 ; ix = this
+; iy = draw context
 Sprites_Draw:
 	call Sprites_DrawSprites
 	call Sprites_DrawColors
 	ret
 
 ; ix = this
+; iy = draw context
 Sprites_DrawSprites: PROC
-	push ix
-	call Sprites_GetCurrentAttributeTable
 	ld a,0
-	call SpriteAttributeTable_SetAttributeWrite
-	pop ix
+	call DrawContext_SetSpriteAttributeWriteIY
 	ld b,Sprites_MAX_SPRITES
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh
 	add hl,de
+	push iy
 Loop:
 	push bc
 	ld e,(hl)
@@ -254,21 +185,21 @@ Loop:
 	pop hl
 	pop bc
 	djnz Loop
+	pop iy
 	ret
 	ENDP
 
 ; ix = this
+; iy = draw context
 Sprites_DrawColors: PROC
-	push ix
-	call Sprites_GetCurrentAttributeTable
 	ld a,0
-	call SpriteAttributeTable_SetColorWrite
-	pop ix
+	call DrawContext_SetSpriteColorWriteIY
 	ld b,Sprites_MAX_SPRITES
 	ld hl,Sprites.sprites
 	ld e,ixl
 	ld d,ixh
 	add hl,de
+	push iy
 Loop:
 	push bc
 	ld e,(hl)
@@ -282,6 +213,7 @@ Loop:
 	pop hl
 	pop bc
 	djnz Loop
+	pop iy
 	ret
 	ENDP
 
