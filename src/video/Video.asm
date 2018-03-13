@@ -11,6 +11,8 @@
 Video: MACRO
 	currentDrawContext:
 		dw drawContextEven
+	displayDrawContext:
+		dw drawContextOdd
 	drawContextEven:
 		DrawContext 0H, 1F400H, 1F800H
 	drawContextOdd:
@@ -46,23 +48,13 @@ Video_GetCurrentDrawContext_IY:
 	ret
 
 ; ix = this
-Video_SwapTables: PROC
+Video_SwapTables:
 	ld c,(ix + Video.currentDrawContext)
 	ld b,(ix + Video.currentDrawContext + 1)
-	ld e,ixl
-	ld d,ixh
-	ld hl,Video.drawContextEven
-	add hl,de
-	ld a,l
-	cp c
-	jr nz,Even
-	ld a,h
-	cp b
-	jr nz,Even
-	ld hl,Video.drawContextOdd
-	add hl,de
-Even:
-	ld (ix + Video.currentDrawContext),l
-	ld (ix + Video.currentDrawContext + 1),h
+	ld e,(ix + Video.displayDrawContext)
+	ld d,(ix + Video.displayDrawContext + 1)
+	ld (ix + Video.currentDrawContext),e
+	ld (ix + Video.currentDrawContext + 1),d
+	ld (ix + Video.displayDrawContext),c
+	ld (ix + Video.displayDrawContext + 1),d
 	ret
-	ENDP
