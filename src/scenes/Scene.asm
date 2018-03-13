@@ -137,11 +137,6 @@ Scene_Start:
 ; ix = this
 Scene_Update:
 	push ix
-	call Scene_GetMapView
-	call MapView_Update
-	pop ix
-
-	push ix
 	call Scene_GetVideo
 	call Video_SwapTables
 	pop ix
@@ -159,6 +154,15 @@ Scene_Update:
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
 	call Scene_UpdateMapViewPosition
+
+	push ix
+	call Scene_GetVideo
+	call Video_GetCurrentDrawContext_IY
+	pop ix
+	push ix
+	call Scene_GetMapView
+	call MapView_Update
+	pop ix
 
 	IF DEBUG
 	ld a,1

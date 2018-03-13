@@ -2,6 +2,12 @@
 ; A drawing context
 ;
 DrawContext: MACRO ?patternNameAddress, ?spriteColorAddress, ?spritePatternAddress
+	displayOffset:
+		db 0
+	horizontalOffsetCharacters:
+		db 0
+	horizontalOffsetDots:
+		db 0
 	patternNameTable:
 		PatternNameTable ?patternNameAddress
 	spriteColorTable:
@@ -74,6 +80,15 @@ DrawContext_Select:
 	call DrawContext_GetSpritePatternTable
 	call SpritePatternTable_Select
 	pop ix
+	ld a,(ix + DrawContext.displayOffset)
+	ld b,23
+	call VDP_SetRegister
+	ld a,(ix + DrawContext.horizontalOffsetCharacters)
+	ld b,26
+	call VDP_SetRegister
+	ld a,(ix + DrawContext.horizontalOffsetDots)
+	ld b,27
+	call VDP_SetRegister
 	ret
 
 ; hl = offset
@@ -126,4 +141,25 @@ DrawContext_SetSpritePatternWriteIY:
 	add ix,de
 	call SpritePatternTable_SetPatternWrite
 	pop ix
+	ret
+
+; a = offset
+; iy = this
+DrawContext_SetVerticalOffsetIY:
+	ld (iy + DrawContext.displayOffset),a
+	ret
+
+; a = offset
+; iy = this
+DrawContext_SetHorizontalOffsetIY:
+	push af
+	neg
+	and 07H
+	ld (iy + DrawContext.horizontalOffsetDots),a
+	pop af
+	dec a
+	srl a
+	srl a
+	srl a
+	ld (iy + DrawContext.horizontalOffsetCharacters),a
 	ret

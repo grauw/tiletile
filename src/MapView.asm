@@ -183,7 +183,6 @@ MapView_Start:
 	ld b,25
 	call VDP_SetRegister
 	call MapView_Recenter
-	call MapView_Update
 	call MapView_Draw
 	ret
 
@@ -209,22 +208,12 @@ NoOverflow:
 	ENDP
 
 ; ix = this
+; iy = draw context
 MapView_Update:
 	ld a,(ix + MapView.y)
-	ld b,23
-	call VDP_SetRegister
+	call DrawContext_SetVerticalOffsetIY
 	ld a,(ix + MapView.x)
-	neg
-	and 07H
-	ld b,27
-	call VDP_SetRegister
-	ld a,(ix + MapView.x)
-	dec a
-	srl a
-	srl a
-	srl a
-	ld b,26
-	call VDP_SetRegister
+	call DrawContext_SetHorizontalOffsetIY
 	ret
 
 ; ix = this
