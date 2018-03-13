@@ -194,6 +194,12 @@ Scene_Update:
 	call Sprites_Draw
 	pop ix
 
+	push ix
+	call Scene_GetVideo
+	call Video_GetCurrentDrawContext
+	call DrawContext_Submit
+	pop ix
+
 	IF DEBUG
 	xor a
 	out (2ch),a

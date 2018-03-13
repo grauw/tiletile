@@ -48,9 +48,11 @@ Video_GetCurrentDrawContext_IY:
 	ret
 
 ; ix = this
-Video_SwapTables:
+Video_SwapTables: PROC
 	push ix
 	call Video_GetCurrentDrawContext
+	call DrawContext_IsSubmitted
+	jr z,Skip
 	call DrawContext_Select
 	pop ix
 	ld c,(ix + Video.currentDrawContext)
@@ -61,4 +63,10 @@ Video_SwapTables:
 	ld (ix + Video.currentDrawContext + 1),d
 	ld (ix + Video.displayDrawContext),c
 	ld (ix + Video.displayDrawContext + 1),d
+	push ix
+	call Video_GetCurrentDrawContext
+	call DrawContext_Release
+Skip:
+	pop ix
 	ret
+	ENDP
