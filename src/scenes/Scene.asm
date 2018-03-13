@@ -143,10 +143,6 @@ Scene_Update:
 
 	push ix
 	call Scene_GetVideo
-	push ix
-	call Video_GetCurrentDrawContext
-	call DrawContext_Select
-	pop ix
 	call Video_SwapTables
 	pop ix
 

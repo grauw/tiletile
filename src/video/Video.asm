@@ -49,6 +49,10 @@ Video_GetCurrentDrawContext_IY:
 
 ; ix = this
 Video_SwapTables:
+	push ix
+	call Video_GetCurrentDrawContext
+	call DrawContext_Select
+	pop ix
 	ld c,(ix + Video.currentDrawContext)
 	ld b,(ix + Video.currentDrawContext + 1)
 	ld e,(ix + Video.displayDrawContext)
