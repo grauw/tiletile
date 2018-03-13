@@ -8,12 +8,8 @@ Scene: MACRO ?tileset, ?tilemap
 		dw ?tilemap
 	input:
 		dw 0
-	currentDrawContext:
-		dw drawContextEven
-	drawContextEven:
-		DrawContext 0H, 1F400H, 1F800H
-	drawContextOdd:
-		DrawContext 0H, 1F000H, 1F800H
+	video:
+		Video
 	mapView:
 		MapView
 	sprites:
@@ -28,14 +24,10 @@ Scene_Construct:
 	ld (ix + Scene.input),e
 	ld (ix + Scene.input + 1),d
 
-	ld de,Scene.drawContextEven
-	add ix,de
-	call DrawContext_Construct
-	ld de,Scene.drawContextOdd - Scene.drawContextEven
-	add ix,de
-	call DrawContext_Construct
-	ld de,-Scene.drawContextOdd
-	add ix,de
+	push ix
+	call Scene_GetVideo
+	call Video_Construct
+	pop ix
 
 	push ix
 	call Scene_GetSprites
@@ -85,19 +77,9 @@ Scene_GetInput_IY:
 	ret
 
 ; ix = this
-Scene_GetCurrentDrawContext:
-	ld e,(ix + Scene.currentDrawContext)
-	ld d,(ix + Scene.currentDrawContext + 1)
-	ld ixl,e
-	ld ixh,d
-	ret
-
-; ix = this
-Scene_GetCurrentDrawContext_IY:
-	ld e,(ix + Scene.currentDrawContext)
-	ld d,(ix + Scene.currentDrawContext + 1)
-	ld iyl,e
-	ld iyh,d
+Scene_GetVideo:
+	ld de,Scene.video
+	add ix,de
 	ret
 
 ; ix = this
@@ -130,28 +112,6 @@ Scene_GetPlayer:
 	ret
 
 ; ix = this
-Scene_SwapTables: PROC
-	ld c,(ix + Scene.currentDrawContext)
-	ld b,(ix + Scene.currentDrawContext + 1)
-	ld e,ixl
-	ld d,ixh
-	ld hl,Scene.drawContextEven
-	add hl,de
-	ld a,l
-	cp c
-	jr nz,Even
-	ld a,h
-	cp b
-	jr nz,Even
-	ld hl,Scene.drawContextOdd
-	add hl,de
-Even:
-	ld (ix + Scene.currentDrawContext),l
-	ld (ix + Scene.currentDrawContext + 1),h
-	ret
-	ENDP
-
-; ix = this
 Scene_Start:
 	push ix
 	call Scene_GetTileSet
@@ -182,11 +142,13 @@ Scene_Update:
 	pop ix
 
 	push ix
-	call Scene_GetCurrentDrawContext
+	call Scene_GetVideo
+	push ix
+	call Video_GetCurrentDrawContext
 	call DrawContext_Select
 	pop ix
-
-	call Scene_SwapTables
+	call Video_SwapTables
+	pop ix
 
 	push ix
 	call Scene_GetPlayer
@@ -223,7 +185,10 @@ Scene_Update:
 	call Sprites_SetPosition
 	pop ix
 
-	call Scene_GetCurrentDrawContext_IY
+	push ix
+	call Scene_GetVideo
+	call Video_GetCurrentDrawContext_IY
+	pop ix
 	push ix
 	call Scene_GetSprites
 	call Sprites_Draw
