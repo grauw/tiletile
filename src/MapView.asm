@@ -177,6 +177,11 @@ MapView_MoveDown:
 
 ; ix = this
 MapView_Start:
+	ld a,(VDP_MIRROR_25 + 25)
+	or 00000010B  ; MSK
+	ld (VDP_MIRROR_25 + 25),a
+	ld b,25
+	call VDP_SetRegister
 	call MapView_Recenter
 	call MapView_Update
 	call MapView_Draw
@@ -205,11 +210,6 @@ NoOverflow:
 
 ; ix = this
 MapView_Update:
-	ld a,(VDP_MIRROR_25 + 25)
-	or 00000010B
-	ld (VDP_MIRROR_25 + 25),a
-	ld b,25
-	call VDP_SetRegister
 	ld a,(ix + MapView.y)
 	ld b,23
 	call VDP_SetRegister
