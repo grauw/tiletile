@@ -20,8 +20,6 @@ Application_Main:
 
 	call System_SetDirectBIOSHandlers
 
-;	call System_EnableTurbo
-
 	call MemoryTest_Test
 
 	ld ix,Application_instance
