@@ -11,16 +11,7 @@ Input_Construct:
 	ret
 
 ; ix = this
-Input_Update_IY:
-	push iy
-	ex (sp),ix
-	call Input_UpdateNewKey
-	ex (sp),ix
-	pop iy
-	ret
-
-; ix = this
-Input_UpdateNewKey: PROC
+Input_Update: PROC
 	ld c,ixl
 	ld b,ixh
 	ld hl,Input.newKey

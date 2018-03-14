@@ -126,9 +126,6 @@ Scene_Start:
 Scene_Update:
 	push iy
 
-	call Scene_GetInput_IY
-	call Input_Update_IY
-
 	push ix
 	call Scene_GetPlayer
 	call Player_Update

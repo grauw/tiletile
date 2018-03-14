@@ -53,11 +53,13 @@ Application_Construct:
 	call TIMIHook_Construct
 	pop ix
 
-	call Application_GetInput_IY
+	push ix
 	push ix
 	call Application_GetScene
-	ld e,iyl
-	ld d,iyh
+	ex (sp),ix
+	call Application_GetInput
+	ex (sp),ix
+	pop de
 	call Scene_Construct
 	pop ix
 	ret
@@ -66,14 +68,6 @@ Application_Construct:
 Application_GetInput:
 	ld de,Application.input
 	add ix,de
-	ret
-
-; ix = this
-Application_GetInput_IY:
-	ld e,ixl
-	ld d,ixh
-	ld iy,Application.input
-	add iy,de
 	ret
 
 ; ix = this
@@ -148,6 +142,12 @@ Application_MainLoop:
 
 	ld iyl,e
 	ld iyh,d
+
+	push ix
+	call Application_GetInput
+	call Input_Update
+	pop ix
+
 	push ix
 	call Application_GetScene
 	call Scene_Update
