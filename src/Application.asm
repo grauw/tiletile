@@ -2,12 +2,12 @@
 ; Top-level program class
 ;
 Application: MACRO
-	timiHook:
-		TIMIHook
 	input:
 		Input
 	video:
 		Video
+	timiHook:
+		TIMIHook
 	scene:
 		Scene FieldSet_instance, FieldMap_instance
 	ENDM
@@ -38,13 +38,6 @@ Application_Construct:
 	call Video_Construct
 	pop ix
 
-	call Application_GetInput_IY
-	push ix
-	call Application_GetScene
-	ld e,iyl
-	ld d,iyh
-	call Scene_Construct
-	pop ix
 	ld e,ixl
 	ld d,ixh
 	ld hl,Application_TIMIInterruptEntry
@@ -53,6 +46,14 @@ Application_Construct:
 	call Application_GetTIMIHook
 	pop de
 	call TIMIHook_Construct
+	pop ix
+
+	call Application_GetInput_IY
+	push ix
+	call Application_GetScene
+	ld e,iyl
+	ld d,iyh
+	call Scene_Construct
 	pop ix
 	ret
 
