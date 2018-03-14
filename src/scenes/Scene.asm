@@ -8,8 +8,6 @@ Scene: MACRO ?tileset, ?tilemap
 		dw ?tilemap
 	input:
 		dw 0
-	video:
-		Video
 	mapView:
 		MapView
 	sprites:
@@ -23,11 +21,6 @@ Scene: MACRO ?tileset, ?tilemap
 Scene_Construct:
 	ld (ix + Scene.input),e
 	ld (ix + Scene.input + 1),d
-
-	push ix
-	call Scene_GetVideo
-	call Video_Construct
-	pop ix
 
 	push ix
 	call Scene_GetSprites
@@ -74,12 +67,6 @@ Scene_GetInput_IY:
 	ld d,(ix + Scene.input + 1)
 	ld iyl,e
 	ld iyh,d
-	ret
-
-; ix = this
-Scene_GetVideo:
-	ld de,Scene.video
-	add ix,de
 	ret
 
 ; ix = this
@@ -134,29 +121,11 @@ Scene_Start:
 	pop ix
 	ret
 
-; ix = this
-Scene_Run:
-	push ix
-	call Scene_GetVideo
-	call Video_GetCurrentDrawContext
-	call DrawContext_IsSubmitted
-	pop ix
-	jr nz,Scene_Run
-
-	IF DEBUG
-	in a,(2dh)
-	ENDIF
-
-	call Scene_Update
-
-	IF DEBUG
-	out (2dh),a
-	ENDIF
-
-	jr Scene_Run
-
+; iy = draw context
 ; ix = this
 Scene_Update:
+	push iy
+
 	call Scene_GetInput_IY
 	call Input_Update_IY
 
@@ -174,10 +143,8 @@ Scene_Update:
 	call Scene_UpdateMapViewPosition
 	call Scene_UpdateMapViewPosition
 
-	push ix
-	call Scene_GetVideo
-	call Video_GetCurrentDrawContext_IY
-	pop ix
+	pop iy
+	push iy
 	push ix
 	call Scene_GetMapView
 	call MapView_Update
@@ -204,41 +171,21 @@ Scene_Update:
 	call Sprites_SetPosition
 	pop ix
 
-	push ix
-	call Scene_GetVideo
-	call Video_GetCurrentDrawContext_IY
-	pop ix
+	pop iy
+	push iy
 	push ix
 	call Scene_GetSprites
 	call Sprites_Draw
 	pop ix
 
-	push ix
-	call Scene_GetVideo
-	call Video_GetCurrentDrawContext
+	ex (sp),ix
 	call DrawContext_Submit
-	pop ix
+	ex (sp),ix
+
+	pop iy
 
 	IF DEBUG
 	xor a
-	out (2ch),a
-	ENDIF
-	ret
-
-; ix = this
-Scene_UpdateSync:
-	IF DEBUG
-	ld a,2
-	in a,(2ch)
-	ENDIF
-
-	push ix
-	call Scene_GetVideo
-	call Video_SwapTables
-	pop ix
-
-	IF DEBUG
-	ld a,2
 	out (2ch),a
 	ENDIF
 	ret

@@ -6,6 +6,8 @@ Application: MACRO
 		TIMIHook
 	input:
 		Input
+	video:
+		Video
 	scene:
 		Scene FieldSet_instance, FieldMap_instance
 	ENDM
@@ -31,6 +33,11 @@ Application_Main:
 
 ; ix = this
 Application_Construct:
+	push ix
+	call Application_GetVideo
+	call Video_Construct
+	pop ix
+
 	call Application_GetInput_IY
 	push ix
 	call Application_GetScene
@@ -55,6 +62,12 @@ Application_GetInput_IY:
 	ld d,ixh
 	ld iy,Application.input
 	add iy,de
+	ret
+
+; ix = this
+Application_GetVideo:
+	ld de,Application.video
+	add ix,de
 	ret
 
 ; ix = this
@@ -111,19 +124,48 @@ Application_EnterMainLoop:
 ; ix = this
 Application_MainLoop:
 	push ix
-	call Application_GetScene
-	call Scene_Run
+	call Application_GetVideo
+	call Video_GetCurrentDrawContext
+	call DrawContext_IsSubmitted
 	pop ix
-	ret
+	jr nz,Application_MainLoop
+
+	IF DEBUG
+	in a,(2dh)
+	ENDIF
+
+	ld iyl,e
+	ld iyh,d
+	push ix
+	call Application_GetScene
+	call Scene_Update
+	pop ix
+
+	IF DEBUG
+	out (2dh),a
+	ENDIF
+
+	jr Application_MainLoop
 
 ; ix = this
 Application_TIMIInterruptEntry:
+	IF DEBUG
+	ld a,2
+	in a,(2ch)
+	ENDIF
+
 	ld a,0FFH
 	ld (SCNCNT),a
+
 	push ix
-	call Application_GetScene
-	call Scene_UpdateSync
+	call Application_GetVideo
+	call Video_SwapTables
 	pop ix
+
+	IF DEBUG
+	ld a,2
+	out (2ch),a
+	ENDIF
 	ret
 
 ;
