@@ -112,27 +112,20 @@ Application_EnterMainLoop:
 
 ; ix = this
 Application_MainLoop:
-	jp Application_MainLoop
+	push ix
+	call Application_GetScene
+	call Scene_Run
+	pop ix
 	ret
 
 ; ix = this
 Application_TIMIInterruptEntry:
-	IF DEBUG
-	in a,(2dh)
-	ENDIF
-
 	ld a,0FFH
 	ld (SCNCNT),a
-	call Application_GetInput_IY
-	call Input_Update_IY
 	push ix
 	call Application_GetScene
-	call Scene_Update
+	call Scene_UpdateSync
 	pop ix
-
-	IF DEBUG
-	out (2dh),a
-	ENDIF
 	ret
 
 ;

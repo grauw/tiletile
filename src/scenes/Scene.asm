@@ -135,11 +135,30 @@ Scene_Start:
 	ret
 
 ; ix = this
-Scene_Update:
+Scene_Run:
 	push ix
 	call Scene_GetVideo
-	call Video_SwapTables
+	call Video_GetCurrentDrawContext
+	call DrawContext_IsSubmitted
 	pop ix
+	jr nz,Scene_Run
+
+	IF DEBUG
+	in a,(2dh)
+	ENDIF
+
+	call Scene_Update
+
+	IF DEBUG
+	out (2dh),a
+	ENDIF
+
+	jr Scene_Run
+
+; ix = this
+Scene_Update:
+	call Scene_GetInput_IY
+	call Input_Update_IY
 
 	push ix
 	call Scene_GetPlayer
@@ -202,6 +221,24 @@ Scene_Update:
 
 	IF DEBUG
 	xor a
+	out (2ch),a
+	ENDIF
+	ret
+
+; ix = this
+Scene_UpdateSync:
+	IF DEBUG
+	ld a,2
+	in a,(2ch)
+	ENDIF
+
+	push ix
+	call Scene_GetVideo
+	call Video_SwapTables
+	pop ix
+
+	IF DEBUG
+	ld a,2
 	out (2ch),a
 	ENDIF
 	ret
