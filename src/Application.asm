@@ -34,6 +34,11 @@ Application_Main:
 ; ix = this
 Application_Construct:
 	push ix
+	call Application_GetInput
+	call Input_Construct
+	pop ix
+
+	push ix
 	call Application_GetVideo
 	call Video_Construct
 	pop ix
@@ -55,6 +60,12 @@ Application_Construct:
 	ld d,iyh
 	call Scene_Construct
 	pop ix
+	ret
+
+; ix = this
+Application_GetInput:
+	ld de,Application.input
+	add ix,de
 	ret
 
 ; ix = this

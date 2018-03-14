@@ -7,6 +7,10 @@ Input: MACRO
 	ENDM
 
 ; ix = this
+Input_Construct:
+	ret
+
+; ix = this
 Input_Update_IY:
 	push iy
 	ex (sp),ix
