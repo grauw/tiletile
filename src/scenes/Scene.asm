@@ -126,18 +126,17 @@ Scene_Start:
 Scene_Update:
 	push iy
 
+	IF DEBUG
+	ld a,0
+	in a,(2ch)
+	ENDIF
+
 	push ix
 	call Scene_GetPlayer
 	call Player_Update
 	pop ix
 
-	IF DEBUG
-	ld a,1
-	in a,(2ch)
-	ENDIF
-
 	call Scene_UpdatePlayerPosition
-	call Scene_UpdateMapViewPosition
 	call Scene_UpdateMapViewPosition
 
 	pop iy
@@ -148,19 +147,19 @@ Scene_Update:
 	pop ix
 
 	IF DEBUG
-	ld a,1
+	ld a,0
 	out (2ch),a
 	ENDIF
 
 	IF DEBUG
-	xor a
+	ld a,1
 	in a,(2ch)
 	ENDIF
 
 	push ix
 	push ix
 	call Scene_GetMapView
-	call MapView_GetPosition
+	call MapView_GetTargetPosition
 	pop ix
 	push de
 	call Scene_GetSprites
@@ -175,16 +174,41 @@ Scene_Update:
 	call Sprites_Draw
 	pop ix
 
+	IF DEBUG
+	ld a,1
+	out (2ch),a
+	ENDIF
+
+	IF DEBUG
+	ld a,2
+	in a,(2ch)
+	ENDIF
+
+	push ix
+	call Scene_GetMapView
+	call MapView_Move
+	pop ix
+
+	IF DEBUG
+	ld a,2
+	out (2ch),a
+	ENDIF
+
+	IF DEBUG
+	ld a,3
+	in a,(2ch)
+	ENDIF
+
 	ex (sp),ix
 	call DrawContext_Submit
 	ex (sp),ix
 
-	pop iy
-
 	IF DEBUG
-	xor a
+	ld a,3
 	out (2ch),a
 	ENDIF
+
+	pop iy
 	ret
 
 ; ix = this
@@ -210,44 +234,19 @@ Scene_UpdatePlayerPosition:
 	ret
 
 ; ix = this
-Scene_UpdateMapViewPosition: PROC
+Scene_UpdateMapViewPosition:
 	push ix
 	call Scene_GetPlayer
-	ld e,(ix + Player.x)
-	ld d,(ix + Player.x + 1)
-	ld l,(ix + Player.y)
-	ld h,(ix + Player.y + 1)
+	ld l,(ix + Player.x)
+	ld h,(ix + Player.x + 1)
+	ld e,(ix + Player.y)
+	ld d,(ix + Player.y + 1)
 	pop ix
 	push ix
-	push hl
 	push de
 	call Scene_GetMapView
-	pop de
-	call LeftRight
-	pop de
-	call UpDown
+	call MapView_SetTargetX
+	pop hl
+	call MapView_SetTargetY
 	pop ix
 	ret
-LeftRight:
-	ld l,(ix + MapView.x)
-	ld h,(ix + MapView.x + 1)
-	ld c,(ix + MapView.width)
-	ld b,0
-	srl c
-	add hl,bc
-	sbc hl,de
-	ret z
-	jp m,MapView_MoveRight
-	jp MapView_MoveLeft
-UpDown:
-	ld l,(ix + MapView.y)
-	ld h,(ix + MapView.y + 1)
-	ld c,(ix + MapView.height)
-	ld b,0
-	srl c
-	add hl,bc
-	sbc hl,de
-	ret z
-	jp m,MapView_MoveDown
-	jp MapView_MoveUp
-	ENDP

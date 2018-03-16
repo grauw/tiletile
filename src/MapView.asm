@@ -8,6 +8,10 @@ MapView: MACRO
 		dw 0
 	y:
 		dw 0
+	targetX:
+		dw 0
+	targetY:
+		dw 0
 	maxX:
 		dw 0
 	maxY:
@@ -78,12 +82,60 @@ MapView_GetTileCopyCommand_IY:
 ; ix = this
 ; bc <- x
 ; de <- y
-MapView_GetPosition:
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
+MapView_GetTargetPosition:
+	ld c,(ix + MapView.targetX)
+	ld b,(ix + MapView.targetX + 1)
+	ld e,(ix + MapView.targetY)
+	ld d,(ix + MapView.targetY + 1)
 	ret
+
+; hl = target x
+; ix = this
+MapView_SetTargetX: PROC
+	ld e,(ix + MapView.width)
+	ld d,0
+	srl e  ; center
+	sbc hl,de
+	jp m,Negative
+	ld (ix + MapView.targetX),l
+	ld (ix + MapView.targetX + 1),h
+	ld e,(ix + MapView.maxX)
+	ld d,(ix + MapView.maxX + 1)
+	sbc hl,de
+	ret c
+	ret z
+	ld (ix + MapView.targetX),e
+	ld (ix + MapView.targetX + 1),d
+	ret
+Negative:
+	ld (ix + MapView.targetX),0
+	ld (ix + MapView.targetX + 1),0
+	ret
+	ENDP
+
+; hl = target y
+; ix = this
+MapView_SetTargetY: PROC
+	ld e,(ix + MapView.height)
+	ld d,0
+	srl e  ; center
+	sbc hl,de
+	jp m,Negative
+	ld (ix + MapView.targetY),l
+	ld (ix + MapView.targetY + 1),h
+	ld e,(ix + MapView.maxY)
+	ld d,(ix + MapView.maxY + 1)
+	sbc hl,de
+	ret c
+	ret z
+	ld (ix + MapView.targetY),e
+	ld (ix + MapView.targetY + 1),d
+	ret
+Negative:
+	ld (ix + MapView.targetY),0
+	ld (ix + MapView.targetY + 1),0
+	ret
+	ENDP
 
 ; bc = x
 ; de = y
@@ -106,74 +158,70 @@ MapView_GetTile:
 	ret
 
 ; ix = this
-MapView_MoveLeft:
-	ld l,(ix + MapView.x)
-	ld h,(ix + MapView.x + 1)
-	ld de,-1
-	add hl,de
-	ret nc
-	ld (ix + MapView.x),l
-	ld (ix + MapView.x + 1),h
-	ld a,l
-	call MapView_DrawTileHorizontal
+MapView_Move:
+	call MapView_MoveHorizontal
+	call MapView_MoveHorizontal
+	call MapView_MoveVertical
+	call MapView_MoveVertical
 	ret
 
 ; ix = this
-MapView_MoveRight:
-	ld l,(ix + MapView.x)
-	ld h,(ix + MapView.x + 1)
-	ld de,1
-	add hl,de
-	ld e,(ix + MapView.maxX)
-	ld d,(ix + MapView.maxX + 1)
-	ex de,hl
+MapView_MoveHorizontal: PROC
+	ld l,(ix + MapView.targetX)
+	ld h,(ix + MapView.targetX + 1)
+	ld e,(ix + MapView.x)
+	ld d,(ix + MapView.x + 1)
+	and a
 	sbc hl,de
-	ret c
+	ret z
+	jr nc,Right
+Left:
+	dec de
 	ld (ix + MapView.x),e
 	ld (ix + MapView.x + 1),d
-	dec e
 	ld a,e
-	call MapView_DrawTileHorizontal
-	ret
+	jp MapView_DrawTileHorizontal
+Right:
+	inc de
+	ld (ix + MapView.x),e
+	ld (ix + MapView.x + 1),d
+	ld a,e
+	dec a
+	jp MapView_DrawTileHorizontal
+	ENDP
 
 ; ix = this
-MapView_MoveUp:
-	ld l,(ix + MapView.y)
-	ld h,(ix + MapView.y + 1)
-	ld de,-1
-	add hl,de
-	ret nc
-	ld (ix + MapView.y),l
-	ld (ix + MapView.y + 1),h
-	ld a,l
-	rlca
-	rlca
-	rlca
-	rlca
-	call MapView_DrawTile
-	ret
-
-; ix = this
-MapView_MoveDown:
-	ld l,(ix + MapView.y)
-	ld h,(ix + MapView.y + 1)
-	ld de,1
-	add hl,de
-	ld e,(ix + MapView.maxY)
-	ld d,(ix + MapView.maxY + 1)
-	ex de,hl
+MapView_MoveVertical: PROC
+	ld l,(ix + MapView.targetY)
+	ld h,(ix + MapView.targetY + 1)
+	ld e,(ix + MapView.y)
+	ld d,(ix + MapView.y + 1)
+	and a
 	sbc hl,de
-	ret c
+	ret z
+	jp nc,Down
+Up:
+	dec de
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
-	dec e
 	ld a,e
 	rlca
 	rlca
 	rlca
 	rlca
-	call MapView_DrawTile
-	ret
+	jp MapView_DrawTile
+Down:
+	inc de
+	ld (ix + MapView.y),e
+	ld (ix + MapView.y + 1),d
+	ld a,e
+	dec a
+	rlca
+	rlca
+	rlca
+	rlca
+	jp MapView_DrawTile
+	ENDP
 
 ; ix = this
 MapView_Start:
@@ -210,9 +258,9 @@ NoOverflow:
 ; ix = this
 ; iy = draw context
 MapView_Update:
-	ld a,(ix + MapView.y)
+	ld a,(ix + MapView.targetY)
 	call DrawContext_SetVerticalOffsetIY
-	ld a,(ix + MapView.x)
+	ld a,(ix + MapView.targetX)
 	call DrawContext_SetHorizontalOffsetIY
 	ret
 
