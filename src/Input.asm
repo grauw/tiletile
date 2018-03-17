@@ -37,20 +37,21 @@ Input_GetDirectionIY: PROC
 	ld c,b
 	ld d,b
 	ld e,b
-	bit 4,(iy + Input.newKey + 8)
-	jr nz,NoLeft
-	dec bc
-NoLeft:
-	bit 7,(iy + Input.newKey + 8)
-	jr nz,NoRight
+	ld a,(iy + Input.newKey + 8)
+	rlca
+	jr c,NoRight
 	inc bc
 NoRight:
-	bit 5,(iy + Input.newKey + 8)
-	jr nz,NoUp
+	rlca
+	jr c,NoDown
+	inc de
+NoDown:
+	rlca
+	jr c,NoUp
 	dec de
 NoUp:
-	bit 6,(iy + Input.newKey + 8)
-	ret nz
-	inc de
+	rlca
+	ret c
+	dec bc
 	ret
 	ENDP
