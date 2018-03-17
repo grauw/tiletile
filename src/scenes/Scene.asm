@@ -216,20 +216,8 @@ Scene_UpdatePlayerPosition:
 	call Scene_GetInput_IY
 	push ix
 	call Scene_GetPlayer
-	bit 4,(iy + Input.newKey + 8)
-	push iy
-	call z,Player_MoveLeft
-	pop iy
-	bit 7,(iy + Input.newKey + 8)
-	push iy
-	call z,Player_MoveRight
-	pop iy
-	bit 5,(iy + Input.newKey + 8)
-	push iy
-	call z,Player_MoveUp
-	pop iy
-	bit 6,(iy + Input.newKey + 8)
-	call z,Player_MoveDown
+	call Input_GetDirectionIY
+	call Player_Move
 	pop ix
 	ret
 

@@ -4,7 +4,6 @@
 Player_SPRITE_COUNT: equ 8
 Player_TILE_TOP: equ FieldSet_ben0
 Player_TILE_BOTTOM: equ FieldSet_ben1
-Player_MOVE_SPEED: equ 2
 
 Player: MACRO
 	x:
@@ -87,98 +86,43 @@ Loop:
 Player_Update:
 	ret
 
-; ix = this
-Player_MoveLeft: PROC
-	ld a,(ix + Player.x)
-	sub Player_MOVE_SPEED
-	ld (ix + Player.x),a
-	ld a,(ix + Player.x + 1)
-	sbc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.x + 1),a
+; bc = x (-1 left, 1 right)
+; de = y (-1 up, 1 down)
+Player_Move: PROC
+	sla c  ; speed x2
+	rl b
+	sla e
+	rl d
+	ld l,(ix + Player.x)
+	ld h,(ix + Player.x + 1)
+	add hl,bc
+	ld (ix + Player.x),l
+	ld (ix + Player.x + 1),h
+	ld l,(ix + Player.y)
+	ld h,(ix + Player.y + 1)
+	add hl,de
+	ld (ix + Player.y),l
+	ld (ix + Player.y + 1),h
 	push ix
-	ld b,Player_SPRITE_COUNT
+	exx
 	ld de,Sprite._size
+	ld b,Player_SPRITE_COUNT
 Loop:
-	ld a,(ix + Player.sprites + Sprite.x)
-	sub Player_MOVE_SPEED
-	ld (ix + Player.sprites + Sprite.x),a
-	ld a,(ix + Player.sprites + Sprite.x + 1)
-	sbc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.sprites + Sprite.x + 1),a
+	exx
+	ld l,(ix + Player.sprites + Sprite.x)
+	ld h,(ix + Player.sprites + Sprite.x + 1)
+	add hl,bc
+	ld (ix + Player.sprites + Sprite.x),l
+	ld (ix + Player.sprites + Sprite.x + 1),h
+	ld l,(ix + Player.sprites + Sprite.y)
+	ld h,(ix + Player.sprites + Sprite.y + 1)
+	add hl,de
+	ld (ix + Player.sprites + Sprite.y),l
+	ld (ix + Player.sprites + Sprite.y + 1),h
+	exx
 	add ix,de
 	djnz Loop
-	pop ix
-	ret
-	ENDP
-
-; ix = this
-Player_MoveRight: PROC
-	ld a,(ix + Player.x)
-	add a,Player_MOVE_SPEED
-	ld (ix + Player.x),a
-	ld a,(ix + Player.x + 1)
-	adc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.x + 1),a
-	push ix
-	ld b,Player_SPRITE_COUNT
-	ld de,Sprite._size
-Loop:
-	ld a,(ix + Player.sprites + Sprite.x)
-	add a,Player_MOVE_SPEED
-	ld (ix + Player.sprites + Sprite.x),a
-	ld a,(ix + Player.sprites + Sprite.x + 1)
-	adc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.sprites + Sprite.x + 1),a
-	add ix,de
-	djnz Loop
-	pop ix
-	ret
-	ENDP
-
-; ix = this
-Player_MoveUp: PROC
-	ld a,(ix + Player.y)
-	sub Player_MOVE_SPEED
-	ld (ix + Player.y),a
-	ld a,(ix + Player.y + 1)
-	sbc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.y + 1),a
-	push ix
-	ld b,Player_SPRITE_COUNT
-	ld de,Sprite._size
-Loop:
-	ld a,(ix + Player.sprites + Sprite.y)
-	sub Player_MOVE_SPEED
-	ld (ix + Player.sprites + Sprite.y),a
-	ld a,(ix + Player.sprites + Sprite.y + 1)
-	sbc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.sprites + Sprite.y + 1),a
-	add ix,de
-	djnz Loop
-	pop ix
-	ret
-	ENDP
-
-; ix = this
-Player_MoveDown: PROC
-	ld a,(ix + Player.y)
-	add a,Player_MOVE_SPEED
-	ld (ix + Player.y),a
-	ld a,(ix + Player.y + 1)
-	adc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.y + 1),a
-	push ix
-	ld b,Player_SPRITE_COUNT
-	ld de,Sprite._size
-Loop:
-	ld a,(ix + Player.sprites + Sprite.y)
-	add a,Player_MOVE_SPEED
-	ld (ix + Player.sprites + Sprite.y),a
-	ld a,(ix + Player.sprites + Sprite.y + 1)
-	adc a,Player_MOVE_SPEED >> 8
-	ld (ix + Player.sprites + Sprite.y + 1),a
-	add ix,de
-	djnz Loop
+	exx
 	pop ix
 	ret
 	ENDP
