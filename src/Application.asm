@@ -150,7 +150,7 @@ Application_MainLoop:
 ; ix = this
 Application_TIMIInterruptEntry:
 	IF DEBUG
-	ld a,4
+	ld a,6
 	in a,(2ch)
 	ENDIF
 
@@ -163,7 +163,7 @@ Application_TIMIInterruptEntry:
 	pop ix
 
 	IF DEBUG
-	ld a,4
+	ld a,6
 	out (2ch),a
 	ENDIF
 	ret

@@ -124,60 +124,21 @@ Scene_Start:
 ; iy = draw context
 ; ix = this
 Scene_Update:
-	IF DEBUG
-	ld a,0
-	in a,(2ch)
-	ENDIF
-
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
-
-	IF DEBUG
-	ld a,0
-	out (2ch),a
-	ENDIF
-
-	IF DEBUG
-	ld a,1
-	in a,(2ch)
-	ENDIF
-
 	call Scene_UpdateSpritePositions
 	call Scene_UpdateSpriteColors
-
-	IF DEBUG
-	ld a,1
-	out (2ch),a
-	ENDIF
-
-	IF DEBUG
-	ld a,2
-	in a,(2ch)
-	ENDIF
-
 	call Scene_UpdateMapViewPixels
-
-	IF DEBUG
-	ld a,2
-	out (2ch),a
-	ENDIF
-
-	IF DEBUG
-	ld a,3
-	in a,(2ch)
-	ENDIF
-
 	call Scene_SubmitDrawContext
-
-	IF DEBUG
-	ld a,3
-	out (2ch),a
-	ENDIF
-
 	ret
 
 ; ix = this
 Scene_UpdatePlayerPosition:
+	IF DEBUG
+	ld a,0
+	in a,(2ch)
+	ENDIF
+
 	push iy
 	call Scene_GetInput_IY
 	push ix
@@ -186,11 +147,21 @@ Scene_UpdatePlayerPosition:
 	call Player_Move
 	pop ix
 	pop iy
+
+	IF DEBUG
+	ld a,0
+	out (2ch),a
+	ENDIF
 	ret
 
 ; iy = draw context
 ; ix = this
 Scene_UpdateMapViewPosition:
+	IF DEBUG
+	ld a,1
+	in a,(2ch)
+	ENDIF
+
 	push iy
 	call DrawContext_GetDisplayOffsetIY_IY
 	push ix
@@ -209,11 +180,21 @@ Scene_UpdateMapViewPosition:
 	call MapView_Update
 	pop ix
 	pop iy
+
+	IF DEBUG
+	ld a,1
+	out (2ch),a
+	ENDIF
 	ret
 
 ; iy = draw context
 ; ix = this
 Scene_UpdateSpritePositions:
+	IF DEBUG
+	ld a,2
+	in a,(2ch)
+	ENDIF
+
 	push iy
 	call DrawContext_GetSpriteAttributeTableIY_IY
 	push ix
@@ -228,11 +209,21 @@ Scene_UpdateSpritePositions:
 	call Sprites_DrawAttributes
 	pop ix
 	pop iy
+
+	IF DEBUG
+	ld a,2
+	out (2ch),a
+	ENDIF
 	ret
 
 ; iy = draw context
 ; ix = this
 Scene_UpdateSpriteColors:
+	IF DEBUG
+	ld a,3
+	in a,(2ch)
+	ENDIF
+
 	push iy
 	call DrawContext_GetSpriteColorTableIY_IY
 	push ix
@@ -240,21 +231,46 @@ Scene_UpdateSpriteColors:
 	call Sprites_DrawColors
 	pop ix
 	pop iy
+
+	IF DEBUG
+	ld a,3
+	out (2ch),a
+	ENDIF
 	ret
 
 ; iy = draw context
 ; ix = this
 Scene_UpdateMapViewPixels:
+	IF DEBUG
+	ld a,4
+	in a,(2ch)
+	ENDIF
+
 	push iy
 	push ix
 	call Scene_GetMapView
 	call MapView_Move
 	pop ix
 	pop iy
+
+	IF DEBUG
+	ld a,4
+	out (2ch),a
+	ENDIF
 	ret
 
 ; iy = draw context
 ; ix = this
 Scene_SubmitDrawContext:
+	IF DEBUG
+	ld a,5
+	in a,(2ch)
+	ENDIF
+
 	call DrawContext_SubmitIY
+
+	IF DEBUG
+	ld a,5
+	out (2ch),a
+	ENDIF
 	ret
