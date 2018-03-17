@@ -3,10 +3,6 @@
 ;
 ; Mode 2, 16x16, not magnified
 ;
-	INCLUDE "Sprite.asm"
-	INCLUDE "SpriteColor.asm"
-	INCLUDE "SpritePattern.asm"
-
 Sprites_MAX_SPRITES: equ 32
 Sprites_MAX_PATTERNS: equ 64
 

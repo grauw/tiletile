@@ -50,7 +50,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "VDPCommand.asm"
 	INCLUDE "Palette.asm"
 	INCLUDE "video/Video.asm"
-	INCLUDE "sprites/Sprites.asm"
 	INCLUDE "Hook.asm"
 	INCLUDE "TIMIHook.asm"
 	INCLUDE "Input.asm"
