@@ -132,15 +132,10 @@ Scene_Update:
 	ENDIF
 
 	call Scene_UpdatePlayerPosition
-	call Scene_UpdateMapViewPosition
 
 	pop iy
 	push iy
-	call DrawContext_GetDisplayOffsetIY_IY
-	push ix
-	call Scene_GetMapView
-	call MapView_Update
-	pop ix
+	call Scene_UpdateMapViewPosition
 
 	IF DEBUG
 	ld a,0
@@ -224,8 +219,11 @@ Scene_UpdatePlayerPosition:
 	pop ix
 	ret
 
+; iy = draw context
 ; ix = this
 Scene_UpdateMapViewPosition:
+	push iy
+	call DrawContext_GetDisplayOffsetIY_IY
 	push ix
 	call Scene_GetPlayer
 	ld l,(ix + Player.x)
@@ -239,5 +237,7 @@ Scene_UpdateMapViewPosition:
 	call MapView_SetTargetX
 	pop hl
 	call MapView_SetTargetY
+	call MapView_Update
 	pop ix
+	pop iy
 	ret
