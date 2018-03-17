@@ -59,7 +59,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "MapView.asm"
 	INCLUDE "Softsprite.asm"
 	INCLUDE "Player.asm"
-	INCLUDE "scenes/Scene.asm"
+	INCLUDE "Scene.asm"
 
 	ENDS
 
