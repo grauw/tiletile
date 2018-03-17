@@ -113,8 +113,7 @@ DrawContext_GetSpritePatternTableIY_IY:
 ; ix = this
 ; f <- nz: submitted
 DrawContext_IsSubmitted:
-	ld a,(ix + DrawContext.submitted)
-	and a
+	bit 0,(ix + DrawContext.submitted)
 	ret
 
 ; ix = this
