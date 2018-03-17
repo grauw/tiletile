@@ -16,7 +16,7 @@ Input_Update: PROC
 	ld b,ixh
 	ld hl,Input.newKey
 	add hl,bc
-	ld bc,0BA9H
+	ld bc,11 << 8 | 0A9H
 	di
 	in a,(0AAH)
 	and 0F0H
