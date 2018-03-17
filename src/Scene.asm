@@ -124,17 +124,12 @@ Scene_Start:
 ; iy = draw context
 ; ix = this
 Scene_Update:
-	push iy
-
 	IF DEBUG
 	ld a,0
 	in a,(2ch)
 	ENDIF
 
 	call Scene_UpdatePlayerPosition
-
-	pop iy
-	push iy
 	call Scene_UpdateMapViewPosition
 
 	IF DEBUG
@@ -158,8 +153,6 @@ Scene_Update:
 	call Sprites_SetPosition
 	pop ix
 
-	pop iy
-	push iy
 	push ix
 	call Scene_GetSprites
 	push iy
@@ -182,10 +175,12 @@ Scene_Update:
 	in a,(2ch)
 	ENDIF
 
+	push iy
 	push ix
 	call Scene_GetMapView
 	call MapView_Move
 	pop ix
+	pop iy
 
 	IF DEBUG
 	ld a,2
@@ -197,26 +192,29 @@ Scene_Update:
 	in a,(2ch)
 	ENDIF
 
+	push iy
 	ex (sp),ix
 	call DrawContext_Submit
 	ex (sp),ix
+	pop iy
 
 	IF DEBUG
 	ld a,3
 	out (2ch),a
 	ENDIF
 
-	pop iy
 	ret
 
 ; ix = this
 Scene_UpdatePlayerPosition:
+	push iy
 	call Scene_GetInput_IY
 	push ix
 	call Scene_GetPlayer
 	call Input_GetDirectionIY
 	call Player_Move
 	pop ix
+	pop iy
 	ret
 
 ; iy = draw context
