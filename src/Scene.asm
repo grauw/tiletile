@@ -128,8 +128,8 @@ Scene_Update:
 	call Scene_UpdateMapViewPosition
 	call Scene_UpdateSpritePositions
 	call Scene_UpdateSpriteColors
-	call Scene_UpdateMapViewPixels
 	call Scene_SubmitDrawContext
+	call Scene_UpdateMapViewPixels
 	ret
 
 ; ix = this
