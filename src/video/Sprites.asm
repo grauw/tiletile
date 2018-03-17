@@ -54,12 +54,6 @@ Sprites_SetPosition:
 
 ; ix = this
 Sprites_InitializeTables:
-	ld a,(VDP_MIRROR_0 + 1)
-	res 0,a  ; MAG
-	set 1,a  ; SI
-	ld (VDP_MIRROR_0 + 1),a
-	ld b,1
-	call VDP_SetRegister
 	push ix
 	call Sprites_GetPatternTable
 	call SpritePatternTable_Select
