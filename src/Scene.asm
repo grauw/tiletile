@@ -142,23 +142,10 @@ Scene_Update:
 	in a,(2ch)
 	ENDIF
 
-	push ix
-	push ix
-	call Scene_GetMapView
-	call MapView_GetTargetPosition
-	pop ix
-	push de
-	call Scene_GetSprites
-	pop de
-	call Sprites_SetPosition
-	pop ix
+	call Scene_UpdateSpritePositions
 
 	push ix
 	call Scene_GetSprites
-	push iy
-	call DrawContext_GetSpriteAttributeTableIY_IY
-	call Sprites_DrawAttributes
-	pop iy
 	push iy
 	call DrawContext_GetSpriteColorTableIY_IY
 	call Sprites_DrawColors
@@ -236,6 +223,25 @@ Scene_UpdateMapViewPosition:
 	pop hl
 	call MapView_SetTargetY
 	call MapView_Update
+	pop ix
+	pop iy
+	ret
+
+; iy = draw context
+; ix = this
+Scene_UpdateSpritePositions:
+	push iy
+	call DrawContext_GetSpriteAttributeTableIY_IY
+	push ix
+	push ix
+	call Scene_GetMapView
+	call MapView_GetTargetPosition
+	pop ix
+	push de
+	call Scene_GetSprites
+	pop de
+	call Sprites_SetPosition
+	call Sprites_DrawAttributes
 	pop ix
 	pop iy
 	ret
