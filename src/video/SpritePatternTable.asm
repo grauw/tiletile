@@ -49,3 +49,19 @@ SpritePatternTable_SetPatternWrite:
 	add hl,hl
 	call VRAMTable_SetWrite
 	ret
+
+; a = sprite pattern number
+; iy = this
+; c <- write port
+SpritePatternTable_SetPatternWriteIY:
+	add a,a
+	call c,System_ThrowException
+	add a,a
+	call c,System_ThrowException
+	ld l,a
+	ld h,0
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	call VRAMTable_SetWriteIY
+	ret

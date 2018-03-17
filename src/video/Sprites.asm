@@ -147,15 +147,21 @@ Found:
 ; ix = this
 ; iy = draw context
 Sprites_Draw:
+	push iy
+	call DrawContext_GetSpriteAttributeTableIY_IY
 	call Sprites_DrawSprites
+	pop iy
+	push iy
+	call DrawContext_GetSpriteColorTableIY_IY
 	call Sprites_DrawColors
+	pop iy
 	ret
 
 ; ix = this
-; iy = draw context
+; iy = sprite attribute table
 Sprites_DrawSprites: PROC
 	ld a,0
-	call DrawContext_SetSpriteAttributeWriteIY
+	call SpriteAttributeTable_SetAttributeWriteIY
 	ld b,Sprites_MAX_SPRITES
 	ld hl,Sprites.sprites
 	ld e,ixl
@@ -180,10 +186,10 @@ Loop:
 	ENDP
 
 ; ix = this
-; iy = draw context
+; iy = sprite color table
 Sprites_DrawColors: PROC
 	ld a,0
-	call DrawContext_SetSpriteColorWriteIY
+	call SpriteColorTable_SetColorWriteIY
 	ld b,Sprites_MAX_SPRITES
 	ld hl,Sprites.sprites
 	ld e,ixl

@@ -52,3 +52,14 @@ SpriteAttributeTable_SetAttributeWrite:
 	ld h,0
 	call VRAMTable_SetWrite
 	ret
+
+; a = sprite number
+; iy = this
+; c <- write port
+SpriteAttributeTable_SetAttributeWriteIY:
+	add a,a
+	add a,a
+	ld l,a
+	ld h,0
+	call VRAMTable_SetWriteIY
+	ret

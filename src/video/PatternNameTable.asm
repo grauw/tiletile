@@ -45,3 +45,14 @@ PatternNameTable_SetPatternNameWrite:
 	ld h,0
 	call VRAMTable_SetWrite
 	ret
+
+; hl = offset
+; iy = this
+; c <- write port
+PatternNameTable_SetPatternNameWriteIY:
+	add a,a
+	add a,a
+	ld l,a
+	ld h,0
+	call VRAMTable_SetWriteIY
+	ret

@@ -61,11 +61,25 @@ DrawContext_GetPatternNameTable:
 	add ix,de
 	ret
 
+; iy = this
+; iy <- pattern name table
+DrawContext_GetPatternNameTableIY_IY:
+	ld de,DrawContext.patternNameTable
+	add iy,de
+	ret
+
 ; ix = this
 ; ix <- sprite color table
 DrawContext_GetSpriteColorTable:
 	ld de,DrawContext.spriteColorTable
 	add ix,de
+	ret
+
+; iy = this
+; iy <- sprite color table
+DrawContext_GetSpriteColorTableIY_IY:
+	ld de,DrawContext.spriteColorTable
+	add iy,de
 	ret
 
 ; ix = this
@@ -75,11 +89,25 @@ DrawContext_GetSpriteAttributeTable:
 	add ix,de
 	ret
 
+; iy = this
+; iy <- sprite attribute table
+DrawContext_GetSpriteAttributeTableIY_IY:
+	ld de,DrawContext.spriteAttributeTable
+	add iy,de
+	ret
+
 ; ix = this
 ; ix <- sprite pattern table
 DrawContext_GetSpritePatternTable:
 	ld de,DrawContext.spritePatternTable
 	add ix,de
+	ret
+
+; iy = this
+; iy <- sprite pattern table
+DrawContext_GetSpritePatternTableIY_IY:
+	ld de,DrawContext.spritePatternTable
+	add iy,de
 	ret
 
 ; ix = this
@@ -131,44 +159,5 @@ DrawContext_SetPatternNameWriteIY:
 	ld ix,DrawContext.patternNameTable
 	add ix,de
 	call PatternNameTable_SetPatternNameWrite
-	pop ix
-	ret
-
-; a = sprite number
-; ix = this
-; c <- write port
-DrawContext_SetSpriteColorWriteIY:
-	push ix
-	ld e,iyl
-	ld d,iyh
-	ld ix,DrawContext.spriteColorTable
-	add ix,de
-	call SpriteColorTable_SetColorWrite
-	pop ix
-	ret
-
-; a = sprite number
-; ix = this
-; c <- write port
-DrawContext_SetSpriteAttributeWriteIY:
-	push ix
-	ld e,iyl
-	ld d,iyh
-	ld ix,DrawContext.spriteAttributeTable
-	add ix,de
-	call SpriteAttributeTable_SetAttributeWrite
-	pop ix
-	ret
-
-; a = sprite pattern number
-; ix = this
-; c <- write port
-DrawContext_SetSpritePatternWriteIY:
-	push ix
-	ld e,iyl
-	ld d,iyh
-	ld ix,DrawContext.spritePatternTable
-	add ix,de
-	call SpritePatternTable_SetPatternWrite
 	pop ix
 	ret

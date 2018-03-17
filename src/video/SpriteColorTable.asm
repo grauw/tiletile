@@ -54,3 +54,17 @@ SpriteColorTable_SetColorWrite:
 	rl h
 	call VRAMTable_SetWrite
 	ret
+
+; a = sprite number
+; iy = this
+; c <- write port
+SpriteColorTable_SetColorWriteIY:
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld l,a
+	ld h,0
+	rl h
+	call VRAMTable_SetWriteIY
+	ret
