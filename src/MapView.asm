@@ -182,11 +182,10 @@ Left:
 	ld a,e
 	jp MapView_DrawTileHorizontal
 Right:
+	ld a,e
 	inc de
 	ld (ix + MapView.x),e
 	ld (ix + MapView.x + 1),d
-	ld a,e
-	dec a
 	jp MapView_DrawTileHorizontal
 	ENDP
 
@@ -211,11 +210,10 @@ Up:
 	rlca
 	jp MapView_DrawTile
 Down:
+	ld a,e
 	inc de
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
-	ld a,e
-	dec a
 	rlca
 	rlca
 	rlca
