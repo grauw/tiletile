@@ -5,11 +5,7 @@ DrawContext: MACRO ?patternNameAddress, ?spriteColorAddress, ?spritePatternAddre
 	submitted:
 		db 0
 	displayOffset:
-		db 0
-	horizontalOffsetCharacters:
-		db 0
-	horizontalOffsetDots:
-		db 0
+		DisplayOffset
 	patternNameTable:
 		PatternNameTable ?patternNameAddress
 	spriteColorTable:
@@ -22,6 +18,10 @@ DrawContext: MACRO ?patternNameAddress, ?spriteColorAddress, ?spritePatternAddre
 
 ; ix = this
 DrawContext_Construct:
+	push ix
+	call DrawContext_GetDisplayOffset
+	call DisplayOffset_Construct
+	pop ix
 	push ix
 	call DrawContext_GetPatternNameTable
 	call PatternNameTable_Construct
@@ -38,6 +38,13 @@ DrawContext_Construct:
 	call DrawContext_GetSpritePatternTable
 	call SpritePatternTable_Construct
 	pop ix
+	ret
+
+; ix = this
+; ix <- display offset
+DrawContext_GetDisplayOffset:
+	ld de,DrawContext.displayOffset
+	add ix,de
 	ret
 
 ; ix = this
@@ -90,6 +97,10 @@ DrawContext_Select:
 	call DrawContext_IsSubmitted
 	call z,System_ThrowException
 	push ix
+	call DrawContext_GetDisplayOffset
+	call DisplayOffset_Select
+	pop ix
+	push ix
 	call DrawContext_GetPatternNameTable
 	call PatternNameTable_Select
 	pop ix
@@ -101,15 +112,6 @@ DrawContext_Select:
 	call DrawContext_GetSpritePatternTable
 	call SpritePatternTable_Select
 	pop ix
-	ld a,(ix + DrawContext.displayOffset)
-	ld b,23
-	call VDP_SetRegister
-	ld a,(ix + DrawContext.horizontalOffsetCharacters)
-	ld b,26
-	call VDP_SetRegister
-	ld a,(ix + DrawContext.horizontalOffsetDots)
-	ld b,27
-	call VDP_SetRegister
 	ret
 
 ; hl = offset
@@ -166,21 +168,20 @@ DrawContext_SetSpritePatternWriteIY:
 
 ; a = offset
 ; iy = this
-DrawContext_SetVerticalOffsetIY:
-	ld (iy + DrawContext.displayOffset),a
+DrawContext_SetHorizontalOffsetIY:
+	ld de,DrawContext.displayOffset
+	add iy,de
+	call DisplayOffset_SetHorizontalOffsetIY
+	ld de,-DrawContext.displayOffset
+	add iy,de
 	ret
 
 ; a = offset
 ; iy = this
-DrawContext_SetHorizontalOffsetIY:
-	push af
-	neg
-	and 07H
-	ld (iy + DrawContext.horizontalOffsetDots),a
-	pop af
-	dec a
-	srl a
-	srl a
-	srl a
-	ld (iy + DrawContext.horizontalOffsetCharacters),a
+DrawContext_SetVerticalOffsetIY:
+	ld de,DrawContext.displayOffset
+	add iy,de
+	call DisplayOffset_SetVerticalOffsetIY
+	ld de,-DrawContext.displayOffset
+	add iy,de
 	ret
