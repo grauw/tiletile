@@ -97,6 +97,7 @@ Player_MoveLeft: PROC
 	ld (ix + Player.x + 1),a
 	push ix
 	ld b,Player_SPRITE_COUNT
+	ld de,Sprite._size
 Loop:
 	ld a,(ix + Player.sprites + Sprite.x)
 	sub Player_MOVE_SPEED
@@ -104,7 +105,6 @@ Loop:
 	ld a,(ix + Player.sprites + Sprite.x + 1)
 	sbc a,Player_MOVE_SPEED >> 8
 	ld (ix + Player.sprites + Sprite.x + 1),a
-	ld de,Sprite._size
 	add ix,de
 	djnz Loop
 	pop ix
@@ -121,6 +121,7 @@ Player_MoveRight: PROC
 	ld (ix + Player.x + 1),a
 	push ix
 	ld b,Player_SPRITE_COUNT
+	ld de,Sprite._size
 Loop:
 	ld a,(ix + Player.sprites + Sprite.x)
 	add a,Player_MOVE_SPEED
@@ -128,7 +129,6 @@ Loop:
 	ld a,(ix + Player.sprites + Sprite.x + 1)
 	adc a,Player_MOVE_SPEED >> 8
 	ld (ix + Player.sprites + Sprite.x + 1),a
-	ld de,Sprite._size
 	add ix,de
 	djnz Loop
 	pop ix
@@ -145,6 +145,7 @@ Player_MoveUp: PROC
 	ld (ix + Player.y + 1),a
 	push ix
 	ld b,Player_SPRITE_COUNT
+	ld de,Sprite._size
 Loop:
 	ld a,(ix + Player.sprites + Sprite.y)
 	sub Player_MOVE_SPEED
@@ -152,7 +153,6 @@ Loop:
 	ld a,(ix + Player.sprites + Sprite.y + 1)
 	sbc a,Player_MOVE_SPEED >> 8
 	ld (ix + Player.sprites + Sprite.y + 1),a
-	ld de,Sprite._size
 	add ix,de
 	djnz Loop
 	pop ix
@@ -169,6 +169,7 @@ Player_MoveDown: PROC
 	ld (ix + Player.y + 1),a
 	push ix
 	ld b,Player_SPRITE_COUNT
+	ld de,Sprite._size
 Loop:
 	ld a,(ix + Player.sprites + Sprite.y)
 	add a,Player_MOVE_SPEED
@@ -176,7 +177,6 @@ Loop:
 	ld a,(ix + Player.sprites + Sprite.y + 1)
 	adc a,Player_MOVE_SPEED >> 8
 	ld (ix + Player.sprites + Sprite.y + 1),a
-	ld de,Sprite._size
 	add ix,de
 	djnz Loop
 	pop ix
