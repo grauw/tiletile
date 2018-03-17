@@ -149,7 +149,7 @@ Found:
 Sprites_Draw:
 	push iy
 	call DrawContext_GetSpriteAttributeTableIY_IY
-	call Sprites_DrawSprites
+	call Sprites_DrawAttributes
 	pop iy
 	push iy
 	call DrawContext_GetSpriteColorTableIY_IY
@@ -159,7 +159,7 @@ Sprites_Draw:
 
 ; ix = this
 ; iy = sprite attribute table
-Sprites_DrawSprites: PROC
+Sprites_DrawAttributes: PROC
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY
 	ld b,Sprites_MAX_SPRITES
