@@ -229,12 +229,12 @@ MapView_Start:
 	ret
 
 ; ix = this
-; iy = draw context
+; iy = display offset
 MapView_Update:
 	ld a,(ix + MapView.targetY)
-	call DrawContext_SetVerticalOffsetIY
+	call DisplayOffset_SetVerticalOffsetIY
 	ld a,(ix + MapView.targetX)
-	call DrawContext_SetHorizontalOffsetIY
+	call DisplayOffset_SetHorizontalOffsetIY
 	ret
 
 ; ix = this

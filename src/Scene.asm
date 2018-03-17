@@ -141,6 +141,7 @@ Scene_Update:
 
 	pop iy
 	push iy
+	call DrawContext_GetDisplayOffsetIY_IY
 	push ix
 	call Scene_GetMapView
 	call MapView_Update

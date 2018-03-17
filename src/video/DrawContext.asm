@@ -47,6 +47,13 @@ DrawContext_GetDisplayOffset:
 	add ix,de
 	ret
 
+; iy = this
+; iy <- display offset
+DrawContext_GetDisplayOffsetIY_IY:
+	ld de,DrawContext.displayOffset
+	add iy,de
+	ret
+
 ; ix = this
 ; ix <- pattern name table
 DrawContext_GetPatternNameTable:
@@ -164,24 +171,4 @@ DrawContext_SetSpritePatternWriteIY:
 	add ix,de
 	call SpritePatternTable_SetPatternWrite
 	pop ix
-	ret
-
-; a = offset
-; iy = this
-DrawContext_SetHorizontalOffsetIY:
-	ld de,DrawContext.displayOffset
-	add iy,de
-	call DisplayOffset_SetHorizontalOffsetIY
-	ld de,-DrawContext.displayOffset
-	add iy,de
-	ret
-
-; a = offset
-; iy = this
-DrawContext_SetVerticalOffsetIY:
-	ld de,DrawContext.displayOffset
-	add iy,de
-	call DisplayOffset_SetVerticalOffsetIY
-	ld de,-DrawContext.displayOffset
-	add iy,de
 	ret
