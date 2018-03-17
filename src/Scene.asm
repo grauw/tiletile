@@ -167,11 +167,7 @@ Scene_Update:
 	in a,(2ch)
 	ENDIF
 
-	push iy
-	ex (sp),ix
-	call DrawContext_Submit
-	ex (sp),ix
-	pop iy
+	call Scene_SubmitDrawContext
 
 	IF DEBUG
 	ld a,3
@@ -254,5 +250,15 @@ Scene_UpdateMapViewPixels:
 	call Scene_GetMapView
 	call MapView_Move
 	pop ix
+	pop iy
+	ret
+
+; iy = draw context
+; ix = this
+Scene_SubmitDrawContext:
+	push iy
+	ex (sp),ix
+	call DrawContext_Submit
+	ex (sp),ix
 	pop iy
 	ret
