@@ -131,11 +131,6 @@ Scene_Update:
 	in a,(2ch)
 	ENDIF
 
-	push ix
-	call Scene_GetPlayer
-	call Player_Update
-	pop ix
-
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
 

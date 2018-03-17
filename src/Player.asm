@@ -82,10 +82,6 @@ Loop:
 	ret
 	ENDP
 
-; ix = this
-Player_Update:
-	ret
-
 ; bc = x (-1 left, 1 right)
 ; de = y (-1 up, 1 down)
 Player_Move: PROC
