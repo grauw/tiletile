@@ -122,6 +122,11 @@ DrawContext_Submit:
 	ld (ix + DrawContext.submitted),1
 	ret
 
+; iy = this
+DrawContext_SubmitIY:
+	ld (iy + DrawContext.submitted),1
+	ret
+
 ; ix = this
 DrawContext_Release:
 	ld (ix + DrawContext.submitted),0

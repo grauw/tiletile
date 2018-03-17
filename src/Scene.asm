@@ -256,9 +256,5 @@ Scene_UpdateMapViewPixels:
 ; iy = draw context
 ; ix = this
 Scene_SubmitDrawContext:
-	push iy
-	ex (sp),ix
-	call DrawContext_Submit
-	ex (sp),ix
-	pop iy
+	call DrawContext_SubmitIY
 	ret
