@@ -159,7 +159,7 @@ Application_TIMIInterruptEntry:
 
 	push ix
 	call Application_GetVideo
-	call Video_SwapTables
+	call Video_UpdateSync
 	pop ix
 
 	IF DEBUG

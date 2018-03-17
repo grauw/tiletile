@@ -104,7 +104,7 @@ Video_GetCurrentDrawContext_IY:
 	ret
 
 ; ix = this
-Video_SwapTables: PROC
+Video_UpdateSync: PROC
 	push ix
 	call Video_GetCurrentDrawContext
 	call DrawContext_IsSubmitted
