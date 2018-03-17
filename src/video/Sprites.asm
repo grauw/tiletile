@@ -145,19 +145,6 @@ Found:
 	ENDP
 
 ; ix = this
-; iy = draw context
-Sprites_Draw:
-	push iy
-	call DrawContext_GetSpriteAttributeTableIY_IY
-	call Sprites_DrawAttributes
-	pop iy
-	push iy
-	call DrawContext_GetSpriteColorTableIY_IY
-	call Sprites_DrawColors
-	pop iy
-	ret
-
-; ix = this
 ; iy = sprite attribute table
 Sprites_DrawAttributes: PROC
 	ld a,0
