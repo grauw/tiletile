@@ -10,4 +10,5 @@ SpriteAttribute: MACRO ?x = 0, ?y = 0, ?pattern = 0, ?color = 0
 		db ?pattern
 	color:
 		db ?color
+	_size:
 	ENDM
