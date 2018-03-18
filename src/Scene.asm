@@ -12,6 +12,8 @@ Scene: MACRO ?tileset, ?tilemap
 		MapView
 	player:
 		Player
+	rain:
+		Rain
 	ENDM
 
 ; de = input
@@ -35,6 +37,11 @@ Scene_Construct:
 	push ix
 	call Scene_GetPlayer
 	call Player_Construct
+	pop ix
+
+	push ix
+	call Scene_GetRain
+	call Rain_Construct
 	pop ix
 	ret
 
@@ -76,6 +83,13 @@ Scene_GetPlayer:
 	ret
 
 ; ix = this
+; ix <- rain
+Scene_GetRain:
+	ld de,Scene.rain
+	add ix,de
+	ret
+
+; ix = this
 ; iy = video
 Scene_Start:
 	push ix
@@ -108,6 +122,10 @@ Scene_InitializeSpritePatterns:
 	call Scene_GetPlayer
 	call Player_DrawSpritePatterns
 	pop ix
+	push ix
+	call Scene_GetRain
+	call Rain_DrawSpritePatterns
+	pop ix
 	ret
 
 ; ix = this
@@ -134,6 +152,14 @@ Scene_UpdatePlayerPosition:
 	call Scene_GetPlayer
 	call Input_GetDirectionIY
 	call Player_Move
+	pop ix
+	pop iy
+
+	push iy
+	call Scene_GetInput_IY
+	push ix
+	call Scene_GetRain
+	call Rain_Tick
 	pop ix
 	pop iy
 
@@ -195,8 +221,11 @@ Scene_UpdateSpriteAttributes:
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY
 	push ix
+	call Scene_GetRain
+	call Rain_DrawSpriteAttributes
+	pop ix
+	push ix
 	call Scene_GetPlayer
-	call Player_DrawSpriteAttributes
 	call Player_DrawSpriteAttributes
 	call Player_DrawSpriteAttributes
 	call Player_DrawSpriteAttributes
@@ -222,8 +251,11 @@ Scene_UpdateSpriteColors:
 	ld a,0
 	call SpriteColorTable_SetColorWriteIY
 	push ix
+	call Scene_GetRain
+	call Rain_DrawSpriteColors
+	pop ix
+	push ix
 	call Scene_GetPlayer
-	call Player_DrawSpriteColors
 	call Player_DrawSpriteColors
 	call Player_DrawSpriteColors
 	call Player_DrawSpriteColors
