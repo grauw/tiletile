@@ -57,7 +57,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "TileSet.asm"
 	INCLUDE "TileMap.asm"
 	INCLUDE "MapView.asm"
-	INCLUDE "Softsprite.asm"
 	INCLUDE "Player.asm"
 	INCLUDE "Scene.asm"
 
