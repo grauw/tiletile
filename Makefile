@@ -8,7 +8,7 @@ all:
 
 copy: all
 	cp bin/tiletile.rom $(COPY_TARGET)/
-	diskutil umountDisk $(COPY_TARGET)
+	diskutil umount $(COPY_TARGET)
 
 run: all
 	openmsx -cart bin/tiletile.rom -romtype KonamiSCC -machine Panasonic_FS-A1GT -script openmsx.tcl
