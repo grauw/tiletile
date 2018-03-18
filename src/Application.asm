@@ -65,24 +65,28 @@ Application_Construct:
 	ret
 
 ; ix = this
+; ix <- input
 Application_GetInput:
 	ld de,Application.input
 	add ix,de
 	ret
 
 ; ix = this
+; ix <- video
 Application_GetVideo:
 	ld de,Application.video
 	add ix,de
 	ret
 
 ; ix = this
+; ix <- TIMI hook
 Application_GetTIMIHook:
 	ld de,Application.timiHook
 	add ix,de
 	ret
 
 ; ix = this
+; ix <- scene
 Application_GetScene:
 	ld de,Application.scene
 	add ix,de
