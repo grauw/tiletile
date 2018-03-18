@@ -5,12 +5,12 @@
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "PatternNameTable.asm"
-	INCLUDE "SpriteColorTable.asm"
-	INCLUDE "SpriteAttributeTable.asm"
-	INCLUDE "SpritePatternTable.asm"
-	INCLUDE "SpriteColor.asm"
 	INCLUDE "SpriteAttribute.asm"
+	INCLUDE "SpriteAttributeTable.asm"
+	INCLUDE "SpriteColor.asm"
+	INCLUDE "SpriteColorTable.asm"
 	INCLUDE "SpritePattern.asm"
+	INCLUDE "SpritePatternTable.asm"
 
 Video: MACRO
 	currentDrawContext:

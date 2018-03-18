@@ -8,10 +8,10 @@ DrawContext: MACRO ?patternNameAddress, ?spriteColorAddress, ?spritePatternAddre
 		DisplayOffset
 	patternNameTable:
 		PatternNameTable ?patternNameAddress
-	spriteColorTable:
-		SpriteColorTable ?spriteColorAddress
 	spriteAttributeTable:
 		SpriteAttributeTable ?spriteColorAddress + 200H
+	spriteColorTable:
+		SpriteColorTable ?spriteColorAddress
 	spritePatternTable:
 		SpritePatternTable ?spritePatternAddress
 	ENDM
@@ -27,12 +27,12 @@ DrawContext_Construct:
 	call PatternNameTable_Construct
 	pop ix
 	push ix
-	call DrawContext_GetSpriteColorTable
-	call SpriteColorTable_Construct
-	pop ix
-	push ix
 	call DrawContext_GetSpriteAttributeTable
 	call SpriteAttributeTable_Construct
+	pop ix
+	push ix
+	call DrawContext_GetSpriteColorTable
+	call SpriteColorTable_Construct
 	pop ix
 	push ix
 	call DrawContext_GetSpritePatternTable
@@ -69,20 +69,6 @@ DrawContext_GetPatternNameTableIY_IY:
 	ret
 
 ; ix = this
-; ix <- sprite color table
-DrawContext_GetSpriteColorTable:
-	ld de,DrawContext.spriteColorTable
-	add ix,de
-	ret
-
-; iy = this
-; iy <- sprite color table
-DrawContext_GetSpriteColorTableIY_IY:
-	ld de,DrawContext.spriteColorTable
-	add iy,de
-	ret
-
-; ix = this
 ; ix <- sprite attribute table
 DrawContext_GetSpriteAttributeTable:
 	ld de,DrawContext.spriteAttributeTable
@@ -93,6 +79,20 @@ DrawContext_GetSpriteAttributeTable:
 ; iy <- sprite attribute table
 DrawContext_GetSpriteAttributeTableIY_IY:
 	ld de,DrawContext.spriteAttributeTable
+	add iy,de
+	ret
+
+; ix = this
+; ix <- sprite color table
+DrawContext_GetSpriteColorTable:
+	ld de,DrawContext.spriteColorTable
+	add ix,de
+	ret
+
+; iy = this
+; iy <- sprite color table
+DrawContext_GetSpriteColorTableIY_IY:
+	ld de,DrawContext.spriteColorTable
 	add iy,de
 	ret
 
