@@ -1,6 +1,7 @@
 ;
 ;
 ;
+Player_PATTERN: equ 0
 Player_TILE_TOP: equ FieldSet_may0_run0
 Player_TILE_BOTTOM: equ FieldSet_may1_run0
 
@@ -66,23 +67,23 @@ Player_DrawSpriteAttributes:
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
 	add a,-24
 	ld e,a
-	ld b,0 << 2
+	ld b,Player_PATTERN + 0 << 2
 	call SpriteAttributeTable_WriteAttributeIY
-	ld b,1 << 2
+	ld b,Player_PATTERN + 1 << 2
 	call SpriteAttributeTable_WriteAttributeIY
-	ld b,2 << 2
+	ld b,Player_PATTERN + 2 << 2
 	call SpriteAttributeTable_WriteAttributeIY
-	ld b,3 << 2
+	ld b,Player_PATTERN + 3 << 2
 	call SpriteAttributeTable_WriteAttributeIY
 	add a,16
 	ld e,a
-	ld b,4 << 2
+	ld b,Player_PATTERN + 4 << 2
 	call SpriteAttributeTable_WriteAttributeIY
-	ld b,5 << 2
+	ld b,Player_PATTERN + 5 << 2
 	call SpriteAttributeTable_WriteAttributeIY
-	ld b,6 << 2
+	ld b,Player_PATTERN + 6 << 2
 	call SpriteAttributeTable_WriteAttributeIY
-	ld b,7 << 2
+	ld b,Player_PATTERN + 7 << 2
 	call SpriteAttributeTable_WriteAttributeIY
 	ret
 
@@ -111,7 +112,7 @@ Player_DrawSpriteColors:
 ; ix = this
 ; iy = sprite pattern table
 Player_DrawSpritePatterns:
-	ld a,0
+	ld a,Player_PATTERN
 	call SpritePatternTable_SetPatternWriteIY
 	ld e,ixl
 	ld d,ixh
