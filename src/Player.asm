@@ -27,21 +27,21 @@ Player_Construct:
 Player_DrawPatterns:
 	ld a,0
 	call SpritePatternTable_SetPatternWriteIY
-	ld hl,Player_pattern0 + SpritePattern.data
+	ld hl,Player_pattern0
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern1 + SpritePattern.data
+	ld hl,Player_pattern1
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern2 + SpritePattern.data
+	ld hl,Player_pattern2
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern3 + SpritePattern.data
+	ld hl,Player_pattern3
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern4 + SpritePattern.data
+	ld hl,Player_pattern4
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern5 + SpritePattern.data
+	ld hl,Player_pattern5
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern6 + SpritePattern.data
+	ld hl,Player_pattern6
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern7 + SpritePattern.data
+	ld hl,Player_pattern7
 	call SpritePatternTable_WritePatternIY
 	ret
 

@@ -8,8 +8,6 @@
 	INCLUDE "SpriteColorTable.asm"
 	INCLUDE "SpriteAttributeTable.asm"
 	INCLUDE "SpritePatternTable.asm"
-	INCLUDE "Sprites.asm"
-	INCLUDE "Sprite.asm"
 	INCLUDE "SpriteColor.asm"
 	INCLUDE "SpritePattern.asm"
 
