@@ -9,12 +9,24 @@ Player: MACRO
 		dw 124
 	y:
 		dw 106
+	patterns:
+		SpritePattern
+		SpritePattern
+		SpritePattern
+		SpritePattern
+		SpritePattern
+		SpritePattern
+		SpritePattern
+		SpritePattern
 	ENDM
 
 ; ix = this
 Player_Construct:
 	push ix
-	ld iy,Player_pattern0
+	ld e,ixl
+	ld d,ixh
+	ld iy,Player.patterns
+	add iy,de
 	ld ix,Player_TILE_TOP
 	call Tile_LoadToSpritePatterns
 	ld ix,Player_TILE_BOTTOM
@@ -101,34 +113,16 @@ Player_DrawSpriteColors:
 Player_DrawSpritePatterns:
 	ld a,0
 	call SpritePatternTable_SetPatternWriteIY
-	ld hl,Player_pattern0
+	ld e,ixl
+	ld d,ixh
+	ld hl,Player.patterns
+	add hl,de
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern1
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern2
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern3
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern4
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern5
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern6
 	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern7
 	call SpritePatternTable_WritePatternIY
 	ret
-
-;
-	SECTION RAM
-
-Player_pattern0: SpritePattern
-Player_pattern1: SpritePattern
-Player_pattern2: SpritePattern
-Player_pattern3: SpritePattern
-Player_pattern4: SpritePattern
-Player_pattern5: SpritePattern
-Player_pattern6: SpritePattern
-Player_pattern7: SpritePattern
-
-	ENDS
