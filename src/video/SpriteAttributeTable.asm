@@ -86,13 +86,13 @@ SpriteAttributeTable_SetAttributeWriteIY:
 
 ; b = pattern number
 ; c = write port
-; d = x
-; e = y
+; h = x
+; l = y
 ; iy = this
 SpriteAttributeTable_WriteAttributeIY:
-	out (c),e
+	out (c),l
 	nop
-	out (c),d
+	out (c),h
 	nop
 	out (c),b
 	nop

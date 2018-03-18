@@ -62,11 +62,11 @@ Player_DrawSpriteAttributes:
 	ld a,(ix + Player.x)
 	add a,(iy + SpriteAttributeTable.worldOffsetX)
 	add a,-8
-	ld d,a
+	ld h,a
 	ld a,(ix + Player.y)
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
 	add a,-24
-	ld e,a
+	ld l,a
 	ld b,Player_PATTERN + 0 << 2
 	call SpriteAttributeTable_WriteAttributeIY
 	ld b,Player_PATTERN + 1 << 2
@@ -76,7 +76,7 @@ Player_DrawSpriteAttributes:
 	ld b,Player_PATTERN + 3 << 2
 	call SpriteAttributeTable_WriteAttributeIY
 	add a,16
-	ld e,a
+	ld l,a
 	ld b,Player_PATTERN + 4 << 2
 	call SpriteAttributeTable_WriteAttributeIY
 	ld b,Player_PATTERN + 5 << 2
