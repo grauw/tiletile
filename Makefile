@@ -8,7 +8,7 @@ all:
 
 copy: all
 	cp bin/tiletile.rom $(COPY_TARGET)/
-	diskutil umountDisk `mount | grep $(COPY_TARGET) | cut -d" " -f 1`
+	diskutil umountDisk $(COPY_TARGET)
 
 run: all
 	openmsx -cart bin/tiletile.rom -romtype KonamiSCC -machine Panasonic_FS-A1GT -script openmsx.tcl
