@@ -115,7 +115,7 @@ Scene_InitializeSpritePatterns:
 Scene_Update:
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
-	call Scene_UpdateSpritePositions
+	call Scene_UpdateSpriteAttributes
 	call Scene_UpdateSpriteColors
 	call Scene_SubmitDrawContext
 	call Scene_UpdateMapViewPixels
@@ -178,7 +178,7 @@ Scene_UpdateMapViewPosition:
 
 ; iy = draw context
 ; ix = this
-Scene_UpdateSpritePositions:
+Scene_UpdateSpriteAttributes:
 	IF DEBUG
 	ld a,2
 	in a,(2ch)
