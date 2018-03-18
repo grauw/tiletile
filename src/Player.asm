@@ -149,7 +149,7 @@ Player_DrawSpriteColor:
 	SECTION RAM
 
 Player_pattern0: SpritePattern
-Player_pattern1: SpritePattern 255,255
+Player_pattern1: SpritePattern
 Player_pattern2: SpritePattern
 Player_pattern3: SpritePattern
 Player_pattern4: SpritePattern
