@@ -9,6 +9,7 @@
 	INCLUDE "SpriteAttributeTable.asm"
 	INCLUDE "SpritePatternTable.asm"
 	INCLUDE "SpriteColor.asm"
+	INCLUDE "SpriteAttribute.asm"
 	INCLUDE "SpritePattern.asm"
 
 Video: MACRO
