@@ -226,9 +226,14 @@ Scene_UpdateSpriteColors:
 
 	push iy
 	call DrawContext_GetSpriteColorTableIY_IY
+	ld a,0
+	call SpriteColorTable_SetColorWriteIY
 	push ix
-	call Scene_GetSprites
-	call Sprites_DrawColors
+	call Scene_GetPlayer
+	call Player_DrawSpriteColor
+	call Player_DrawSpriteColor
+	call Player_DrawSpriteColor
+	call Player_DrawSpriteColor
 	pop ix
 	pop iy
 

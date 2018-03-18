@@ -123,6 +123,28 @@ Loop:
 	ret
 	ENDP
 
+; c = transfer port
+; ix = this
+; iy = sprite color table
+Player_DrawSpriteColor:
+	ld hl,SpriteColor_solid1
+	call SpriteColorTable_DrawIY
+	ld hl,SpriteColor_solid2CC
+	call SpriteColorTable_DrawIY
+	ld hl,SpriteColor_solid4CC
+	call SpriteColorTable_DrawIY
+	ld hl,SpriteColor_solid8CC
+	call SpriteColorTable_DrawIY
+	ld hl,SpriteColor_solid1
+	call SpriteColorTable_DrawIY
+	ld hl,SpriteColor_solid2CC
+	call SpriteColorTable_DrawIY
+	ld hl,SpriteColor_solid4CC
+	call SpriteColorTable_DrawIY
+	ld hl,SpriteColor_solid8CC
+	call SpriteColorTable_DrawIY
+	ret
+
 ;
 	SECTION RAM
 
