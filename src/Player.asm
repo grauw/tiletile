@@ -22,29 +22,6 @@ Player_Construct:
 	pop ix
 	ret
 
-; ix = this
-; iy = sprite pattern table
-Player_DrawPatterns:
-	ld a,0
-	call SpritePatternTable_SetPatternWriteIY
-	ld hl,Player_pattern0
-	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern1
-	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern2
-	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern3
-	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern4
-	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern5
-	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern6
-	call SpritePatternTable_WritePatternIY
-	ld hl,Player_pattern7
-	call SpritePatternTable_WritePatternIY
-	ret
-
 ; bc = x (-1 left, 1 right)
 ; de = y (-1 up, 1 down)
 Player_Move: PROC
@@ -100,7 +77,7 @@ Player_DrawSpriteAttributes:
 ; c = transfer port
 ; ix = this
 ; iy = sprite color table
-Player_DrawSpriteColor:
+Player_DrawSpriteColors:
 	ld hl,SpriteColor_solid1
 	call SpriteColorTable_DrawIY
 	ld hl,SpriteColor_solid2CC
@@ -117,6 +94,29 @@ Player_DrawSpriteColor:
 	call SpriteColorTable_DrawIY
 	ld hl,SpriteColor_solid8CC
 	call SpriteColorTable_DrawIY
+	ret
+
+; ix = this
+; iy = sprite pattern table
+Player_DrawSpritePatterns:
+	ld a,0
+	call SpritePatternTable_SetPatternWriteIY
+	ld hl,Player_pattern0
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern1
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern2
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern3
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern4
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern5
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern6
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern7
+	call SpritePatternTable_WritePatternIY
 	ret
 
 ;

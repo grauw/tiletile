@@ -106,7 +106,7 @@ Scene_Start:
 Scene_InitializeSpritePatterns:
 	push ix
 	call Scene_GetPlayer
-	call Player_DrawPatterns
+	call Player_DrawSpritePatterns
 	pop ix
 	ret
 
@@ -223,10 +223,10 @@ Scene_UpdateSpriteColors:
 	call SpriteColorTable_SetColorWriteIY
 	push ix
 	call Scene_GetPlayer
-	call Player_DrawSpriteColor
-	call Player_DrawSpriteColor
-	call Player_DrawSpriteColor
-	call Player_DrawSpriteColor
+	call Player_DrawSpriteColors
+	call Player_DrawSpriteColors
+	call Player_DrawSpriteColors
+	call Player_DrawSpriteColors
 	pop ix
 	pop iy
 
