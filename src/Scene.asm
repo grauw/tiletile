@@ -110,8 +110,8 @@ Scene_InitializeSpritePatterns:
 	pop ix
 	ret
 
-; iy = draw context
 ; ix = this
+; iy = draw context
 Scene_Update:
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
@@ -143,8 +143,8 @@ Scene_UpdatePlayerPosition:
 	ENDIF
 	ret
 
-; iy = draw context
 ; ix = this
+; iy = draw context
 Scene_UpdateMapViewPosition:
 	IF DEBUG
 	ld a,1
@@ -176,8 +176,8 @@ Scene_UpdateMapViewPosition:
 	ENDIF
 	ret
 
-; iy = draw context
 ; ix = this
+; iy = draw context
 Scene_UpdateSpriteAttributes:
 	IF DEBUG
 	ld a,2
@@ -209,8 +209,8 @@ Scene_UpdateSpriteAttributes:
 	ENDIF
 	ret
 
-; iy = draw context
 ; ix = this
+; iy = draw context
 Scene_UpdateSpriteColors:
 	IF DEBUG
 	ld a,3
@@ -236,8 +236,8 @@ Scene_UpdateSpriteColors:
 	ENDIF
 	ret
 
-; iy = draw context
 ; ix = this
+; iy = draw context
 Scene_UpdateMapViewPixels:
 	IF DEBUG
 	ld a,4
@@ -257,8 +257,8 @@ Scene_UpdateMapViewPixels:
 	ENDIF
 	ret
 
-; iy = draw context
 ; ix = this
+; iy = draw context
 Scene_SubmitDrawContext:
 	IF DEBUG
 	ld a,5

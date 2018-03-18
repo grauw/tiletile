@@ -52,8 +52,8 @@ Tile_Load:
 	ld (hl),l
 	ret
 
-; iy = 4 patterns
 ; ix = this
+; iy = 4 patterns
 ; iy <- next pattern
 Tile_LoadToSpritePatterns:
 	ld a,(ix + Tile.imageBank)
