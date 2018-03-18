@@ -20,7 +20,7 @@ MapView: MACRO
 		db 248
 	height:
 		db 212
-	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 16, 16, 0, 0, VDPCommand_HMMM
+	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 4, 16, 0, 0, VDPCommand_HMMM
 	ENDM
 
 ; de = map
@@ -269,9 +269,7 @@ DrawSlice:
 	push af
 	push de
 	call MapView_GetDrawX
-	ld (iy + VDPCommand.nx),4
 	call MapView_ExecuteDraw
-	ld (iy + VDPCommand.nx),16
 	pop de
 	pop af
 	add a,4
@@ -299,9 +297,7 @@ DrawSlice:
 	push af
 	push bc
 	call MapView_GetDrawY
-	ld (iy + VDPCommand.nx),4
 	call MapView_ExecuteDraw
-	ld (iy + VDPCommand.nx),16
 	pop bc
 	pop af
 	add a,4 << 4
