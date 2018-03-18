@@ -2,6 +2,8 @@
 ; Display x/y offset
 ;
 DisplayOffset: MACRO
+	horizontalOffset:
+		db 0
 	horizontalOffsetCharacters:
 		db 0
 	horizontalOffsetDots:
@@ -30,6 +32,7 @@ DisplayOffset_Select:
 ; a = offset
 ; iy = this
 DisplayOffset_SetHorizontalOffsetIY:
+	ld (iy + DisplayOffset.horizontalOffset),a
 	push af
 	neg
 	and 07H

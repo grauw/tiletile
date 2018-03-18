@@ -7,6 +7,14 @@ SpriteAttributeTable: MACRO ?address
 		db 0
 	baseRegister11:
 		db 0
+	worldOffsetX:
+		db 8
+	worldOffsetY:
+		db -1
+	cameraOffsetX:
+		db 8
+	cameraOffsetY:
+		db -1
 	ENDM
 
 ; ix = this
@@ -30,6 +38,18 @@ SpriteAttributeTable_Construct:
 	ld a,(ix + VRAMTable.address + 2)
 	rla
 	ld (ix + SpriteAttributeTable.baseRegister11),a
+	ret
+
+; h = x
+; l = y
+; ix = this
+SpriteAttributeTable_SetDisplayPositionIY:
+	ld a,8
+	sub h
+	ld (iy + SpriteAttributeTable.worldOffsetX),a
+	ld a,-1
+	add a,l
+	ld (iy + SpriteAttributeTable.cameraOffsetY),a
 	ret
 
 ; ix = this
@@ -62,4 +82,19 @@ SpriteAttributeTable_SetAttributeWriteIY:
 	ld l,a
 	ld h,0
 	call VRAMTable_SetWriteIY
+	ret
+
+; b = pattern number
+; c = write port
+; d = x
+; e = y
+; iy = this
+SpriteAttributeTable_WriteAttributeIY:
+	out (c),e
+	nop
+	out (c),d
+	nop
+	out (c),b
+	nop
+	out (c),a
 	ret

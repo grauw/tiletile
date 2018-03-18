@@ -114,11 +114,6 @@ Scene_Start:
 	call Scene_GetMapView
 	call MapView_Start
 	pop ix
-
-	push ix
-	call Scene_GetPlayer
-	call Player_Start
-	pop ix
 	ret
 
 ; iy = draw context
@@ -196,17 +191,21 @@ Scene_UpdateSpritePositions:
 	ENDIF
 
 	push iy
+	call DrawContext_GetDisplayOffsetIY_IY
+	ld h,(iy + DisplayOffset.horizontalOffset)
+	ld l,(iy + DisplayOffset.verticalOffset)
+	pop iy
+	push iy
 	call DrawContext_GetSpriteAttributeTableIY_IY
+	call SpriteAttributeTable_SetDisplayPositionIY
+	ld a,0
+	call SpriteAttributeTable_SetAttributeWriteIY
 	push ix
-	push ix
-	call Scene_GetMapView
-	call MapView_GetTargetPosition
-	pop ix
-	push de
-	call Scene_GetSprites
-	pop de
-	call Sprites_SetPosition
-	call Sprites_DrawAttributes
+	call Scene_GetPlayer
+	call Player_DrawSpriteAttributes
+	call Player_DrawSpriteAttributes
+	call Player_DrawSpriteAttributes
+	call Player_DrawSpriteAttributes
 	pop ix
 	pop iy
 

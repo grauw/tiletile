@@ -52,36 +52,6 @@ Loop:
 	ret
 	ENDP
 
-; ix = this
-Player_Start: PROC
-	ld e,(ix + Player.x)
-	ld d,(ix + Player.x + 1)
-	ld l,(ix + Player.y)
-	ld h,(ix + Player.y + 1)
-	push ix
-	ld b,Player_SPRITE_COUNT
-Loop:
-	push bc
-	ld a,(ix + Player.sprites + Sprite.x)
-	add a,e
-	ld (ix + Player.sprites + Sprite.x),a
-	ld a,(ix + Player.sprites + Sprite.x + 1)
-	adc a,d
-	ld (ix + Player.sprites + Sprite.x + 1),a
-	ld a,(ix + Player.sprites + Sprite.y)
-	add a,l
-	ld (ix + Player.sprites + Sprite.y),a
-	ld a,(ix + Player.sprites + Sprite.y + 1)
-	adc a,h
-	ld (ix + Player.sprites + Sprite.y + 1),a
-	ld bc,Sprite._size
-	add ix,bc
-	pop bc
-	djnz Loop
-	pop ix
-	ret
-	ENDP
-
 ; bc = x (-1 left, 1 right)
 ; de = y (-1 up, 1 down)
 Player_Move: PROC
@@ -99,29 +69,40 @@ Player_Move: PROC
 	add hl,de
 	ld (ix + Player.y),l
 	ld (ix + Player.y + 1),h
-	push ix
-	exx
-	ld de,Sprite._size
-	ld b,Player_SPRITE_COUNT
-Loop:
-	exx
-	ld l,(ix + Player.sprites + Sprite.x)
-	ld h,(ix + Player.sprites + Sprite.x + 1)
-	add hl,bc
-	ld (ix + Player.sprites + Sprite.x),l
-	ld (ix + Player.sprites + Sprite.x + 1),h
-	ld l,(ix + Player.sprites + Sprite.y)
-	ld h,(ix + Player.sprites + Sprite.y + 1)
-	add hl,de
-	ld (ix + Player.sprites + Sprite.y),l
-	ld (ix + Player.sprites + Sprite.y + 1),h
-	exx
-	add ix,de
-	djnz Loop
-	exx
-	pop ix
 	ret
 	ENDP
+
+; c = transfer port
+; ix = this
+; iy = sprite attribute table
+Player_DrawSpriteAttributes:
+	ld a,(ix + Player.x)
+	add a,(iy + SpriteAttributeTable.worldOffsetX)
+	add a,-8
+	ld d,a
+	ld a,(ix + Player.y)
+	add a,(iy + SpriteAttributeTable.worldOffsetY)
+	add a,-24
+	ld e,a
+	ld b,0 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	ld b,1 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	ld b,2 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	ld b,3 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	add a,16
+	ld e,a
+	ld b,4 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	ld b,5 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	ld b,6 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	ld b,7 << 2
+	call SpriteAttributeTable_WriteAttributeIY
+	ret
 
 ; c = transfer port
 ; ix = this
