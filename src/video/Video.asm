@@ -104,6 +104,18 @@ Video_GetCurrentDrawContext_IY:
 	ret
 
 ; ix = this
+Video_GetDrawContextEvenIY_IY:
+	ld de,Video.drawContextEven
+	add iy,de
+	ret
+
+; ix = this
+Video_GetDrawContextOddIY_IY:
+	ld de,Video.drawContextOdd
+	add iy,de
+	ret
+
+; ix = this
 Video_UpdateSync: PROC
 	push ix
 	call Video_GetCurrentDrawContext

@@ -65,3 +65,12 @@ SpritePatternTable_SetPatternWriteIY:
 	add hl,hl
 	call VRAMTable_SetWriteIY
 	ret
+
+; c = write port
+; hl = sprite pattern
+; iy = this
+SpritePatternTable_WritePatternIY:
+	REPT 32
+	outi
+	ENDM
+	ret

@@ -1,7 +1,6 @@
 ;
 ;
 ;
-Player_SPRITE_COUNT: equ 8
 Player_TILE_TOP: equ FieldSet_may0_run0
 Player_TILE_BOTTOM: equ FieldSet_may1_run0
 
@@ -10,47 +9,41 @@ Player: MACRO
 		dw 124
 	y:
 		dw 106
-	sprites:
-		Sprite Player_pattern0, SpriteColor_solid1, -8, -24
-		Sprite Player_pattern1, SpriteColor_solid2CC, -8, -24
-		Sprite Player_pattern2, SpriteColor_solid4CC, -8, -24
-		Sprite Player_pattern3, SpriteColor_solid8CC, -8, -24
-		Sprite Player_pattern4, SpriteColor_solid1, -8, -8
-		Sprite Player_pattern5, SpriteColor_solid2CC, -8, -8
-		Sprite Player_pattern6, SpriteColor_solid4CC, -8, -8
-		Sprite Player_pattern7, SpriteColor_solid8CC, -8, -8
 	ENDM
 
-; iy = sprite system
 ; ix = this
-Player_Construct: PROC
+Player_Construct:
 	push ix
-	push ix
-	push iy
 	ld iy,Player_pattern0
 	ld ix,Player_TILE_TOP
 	call Tile_LoadToSpritePatterns
 	ld ix,Player_TILE_BOTTOM
 	call Tile_LoadToSpritePatterns
 	pop ix
-	pop de
-	ld hl,Player.sprites
-	add hl,de
-	ex de,hl
-	ld b,Player_SPRITE_COUNT
-Loop:
-	push bc
-	push de
-	call Sprites_AddSprite
-	pop de
-	pop bc
-	ld hl,Sprite._size
-	add hl,de
-	ex de,hl
-	djnz Loop
-	pop ix
 	ret
-	ENDP
+
+; ix = this
+; iy = sprite pattern table
+Player_DrawPatterns:
+	ld a,0
+	call SpritePatternTable_SetPatternWriteIY
+	ld hl,Player_pattern0 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern1 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern2 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern3 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern4 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern5 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern6 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ld hl,Player_pattern7 + SpritePattern.data
+	call SpritePatternTable_WritePatternIY
+	ret
 
 ; bc = x (-1 left, 1 right)
 ; de = y (-1 up, 1 down)

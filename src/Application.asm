@@ -79,6 +79,15 @@ Application_GetVideo:
 	ret
 
 ; ix = this
+; iy <- video
+Application_GetVideo_IY:
+	ld e,ixl
+	ld d,ixh
+	ld iy,Application.video
+	add iy,de
+	ret
+
+; ix = this
 ; ix <- TIMI hook
 Application_GetTIMIHook:
 	ld de,Application.timiHook
@@ -99,6 +108,7 @@ Application_EnterMainLoop:
 
 	call VDP_EnableBlank
 
+	call Application_GetVideo_IY
 	push ix
 	call Application_GetScene
 	call Scene_Start

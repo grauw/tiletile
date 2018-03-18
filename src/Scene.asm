@@ -39,7 +39,6 @@ Scene_Construct:
 	pop ix
 
 	push ix
-	call Scene_GetSpritesIY
 	call Scene_GetPlayer
 	call Player_Construct
 	pop ix
@@ -99,6 +98,7 @@ Scene_GetPlayer:
 	ret
 
 ; ix = this
+; iy = video
 Scene_Start:
 	push ix
 	call Scene_GetTileSet
@@ -110,9 +110,30 @@ Scene_Start:
 	call Sprites_InitializeTables
 	pop ix
 
+	push iy
+	call Video_GetDrawContextEvenIY_IY
+	call DrawContext_GetSpritePatternTableIY_IY
+	call Scene_InitializeSpritePatterns
+	pop iy
+
+	push iy
+	call Video_GetDrawContextOddIY_IY
+	call DrawContext_GetSpritePatternTableIY_IY
+	call Scene_InitializeSpritePatterns
+	pop iy
+
 	push ix
 	call Scene_GetMapView
 	call MapView_Start
+	pop ix
+	ret
+
+; ix = this
+; iy = sprite pattern table
+Scene_InitializeSpritePatterns:
+	push ix
+	call Scene_GetPlayer
+	call Player_DrawPatterns
 	pop ix
 	ret
 
