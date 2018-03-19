@@ -10,29 +10,10 @@ Player: MACRO
 		dw 124
 	y:
 		dw 106
-	patterns:
-		SpritePattern
-		SpritePattern
-		SpritePattern
-		SpritePattern
-		SpritePattern
-		SpritePattern
-		SpritePattern
-		SpritePattern
 	ENDM
 
 ; ix = this
 Player_Construct:
-	push ix
-	ld e,ixl
-	ld d,ixh
-	ld iy,Player.patterns
-	add iy,de
-	ld ix,Player_TILE_TOP
-	call Tile_LoadToSpritePatterns
-	ld ix,Player_TILE_BOTTOM
-	call Tile_LoadToSpritePatterns
-	pop ix
 	ret
 
 ; bc = x (-1 left, 1 right)
@@ -114,16 +95,10 @@ Player_DrawSpriteColors:
 Player_DrawSpritePatterns:
 	ld a,Player_PATTERN
 	call SpritePatternTable_SetPatternWriteIY
-	ld e,ixl
-	ld d,ixh
-	ld hl,Player.patterns
-	add hl,de
-	call SpritePatternTable_WritePatternIY
-	call SpritePatternTable_WritePatternIY
-	call SpritePatternTable_WritePatternIY
-	call SpritePatternTable_WritePatternIY
-	call SpritePatternTable_WritePatternIY
-	call SpritePatternTable_WritePatternIY
-	call SpritePatternTable_WritePatternIY
-	call SpritePatternTable_WritePatternIY
+	push ix
+	ld ix,Player_TILE_TOP
+	call Tile_LoadToSpritePatternTable
+	ld ix,Player_TILE_BOTTOM
+	call Tile_LoadToSpritePatternTable
+	pop ix
 	ret

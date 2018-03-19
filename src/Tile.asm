@@ -83,3 +83,31 @@ Tile_LoadToSpritePatterns:
 	pop hl
 	ld (hl),l
 	ret
+
+; c = write port
+; ix = tile
+; iy = sprite pattern table
+Tile_LoadToSpritePatternTable:
+	push bc
+	push iy
+	ld iy,Tile_tempPatterns
+	call Tile_LoadToSpritePatterns
+	pop iy
+	pop bc
+	ld hl,Tile_tempPatterns
+	call SpritePatternTable_WritePatternIY
+	call SpritePatternTable_WritePatternIY
+	call SpritePatternTable_WritePatternIY
+	call SpritePatternTable_WritePatternIY
+	ret
+
+;
+	SECTION RAM
+
+Tile_tempPatterns:
+	SpritePattern
+	SpritePattern
+	SpritePattern
+	SpritePattern
+
+	ENDS
