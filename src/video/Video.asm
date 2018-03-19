@@ -18,9 +18,9 @@ Video: MACRO
 	displayDrawContext:
 		dw drawContextOdd
 	drawContextEven:
-		DrawContext 0H, 1F400H, 1F800H
+		DrawContext 0H, 1EC00H, 1F800H
 	drawContextOdd:
-		DrawContext 0H, 1F000H, 1F800H
+		DrawContext 0H, 1E800H, 1F000H
 	ENDM
 
 ; ix = this
