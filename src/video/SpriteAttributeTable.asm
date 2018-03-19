@@ -98,3 +98,10 @@ SpriteAttributeTable_WriteAttributeIY:
 	nop
 	out (c),a
 	ret
+
+; c = write port
+; iy = this
+SpriteAttributeTable_FinishWriteIY:
+	ld a,216
+	out (c),a
+	ret

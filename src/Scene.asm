@@ -230,6 +230,7 @@ Scene_UpdateSpriteAttributes:
 	call Player_DrawSpriteAttributes
 	call Player_DrawSpriteAttributes
 	pop ix
+	call SpriteAttributeTable_FinishWriteIY
 	pop iy
 
 	IF DEBUG
