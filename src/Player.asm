@@ -55,7 +55,7 @@ Player_Move: PROC
 	ret
 	ENDP
 
-; c = transfer port
+; c = write port
 ; ix = this
 ; iy = sprite attribute table
 Player_DrawSpriteAttributes:
@@ -87,7 +87,7 @@ Player_DrawSpriteAttributes:
 	call SpriteAttributeTable_WriteAttributeIY
 	ret
 
-; c = transfer port
+; c = write port
 ; ix = this
 ; iy = sprite color table
 Player_DrawSpriteColors:

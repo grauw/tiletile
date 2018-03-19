@@ -69,7 +69,7 @@ SpriteColorTable_SetColorWriteIY:
 	call VRAMTable_SetWriteIY
 	ret
 
-; c = VDP write port
+; c = write port
 ; hl = sprite color
 ; ix = this
 SpriteColorTable_DrawIY:

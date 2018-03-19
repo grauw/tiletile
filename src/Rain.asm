@@ -36,7 +36,7 @@ NoOne:
 	ret
 	ENDP
 
-; c = transfer port
+; c = write port
 ; ix = this
 ; iy = sprite attribute table
 Rain_DrawSpriteAttributes:
@@ -56,7 +56,7 @@ Rain_DrawSpriteAttributes:
 	ENDM
 	ret
 
-; c = transfer port
+; c = write port
 ; ix = this
 ; iy = sprite color table
 Rain_DrawSpriteColors:
