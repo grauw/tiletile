@@ -18,6 +18,13 @@ Tile: MACRO ?imageindex, ?tilesbank, ?collision
 	ENDM
 
 ; ix = this
+; f <- c: can
+Tile_CanMove:
+	ld a,(ix + Tile.collision)
+	sub 128
+	ret
+
+; ix = this
 Tile_Load:
 	ld a,(ix + Tile.imageBank)
 	ld hl,(ROM_bankA000)

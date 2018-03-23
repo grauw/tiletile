@@ -14,12 +14,17 @@ Player: MACRO
 		db 0
 	movingStep:
 		db 0
+	tileMap:
+		dw 0
 	sourcePatterns:
 		SpritePatternTable 1D000H
 	ENDM
 
+; de = tile map
 ; ix = this
 Player_Construct:
+	ld (ix + Player.tileMap),e
+	ld (ix + Player.tileMap + 1),d
 	ld e,ixl
 	ld d,ixh
 	ld iy,Player.sourcePatterns
@@ -110,6 +115,15 @@ Player_Construct:
 	pop ix
 	ret
 
+; ix = this
+; ix <- tile map
+Player_GetTileMap:
+	ld e,(ix + Player.tileMap)
+	ld d,(ix + Player.tileMap + 1)
+	ld ixl,e
+	ld ixh,d
+	ret
+
 ; bc = dx (-1 left, 1 right)
 ; de = dy (-1 up, 1 down)
 ; ix = this
@@ -148,15 +162,97 @@ Continue:
 	ld l,(ix + Player.x)
 	ld h,(ix + Player.x + 1)
 	add hl,bc
-	ld (ix + Player.x),l
-	ld (ix + Player.x + 1),h
+	ld c,l
+	ld b,h
 	ld l,(ix + Player.y)
 	ld h,(ix + Player.y + 1)
 	add hl,de
-	ld (ix + Player.y),l
-	ld (ix + Player.y + 1),h
+	ex de,hl
+	call Player_CanMove16x16
+	jr nc,Blocked
+	ld (ix + Player.x),c
+	ld (ix + Player.x + 1),b
+	ld (ix + Player.y),e
+	ld (ix + Player.y + 1),d
+	ret
+Blocked:
+	ld (ix + Player.moving),0
 	ret
 	ENDP
+
+; bc = x
+; de = y
+; ix = this
+; f <- c: can
+Player_CanMove16x16:
+	ld hl,-8
+	add hl,bc
+	ld c,l
+	ld b,h
+	ld hl,-8
+	add hl,de
+	ex de,hl
+	call Player_CanMove
+	ret nc
+	ld hl,15
+	add hl,de
+	ex de,hl
+	call Player_CanMove
+	ret nc
+	ld hl,15
+	add hl,bc
+	ld c,l
+	ld b,h
+	call Player_CanMove
+	ret nc
+	ld hl,-15
+	add hl,de
+	ex de,hl
+	call Player_CanMove
+	ret nc
+	ld hl,-7
+	add hl,bc
+	ld c,l
+	ld b,h
+	ld hl,8
+	add hl,de
+	ex de,hl
+	scf
+	ret
+
+; bc = x
+; de = y
+; ix = this
+; f <- c: can
+Player_CanMove:
+	push bc
+	push de
+	push ix
+	srl b
+	rr c
+	srl b
+	rr c
+	srl b
+	rr c
+	srl b
+	rr c
+	srl d
+	rr e
+	srl d
+	rr e
+	srl d
+	rr e
+	srl d
+	rr e
+	push de
+	call Player_GetTileMap
+	pop de
+	call TileMap_GetTile
+	call Tile_CanMove
+	pop ix
+	pop de
+	pop bc
+	ret
 
 ; c = write port
 ; ix = this

@@ -23,11 +23,7 @@ Scene_Construct:
 	ld (ix + Scene.input + 1),d
 
 	push ix
-	call Scene_GetTileMap
-	ld e,ixl
-	ld d,ixh
-	pop ix
-	push ix
+	call Scene_GetTileMap_DE
 	push de
 	call Scene_GetMapView
 	pop de
@@ -35,7 +31,10 @@ Scene_Construct:
 	pop ix
 
 	push ix
+	call Scene_GetTileMap_DE
+	push de
 	call Scene_GetPlayer
+	pop de
 	call Player_Construct
 	pop ix
 
@@ -61,6 +60,13 @@ Scene_GetTileMap:
 	ld d,(ix + Scene.tileMap + 1)
 	ld ixl,e
 	ld ixh,d
+	ret
+
+; ix = this
+; de <- tile map
+Scene_GetTileMap_DE:
+	ld e,(ix + Scene.tileMap)
+	ld d,(ix + Scene.tileMap + 1)
 	ret
 
 ; ix = this
