@@ -72,6 +72,7 @@ MapView_GetTileMap:
 	ret
 
 ; ix = this
+; iy <- tile copy command
 MapView_GetTileCopyCommand_IY:
 	ld e,ixl
 	ld d,ixh
@@ -337,7 +338,7 @@ NoCarry:
 ; bc = x
 ; de = y
 ; ix = this
-; iy = VDP command
+; iy = tile copy command
 MapView_ExecuteDraw:
 	push ix
 	ld a,e

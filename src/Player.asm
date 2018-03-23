@@ -110,8 +110,9 @@ Player_Construct:
 	pop ix
 	ret
 
-; bc = x (-1 left, 1 right)
-; de = y (-1 up, 1 down)
+; bc = dx (-1 left, 1 right)
+; de = dy (-1 up, 1 down)
+; ix = this
 Player_Move: PROC
 	sla c  ; speed x2
 	rl b

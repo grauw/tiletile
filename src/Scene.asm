@@ -46,6 +46,7 @@ Scene_Construct:
 	ret
 
 ; ix = this
+; ix <- tile set
 Scene_GetTileSet:
 	ld e,(ix + Scene.tileSet)
 	ld d,(ix + Scene.tileSet + 1)
@@ -54,6 +55,7 @@ Scene_GetTileSet:
 	ret
 
 ; ix = this
+; ix <- tile map
 Scene_GetTileMap:
 	ld e,(ix + Scene.tileMap)
 	ld d,(ix + Scene.tileMap + 1)
@@ -62,6 +64,7 @@ Scene_GetTileMap:
 	ret
 
 ; ix = this
+; iy <- input
 Scene_GetInput_IY:
 	ld e,(ix + Scene.input)
 	ld d,(ix + Scene.input + 1)
@@ -70,6 +73,7 @@ Scene_GetInput_IY:
 	ret
 
 ; ix = this
+; ix <- map view
 Scene_GetMapView:
 	ld de,Scene.mapView
 	add ix,de

@@ -71,7 +71,7 @@ SpriteColorTable_SetColorWriteIY:
 
 ; c = write port
 ; hl = sprite color
-; ix = this
+; iy = this
 SpriteColorTable_DrawIY:
 	REPT 16
 	outi

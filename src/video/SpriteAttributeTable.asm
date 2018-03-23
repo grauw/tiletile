@@ -42,7 +42,7 @@ SpriteAttributeTable_Construct:
 
 ; h = x
 ; l = y
-; ix = this
+; iy = this
 SpriteAttributeTable_SetDisplayPositionIY:
 	ld a,8
 	sub h

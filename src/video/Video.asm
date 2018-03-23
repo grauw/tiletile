@@ -87,6 +87,7 @@ NoOverflow:
 	ENDP
 
 ; ix = this
+; ix <- current draw context
 Video_GetCurrentDrawContext:
 	ld e,(ix + Video.currentDrawContext)
 	ld d,(ix + Video.currentDrawContext + 1)
@@ -95,6 +96,7 @@ Video_GetCurrentDrawContext:
 	ret
 
 ; ix = this
+; iy <- current draw context
 Video_GetCurrentDrawContext_IY:
 	ld e,(ix + Video.currentDrawContext)
 	ld d,(ix + Video.currentDrawContext + 1)
@@ -102,13 +104,15 @@ Video_GetCurrentDrawContext_IY:
 	ld iyh,d
 	ret
 
-; ix = this
+; iy = this
+; iy <- even draw context
 Video_GetDrawContextEvenIY_IY:
 	ld de,Video.drawContextEven
 	add iy,de
 	ret
 
-; ix = this
+; iy = this
+; iy <- odd draw context
 Video_GetDrawContextOddIY_IY:
 	ld de,Video.drawContextOdd
 	add iy,de
