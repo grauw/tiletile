@@ -2,18 +2,112 @@
 ;
 ;
 Player_PATTERN: equ 0
-Player_TILE_TOP: equ FieldSet_may0_run0
-Player_TILE_BOTTOM: equ FieldSet_may1_run0
 
 Player: MACRO
 	x:
 		dw 124
 	y:
 		dw 106
+	direction:
+		db 0  ; 0 = down, 5 = left, 10 = up, 15 = right
+	moving:
+		db 0
+	movingStep:
+		db 0
+	sourcePatterns:
+		SpritePatternTable 1D000H
 	ENDM
 
 ; ix = this
 Player_Construct:
+	ld e,ixl
+	ld d,ixh
+	ld iy,Player.sourcePatterns
+	add iy,de
+	ld a,0
+	call SpritePatternTable_SetPatternWriteIY
+	push ix
+	ld ix,FieldSet_may0_standDown
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standDown
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_standRight
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standRight
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_standUp
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standUp
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_standLeft
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standLeft
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft3
+	call Tile_LoadToSpritePatternTable
+	pop ix
 	ret
 
 ; bc = x (-1 left, 1 right)
@@ -23,6 +117,33 @@ Player_Move: PROC
 	rl b
 	sla e
 	rl d
+	ld a,c
+	and a
+	jp m,Left
+	jr nz,Right
+	ld a,e
+	and a
+	jp m,Up
+	jr nz,Down
+	ld (ix + Player.moving),0
+	jr Continue
+Left:
+	ld (ix + Player.direction),15
+	ld (ix + Player.moving),1
+	jr Continue
+Right:
+	ld (ix + Player.direction),5
+	ld (ix + Player.moving),1
+	jr Continue
+Up:
+	ld (ix + Player.direction),10
+	ld (ix + Player.moving),1
+	jr Continue
+Down:
+	ld (ix + Player.direction),0
+	ld (ix + Player.moving),1
+	jr Continue
+Continue:
 	ld l,(ix + Player.x)
 	ld h,(ix + Player.x + 1)
 	add hl,bc
@@ -93,12 +214,37 @@ Player_DrawSpriteColors:
 ; ix = this
 ; iy = sprite pattern table
 Player_DrawSpritePatterns:
-	ld a,Player_PATTERN
-	call SpritePatternTable_SetPatternWriteIY
-	push ix
-	ld ix,Player_TILE_TOP
-	call Tile_LoadToSpritePatternTable
-	ld ix,Player_TILE_BOTTOM
-	call Tile_LoadToSpritePatternTable
-	pop ix
+	call Player_GetSourcePatternOffset
+	ld de,Player.sourcePatterns
+	add ix,de
+	ld de,Player_PATTERN * SpritePattern._size
+	ld bc,8 * SpritePattern._size
+	call VRAMTable_Copy
+	ld de,-Player.sourcePatterns
+	add ix,de
 	ret
+
+; ix = this
+; hl <- pattern offset
+Player_GetSourcePatternOffset: PROC
+	bit 0,(ix + Player.moving)
+	jr nz,Moving
+NotMoving:
+	xor a
+	ld (ix + Player.movingStep),a
+	jr Continue
+Moving:
+	ld a,(ix + Player.movingStep)
+	inc a
+	ld (ix + Player.movingStep),a
+	srl a
+	srl a
+	srl a
+	and 00000011B
+	inc a
+Continue:
+	add a,(ix + Player.direction)
+	ld l,0
+	ld h,a
+	ret
+	ENDP

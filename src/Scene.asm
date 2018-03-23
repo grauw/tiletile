@@ -119,10 +119,6 @@ Scene_Start:
 ; iy = sprite pattern table
 Scene_InitializeSpritePatterns:
 	push ix
-	call Scene_GetPlayer
-	call Player_DrawSpritePatterns
-	pop ix
-	push ix
 	call Scene_GetRain
 	call Rain_DrawSpritePatterns
 	pop ix
@@ -133,6 +129,7 @@ Scene_InitializeSpritePatterns:
 Scene_Update:
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
+	call Scene_UpdateSpritePatterns
 	call Scene_UpdateSpriteAttributes
 	call Scene_UpdateSpriteColors
 	call Scene_SubmitDrawContext
@@ -265,6 +262,28 @@ Scene_UpdateSpriteColors:
 
 	IF DEBUG
 	ld a,3
+	out (2ch),a
+	ENDIF
+	ret
+
+; ix = this
+; iy = draw context
+Scene_UpdateSpritePatterns:
+	IF DEBUG
+	ld a,7
+	in a,(2ch)
+	ENDIF
+
+	push iy
+	call DrawContext_GetSpritePatternTableIY_IY
+	push ix
+	call Scene_GetPlayer
+	call Player_DrawSpritePatterns
+	pop ix
+	pop iy
+
+	IF DEBUG
+	ld a,7
 	out (2ch),a
 	ENDIF
 	ret
