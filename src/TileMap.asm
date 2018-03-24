@@ -16,7 +16,7 @@ TileMap: MACRO ?width, ?height, ?data, ?dataRows
 ; de = y
 ; ix = this
 ; ix <- tile
-; Modifies: af, bc, de
+; Modifies: f, bc, de
 TileMap_GetTile: PROC
 	ld l,(ix + TileMap.height)
 	ld h,(ix + TileMap.height + 1)
@@ -30,10 +30,10 @@ NoClip:
 	ld d,(ix + TileMap.dataRows + 1)
 	add hl,hl
 	add hl,de
-	ld a,(hl)
+	ld e,(hl)
 	inc hl
 	ld h,(hl)
-	ld l,a
+	ld l,e
 	add hl,bc
 	add hl,bc
 	ld e,(hl)
