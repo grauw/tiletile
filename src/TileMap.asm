@@ -25,10 +25,9 @@ TileMap_GetTile: PROC
 	jr nc,NoClip
 	ld de,0
 NoClip:
-	ex de,hl
-	ld e,(ix + TileMap.dataRows)
-	ld d,(ix + TileMap.dataRows + 1)
-	add hl,hl
+	ld l,(ix + TileMap.dataRows)
+	ld h,(ix + TileMap.dataRows + 1)
+	add hl,de
 	add hl,de
 	ld e,(hl)
 	inc hl
