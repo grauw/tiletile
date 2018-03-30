@@ -116,6 +116,12 @@ DrawContext_IsSubmitted:
 	bit 0,(ix + DrawContext.submitted)
 	ret
 
+; iy = this
+; f <- nz: submitted
+DrawContext_IsSubmittedIY:
+	bit 0,(iy + DrawContext.submitted)
+	ret
+
 ; ix = this
 DrawContext_Submit:
 	ld (ix + DrawContext.submitted),1

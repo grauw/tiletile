@@ -131,19 +131,12 @@ Application_EnterMainLoop:
 
 ; ix = this
 Application_MainLoop:
-	push ix
-	call Application_GetVideo
-	call Video_GetCurrentDrawContext
-	call DrawContext_IsSubmitted
-	pop ix
-	jr nz,Application_MainLoop
+	call Application_GetVideo_IY
+	call Video_GetNewDrawContextIY
 
 	IF DEBUG
 	in a,(2dh)
 	ENDIF
-
-	ld iyl,e
-	ld iyh,d
 
 	push ix
 	call Application_GetInput

@@ -95,11 +95,11 @@ Video_GetCurrentDrawContext:
 	ld ixh,d
 	ret
 
-; ix = this
+; iy = this
 ; iy <- current draw context
-Video_GetCurrentDrawContext_IY:
-	ld e,(ix + Video.currentDrawContext)
-	ld d,(ix + Video.currentDrawContext + 1)
+Video_GetCurrentDrawContextIY:
+	ld e,(iy + Video.currentDrawContext)
+	ld d,(iy + Video.currentDrawContext + 1)
 	ld iyl,e
 	ld iyh,d
 	ret
@@ -116,6 +116,19 @@ Video_GetDrawContextEvenIY:
 Video_GetDrawContextOddIY:
 	ld de,Video.drawContextOdd
 	add iy,de
+	ret
+
+; Waits until one is available
+; iy = this
+; iy <- draw context
+Video_GetNewDrawContextIY:
+	push iy
+	call Video_GetCurrentDrawContextIY
+	call DrawContext_IsSubmittedIY
+	pop iy
+	jr nz,Video_GetNewDrawContextIY
+	ld iyl,e
+	ld iyh,d
 	ret
 
 ; ix = this
