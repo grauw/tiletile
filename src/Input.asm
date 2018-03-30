@@ -10,10 +10,10 @@ Input: MACRO
 Input_Construct:
 	ret
 
-; ix = this
-Input_Update: PROC
-	ld c,ixl
-	ld b,ixh
+; iy = this
+Input_UpdateIY: PROC
+	ld c,iyl
+	ld b,iyh
 	ld hl,Input.newKey
 	add hl,bc
 	ld bc,11 << 8 | 0A9H

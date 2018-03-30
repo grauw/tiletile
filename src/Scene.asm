@@ -2,12 +2,12 @@
 ; A scene.
 ;
 Scene: MACRO ?tileset, ?tilemap
+	engine:
+		dw 0
 	tileSet:
 		dw ?tileset
 	tileMap:
 		dw ?tilemap
-	input:
-		dw 0
 	mapView:
 		MapView
 	player:
@@ -16,11 +16,11 @@ Scene: MACRO ?tileset, ?tilemap
 		Rain
 	ENDM
 
-; de = input
+; de = engine
 ; ix = this
 Scene_Construct:
-	ld (ix + Scene.input),e
-	ld (ix + Scene.input + 1),d
+	ld (ix + Scene.engine),e
+	ld (ix + Scene.engine + 1),d
 
 	push ix
 	call Scene_GetTileMap_DE
@@ -42,6 +42,15 @@ Scene_Construct:
 	call Scene_GetRain
 	call Rain_Construct
 	pop ix
+	ret
+
+; ix = this
+; iy <- engine
+Scene_GetEngine_IY:
+	ld e,(ix + Scene.engine)
+	ld d,(ix + Scene.engine + 1)
+	ld iyl,e
+	ld iyh,d
 	ret
 
 ; ix = this
@@ -70,15 +79,6 @@ Scene_GetTileMap_DE:
 	ret
 
 ; ix = this
-; iy <- input
-Scene_GetInput_IY:
-	ld e,(ix + Scene.input)
-	ld d,(ix + Scene.input + 1)
-	ld iyl,e
-	ld iyh,d
-	ret
-
-; ix = this
 ; ix <- map view
 Scene_GetMapView:
 	ld de,Scene.mapView
@@ -100,8 +100,10 @@ Scene_GetRain:
 	ret
 
 ; ix = this
-; iy = video
 Scene_Start:
+	call Scene_GetEngine_IY
+	call Engine_GetVideoIY
+
 	push ix
 	call Scene_GetTileSet
 	call TileSet_Load
@@ -135,6 +137,34 @@ Scene_InitializeSpritePatterns:
 	ret
 
 ; ix = this
+Scene_Stop:
+	ret
+
+; ix = this
+Scene_Run:
+	call Scene_GetEngine_IY
+	call Engine_GetVideoIY
+	call Video_GetNewDrawContextIY
+
+	IF DEBUG
+	in a,(2dh)
+	ENDIF
+
+	push iy
+	call Scene_GetEngine_IY
+	call Engine_GetInputIY
+	call Input_UpdateIY
+	pop iy
+
+	call Scene_Update
+
+	IF DEBUG
+	out (2dh),a
+	ENDIF
+
+	jr Scene_Run
+
+; ix = this
 ; iy = draw context
 Scene_Update:
 	call Scene_UpdatePlayerPosition
@@ -154,16 +184,15 @@ Scene_UpdatePlayerPosition:
 	ENDIF
 
 	push iy
-	call Scene_GetInput_IY
+	call Scene_GetEngine_IY
+	call Engine_GetInputIY
+
 	push ix
 	call Scene_GetPlayer
 	call Input_GetDirectionIY
 	call Player_Move
 	pop ix
-	pop iy
 
-	push iy
-	call Scene_GetInput_IY
 	push ix
 	call Scene_GetRain
 	call Rain_Tick
