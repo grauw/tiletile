@@ -108,14 +108,14 @@ Scene_Start:
 	pop ix
 
 	push iy
-	call Video_GetDrawContextEvenIY_IY
-	call DrawContext_GetSpritePatternTableIY_IY
+	call Video_GetDrawContextEvenIY
+	call DrawContext_GetSpritePatternTableIY
 	call Scene_InitializeSpritePatterns
 	pop iy
 
 	push iy
-	call Video_GetDrawContextOddIY_IY
-	call DrawContext_GetSpritePatternTableIY_IY
+	call Video_GetDrawContextOddIY
+	call DrawContext_GetSpritePatternTableIY
 	call Scene_InitializeSpritePatterns
 	pop iy
 
@@ -185,7 +185,7 @@ Scene_UpdateMapViewPosition:
 	ENDIF
 
 	push iy
-	call DrawContext_GetDisplayOffsetIY_IY
+	call DrawContext_GetDisplayOffsetIY
 	push ix
 	call Scene_GetPlayer
 	ld l,(ix + Player.x)
@@ -218,12 +218,12 @@ Scene_UpdateSpriteAttributes:
 	ENDIF
 
 	push iy
-	call DrawContext_GetDisplayOffsetIY_IY
+	call DrawContext_GetDisplayOffsetIY
 	ld h,(iy + DisplayOffset.horizontalOffset)
 	ld l,(iy + DisplayOffset.verticalOffset)
 	pop iy
 	push iy
-	call DrawContext_GetSpriteAttributeTableIY_IY
+	call DrawContext_GetSpriteAttributeTableIY
 	call SpriteAttributeTable_SetDisplayPositionIY
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY
@@ -255,7 +255,7 @@ Scene_UpdateSpriteColors:
 	ENDIF
 
 	push iy
-	call DrawContext_GetSpriteColorTableIY_IY
+	call DrawContext_GetSpriteColorTableIY
 	ld a,0
 	call SpriteColorTable_SetColorWriteIY
 	push ix
@@ -285,7 +285,7 @@ Scene_UpdateSpritePatterns:
 	ENDIF
 
 	push iy
-	call DrawContext_GetSpritePatternTableIY_IY
+	call DrawContext_GetSpritePatternTableIY
 	push ix
 	call Scene_GetPlayer
 	call Player_DrawSpritePatterns

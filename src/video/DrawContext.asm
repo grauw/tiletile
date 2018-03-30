@@ -49,7 +49,7 @@ DrawContext_GetDisplayOffset:
 
 ; iy = this
 ; iy <- display offset
-DrawContext_GetDisplayOffsetIY_IY:
+DrawContext_GetDisplayOffsetIY:
 	ld de,DrawContext.displayOffset
 	add iy,de
 	ret
@@ -63,7 +63,7 @@ DrawContext_GetPatternNameTable:
 
 ; iy = this
 ; iy <- pattern name table
-DrawContext_GetPatternNameTableIY_IY:
+DrawContext_GetPatternNameTableIY:
 	ld de,DrawContext.patternNameTable
 	add iy,de
 	ret
@@ -77,7 +77,7 @@ DrawContext_GetSpriteAttributeTable:
 
 ; iy = this
 ; iy <- sprite attribute table
-DrawContext_GetSpriteAttributeTableIY_IY:
+DrawContext_GetSpriteAttributeTableIY:
 	ld de,DrawContext.spriteAttributeTable
 	add iy,de
 	ret
@@ -91,7 +91,7 @@ DrawContext_GetSpriteColorTable:
 
 ; iy = this
 ; iy <- sprite color table
-DrawContext_GetSpriteColorTableIY_IY:
+DrawContext_GetSpriteColorTableIY:
 	ld de,DrawContext.spriteColorTable
 	add iy,de
 	ret
@@ -105,7 +105,7 @@ DrawContext_GetSpritePatternTable:
 
 ; iy = this
 ; iy <- sprite pattern table
-DrawContext_GetSpritePatternTableIY_IY:
+DrawContext_GetSpritePatternTableIY:
 	ld de,DrawContext.spritePatternTable
 	add iy,de
 	ret

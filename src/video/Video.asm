@@ -106,14 +106,14 @@ Video_GetCurrentDrawContext_IY:
 
 ; iy = this
 ; iy <- even draw context
-Video_GetDrawContextEvenIY_IY:
+Video_GetDrawContextEvenIY:
 	ld de,Video.drawContextEven
 	add iy,de
 	ret
 
 ; iy = this
 ; iy <- odd draw context
-Video_GetDrawContextOddIY_IY:
+Video_GetDrawContextOddIY:
 	ld de,Video.drawContextOdd
 	add iy,de
 	ret
