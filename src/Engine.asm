@@ -8,6 +8,10 @@ Engine: MACRO
 		Video
 	timiHook:
 		TIMIHook
+	drawContextEven:
+		DrawContext 0H, 1EC00H, 1F800H
+	drawContextOdd:
+		DrawContext 0H, 1E800H, 1F000H
 	ENDM
 
 ; ix = this
@@ -32,6 +36,15 @@ Engine_Construct:
 	pop de
 	call TIMIHook_Construct
 	pop ix
+
+	ld de,Engine.drawContextEven
+	add ix,de
+	call DrawContext_Construct
+	ld de,Engine.drawContextOdd - Engine.drawContextEven
+	add ix,de
+	call DrawContext_Construct
+	ld de,-Engine.drawContextOdd
+	add ix,de
 	ret
 
 ; iy = this
@@ -60,6 +73,20 @@ Engine_GetVideoIY:
 Engine_GetTIMIHook:
 	ld de,Engine.timiHook
 	add ix,de
+	ret
+
+; iy = this
+; iy <- even draw context
+Engine_GetDrawContextEvenIY:
+	ld de,Engine.drawContextEven
+	add iy,de
+	ret
+
+; iy = this
+; iy <- odd draw context
+Engine_GetDrawContextOddIY:
+	ld de,Engine.drawContextOdd
+	add iy,de
 	ret
 
 ; ix = this

@@ -102,7 +102,6 @@ Scene_GetRain:
 ; ix = this
 Scene_Start:
 	call Scene_GetEngine_IY
-	call Engine_GetVideoIY
 
 	push ix
 	call Scene_GetTileSet
@@ -110,13 +109,13 @@ Scene_Start:
 	pop ix
 
 	push iy
-	call Video_GetDrawContextEvenIY
+	call Engine_GetDrawContextEvenIY
 	call DrawContext_GetSpritePatternTableIY
 	call Scene_InitializeSpritePatterns
 	pop iy
 
 	push iy
-	call Video_GetDrawContextOddIY
+	call Engine_GetDrawContextOddIY
 	call DrawContext_GetSpritePatternTableIY
 	call Scene_InitializeSpritePatterns
 	pop iy
@@ -143,8 +142,7 @@ Scene_Stop:
 ; ix = this
 Scene_Run:
 	call Scene_GetEngine_IY
-	call Engine_GetVideoIY
-	call Video_GetDrawContextEvenIY
+	call Engine_GetDrawContextEvenIY
 	push iy
 	call Scene_Update
 	call Scene_GetEngine_IY
@@ -153,8 +151,7 @@ Scene_Run:
 	call Video_SubmitDrawContextIY
 
 	call Scene_GetEngine_IY
-	call Engine_GetVideoIY
-	call Video_GetDrawContextOddIY
+	call Engine_GetDrawContextOddIY
 	push iy
 	call Scene_Update
 	call Scene_GetEngine_IY

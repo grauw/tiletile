@@ -17,22 +17,10 @@ Video: MACRO
 		db 0
 	drawContext:
 		dw 0
-	drawContextEven:
-		DrawContext 0H, 1EC00H, 1F800H
-	drawContextOdd:
-		DrawContext 0H, 1E800H, 1F000H
 	ENDM
 
 ; ix = this
 Video_Construct:
-	ld de,Video.drawContextEven
-	add ix,de
-	call DrawContext_Construct
-	ld de,Video.drawContextOdd - Video.drawContextEven
-	add ix,de
-	call DrawContext_Construct
-	ld de,-Video.drawContextOdd
-	add ix,de
 	ld a,5
 	call VDP_InitScreen
 	call VDP_Enable212Lines
@@ -85,20 +73,6 @@ NoOverflow:
 	call VDP_SetRegister
 	ret
 	ENDP
-
-; iy = this
-; iy <- even draw context
-Video_GetDrawContextEvenIY:
-	ld de,Video.drawContextEven
-	add iy,de
-	ret
-
-; iy = this
-; iy <- odd draw context
-Video_GetDrawContextOddIY:
-	ld de,Video.drawContextOdd
-	add iy,de
-	ret
 
 ; Waits until draw context is displayed
 ; iy = this
