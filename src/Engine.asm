@@ -90,7 +90,7 @@ Engine_TIMIInterruptEntry:
 
 	push ix
 	call Engine_GetVideo
-	call Video_UpdateSync
+	call Video_UpdateVSync
 	pop ix
 
 	IF DEBUG

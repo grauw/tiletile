@@ -132,7 +132,7 @@ Video_GetNewDrawContextIY:
 	ret
 
 ; ix = this
-Video_UpdateSync: PROC
+Video_UpdateVSync: PROC
 	push ix
 	call Video_GetCurrentDrawContext
 	call DrawContext_IsSubmitted
