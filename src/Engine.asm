@@ -12,6 +12,10 @@ Engine: MACRO
 		DrawContext 0H, 1EC00H, 1F800H
 	drawContextOdd:
 		DrawContext 0H, 1E800H, 1F000H
+	displaySettingsEven:
+		DisplaySettings
+	displaySettingsOdd:
+		DisplaySettings
 	ENDM
 
 ; ix = this
@@ -103,6 +107,44 @@ Engine_Stop:
 	call Engine_GetTIMIHook
 	call Hook_Uninstall
 	pop ix
+	ret
+
+; iy = this
+Engine_SubmitEvenIY:
+	push ix
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.displaySettingsEven
+	add ix,de
+	ld de,Engine.drawContextEven
+	add iy,de
+	call DrawContext_SelectIY
+	ld de,Engine.video - Engine.drawContextEven
+	add iy,de
+	ex (sp),ix
+	pop de
+	call Video_SubmitDisplaySettingsIY
+	ld de,-Engine.video
+	add iy,de
+	ret
+
+; iy = this
+Engine_SubmitOddIY:
+	push ix
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.displaySettingsOdd
+	add ix,de
+	ld de,Engine.drawContextOdd
+	add iy,de
+	call DrawContext_SelectIY
+	ld de,Engine.video - Engine.drawContextOdd
+	add iy,de
+	ex (sp),ix
+	pop de
+	call Video_SubmitDisplaySettingsIY
+	ld de,-Engine.video
+	add iy,de
 	ret
 
 ; ix = this

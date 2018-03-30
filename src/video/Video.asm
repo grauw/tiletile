@@ -1,6 +1,7 @@
 ;
 ; Video subsystem
 ;
+	INCLUDE "DisplaySettings.asm"
 	INCLUDE "DrawContext.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
@@ -15,7 +16,7 @@
 Video: MACRO
 	submitted:
 		db 0
-	drawContext:
+	displaySettings:
 		dw 0
 	ENDM
 
@@ -74,13 +75,13 @@ NoOverflow:
 	ret
 	ENDP
 
-; Waits until draw context is displayed
+; Waits until display settings is displayed
 ; iy = this
-; de = draw context
-Video_SubmitDrawContextIY: PROC
+; de = display settings
+Video_SubmitDisplaySettingsIY: PROC
 	di
-	ld (iy + Video.drawContext),e
-	ld (iy + Video.drawContext + 1),d
+	ld (iy + Video.displaySettings),e
+	ld (iy + Video.displaySettings + 1),d
 	ei
 	ld (iy + Video.submitted),1
 Wait:
@@ -93,12 +94,8 @@ Wait:
 Video_UpdateVSync:
 	bit 0,(ix + Video.submitted)
 	ret z
-	push ix
-	ld e,(ix + Video.drawContext)
-	ld d,(ix + Video.drawContext + 1)
-	ld ixl,e
-	ld ixh,d
-	call DrawContext_Select
-	pop ix
+	ld l,(ix + Video.displaySettings)
+	ld h,(ix + Video.displaySettings + 1)
+	call DisplaySettings_ApplyHL
 	ld (ix + Video.submitted),0
 	ret

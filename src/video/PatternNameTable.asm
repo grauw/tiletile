@@ -28,12 +28,10 @@ PatternNameTable_Construct:
 	ld (ix + PatternNameTable.baseRegister2),a
 	ret
 
-; ix = this
-PatternNameTable_Select:
-	ld a,(ix + PatternNameTable.baseRegister2)
-	ld b,2
-	call VDP_SetRegister
-	ret
+PatternNameTable_Select: MACRO ?this, ?displaySettings
+	ld a,(?this + PatternNameTable.baseRegister2)
+	ld (?displaySettings + DisplaySettings.patternName),a
+	ENDM
 
 ; hl = offset
 ; ix = this

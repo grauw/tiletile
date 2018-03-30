@@ -52,15 +52,12 @@ SpriteAttributeTable_SetDisplayPositionIY:
 	ld (iy + SpriteAttributeTable.cameraOffsetY),a
 	ret
 
-; ix = this
-SpriteAttributeTable_Select:
-	ld a,(ix + SpriteAttributeTable.baseRegister5)
-	ld b,5
-	call VDP_SetRegister
-	ld a,(ix + SpriteAttributeTable.baseRegister11)
-	ld b,11
-	call VDP_SetRegister
-	ret
+SpriteAttributeTable_Select: MACRO ?this, ?displaySettings
+	ld a,(?this + SpriteAttributeTable.baseRegister5)
+	ld (?displaySettings + DisplaySettings.spriteAttributeLSB),a
+	ld a,(?this + SpriteAttributeTable.baseRegister11)
+	ld (?displaySettings + DisplaySettings.spriteAttributeMSB),a
+	ENDM
 
 ; a = sprite number
 ; ix = this

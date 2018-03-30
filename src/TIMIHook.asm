@@ -3,24 +3,12 @@
 ;
 TIMIHook: MACRO
 	super: Hook H.TIMI, Entry, OldHook
-	suspend:
-		db 0
 	Entry:
 		push af
-		ld a,(suspend)
-		and a
-		jr nz,Return
-		dec a
-		ei
-		ld (suspend),a
 		ld ix,0
 	object: equ $ - 2
 		call System_ThrowException
 	address: equ $ - 2
-		xor a
-		di
-		ld (suspend),a
-	Return:
 		pop af
 	OldHook:
 		ds 5

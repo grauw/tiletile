@@ -31,15 +31,12 @@ SpriteColorTable_Construct:
 	ld (ix + SpriteColorTable.baseRegister11),a
 	ret
 
-; ix = this
-SpriteColorTable_Select:
-	ld a,(ix + SpriteColorTable.baseRegister5)
-	ld b,5
-	call VDP_SetRegister
-	ld a,(ix + SpriteColorTable.baseRegister11)
-	ld b,11
-	call VDP_SetRegister
-	ret
+SpriteColorTable_Select: MACRO ?this, ?displaySettings
+	ld a,(?this + SpriteColorTable.baseRegister5)
+	ld (?displaySettings + SpriteColorTable.spriteAttributeLSB),a
+	ld a,(?this + SpriteColorTable.baseRegister11)
+	ld (?displaySettings + SpriteColorTable.spriteAttributeMSB),a
+	ENDM
 
 ; a = sprite number
 ; ix = this

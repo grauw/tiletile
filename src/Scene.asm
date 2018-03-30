@@ -143,21 +143,15 @@ Scene_Stop:
 Scene_Run:
 	call Scene_GetEngine_IY
 	call Engine_GetDrawContextEvenIY
-	push iy
 	call Scene_Update
 	call Scene_GetEngine_IY
-	call Engine_GetVideoIY
-	pop de
-	call Video_SubmitDrawContextIY
+	call Engine_SubmitEvenIY
 
 	call Scene_GetEngine_IY
 	call Engine_GetDrawContextOddIY
-	push iy
 	call Scene_Update
 	call Scene_GetEngine_IY
-	call Engine_GetVideoIY
-	pop de
-	call Video_SubmitDrawContextIY
+	call Engine_SubmitOddIY
 
 	jr Scene_Run
 

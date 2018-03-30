@@ -27,12 +27,10 @@ SpritePatternTable_Construct:
 	ld (ix + SpritePatternTable.baseRegister6),a
 	ret
 
-; ix = this
-SpritePatternTable_Select:
-	ld a,(ix + SpritePatternTable.baseRegister6)
-	ld b,6
-	call VDP_SetRegister
-	ret
+SpritePatternTable_Select: MACRO ?this, ?displaySettings
+	ld a,(?this + SpritePatternTable.baseRegister6)
+	ld (?displaySettings + DisplaySettings.spritePattern),a
+	ENDM
 
 ; a = sprite pattern number
 ; ix = this

@@ -16,18 +16,14 @@ DisplayOffset: MACRO
 DisplayOffset_Construct:
 	ret
 
-; ix = this
-DisplayOffset_Select:
-	ld a,(ix + DisplayOffset.horizontalOffsetCharacters)
-	ld b,26
-	call VDP_SetRegister
-	ld a,(ix + DisplayOffset.horizontalOffsetDots)
-	ld b,27
-	call VDP_SetRegister
-	ld a,(ix + DisplayOffset.verticalOffset)
-	ld b,23
-	call VDP_SetRegister
-	ret
+DisplayOffset_Select: MACRO ?this, ?displaySettings
+	ld a,(?this + DisplayOffset.horizontalOffsetCharacters)
+	ld (?displaySettings + DisplaySettings.horizontalOffsetCharacters),a
+	ld a,(?this + DisplayOffset.horizontalOffsetDots)
+	ld (?displaySettings + DisplaySettings.horizontalOffsetDots),a
+	ld a,(?this + DisplayOffset.verticalOffset)
+	ld (?displaySettings + DisplaySettings.verticalOffset),a
+	ENDM
 
 ; a = offset
 ; iy = this

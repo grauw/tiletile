@@ -108,24 +108,13 @@ DrawContext_GetSpritePatternTableIY:
 	add iy,de
 	ret
 
-; ix = this
-DrawContext_Select:
-	push ix
-	call DrawContext_GetDisplayOffset
-	call DisplayOffset_Select
-	pop ix
-	push ix
-	call DrawContext_GetPatternNameTable
-	call PatternNameTable_Select
-	pop ix
-	push ix
-	call DrawContext_GetSpriteAttributeTable
-	call SpriteAttributeTable_Select
-	pop ix
-	push ix
-	call DrawContext_GetSpritePatternTable
-	call SpritePatternTable_Select
-	pop ix
+; ix = display settings
+; iy = this
+DrawContext_SelectIY:
+	DisplayOffset_Select iy + DrawContext.displayOffset, ix
+	PatternNameTable_Select iy + DrawContext.patternNameTable, ix
+	SpriteAttributeTable_Select iy + DrawContext.spriteAttributeTable, ix
+	SpritePatternTable_Select iy + DrawContext.spritePatternTable, ix
 	ret
 
 ; hl = offset
