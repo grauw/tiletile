@@ -33,6 +33,9 @@ Application_Main:
 
 ; ix = this
 Application_Construct:
+	ld a,0
+	ld (CLIKSW),a  ; disable key click
+
 	push ix
 	call Application_GetInput
 	call Input_Construct
@@ -103,9 +106,6 @@ Application_GetScene:
 
 ; ix = this
 Application_EnterMainLoop:
-	ld a,0
-	ld (CLIKSW),a  ; disable key click
-
 	call VDP_EnableBlank
 
 	call Application_GetVideo_IY
