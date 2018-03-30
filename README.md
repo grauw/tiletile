@@ -10,6 +10,7 @@ Tile² game engine
 
 Author: Laurens Holst <laurens.nospam@grauw.nl>  
 Site: <https://bitbucket.org/grauw/tiletile>  
+License: Simplified BSD License (code), CC BY-NC-ND (art, music, story, etc.)
 
 
 System Requirements
