@@ -162,12 +162,7 @@ Scene_Update:
 	in a,(2dh)
 	ENDIF
 
-	push iy
-	call Scene_GetEngine_IY
-	call Engine_GetInputIY
-	call Input_UpdateIY
-	pop iy
-
+	call Scene_UpdateInput
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
 	call Scene_UpdateSpritePatterns
@@ -178,6 +173,15 @@ Scene_Update:
 	IF DEBUG
 	out (2dh),a
 	ENDIF
+	ret
+
+; ix = this
+Scene_UpdateInput:
+	push iy
+	call Scene_GetEngine_IY
+	call Engine_GetInputIY
+	call Input_UpdateIY
+	pop iy
 	ret
 
 ; ix = this
