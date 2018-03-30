@@ -146,6 +146,13 @@ Scene_Run:
 	call Engine_GetVideoIY
 	call Video_GetNewDrawContextIY
 
+	call Scene_Update
+
+	jr Scene_Run
+
+; ix = this
+; iy = draw context
+Scene_Update:
 	IF DEBUG
 	in a,(2dh)
 	ENDIF
@@ -156,17 +163,6 @@ Scene_Run:
 	call Input_UpdateIY
 	pop iy
 
-	call Scene_Update
-
-	IF DEBUG
-	out (2dh),a
-	ENDIF
-
-	jr Scene_Run
-
-; ix = this
-; iy = draw context
-Scene_Update:
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
 	call Scene_UpdateSpritePatterns
@@ -174,6 +170,10 @@ Scene_Update:
 	call Scene_UpdateSpriteColors
 	call Scene_SubmitDrawContext
 	call Scene_UpdateMapViewPixels
+
+	IF DEBUG
+	out (2dh),a
+	ENDIF
 	ret
 
 ; ix = this
