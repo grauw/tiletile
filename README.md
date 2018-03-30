@@ -16,7 +16,7 @@ License: Simplified BSD License (code), CC BY-NC-ND (art, music, story, etc.)
 System Requirements
 -------------------
 
-  * MSX2, MSX2+, MSX turboR
+  * MSX2+, MSX turboR
   * 128kB video RAM
   * 64kB main RAM
   * 64kB Konami 4/5 ROM
