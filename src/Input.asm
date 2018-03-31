@@ -8,6 +8,8 @@ Input_PPI_PORT_C: equ 0AAH
 Input: MACRO
 	newKey:
 		ds Input_KEY_MATRIX_ROWS, 0FFH
+	oldKey:
+		ds Input_KEY_MATRIX_ROWS, 0FFH
 	ENDM
 
 ; ix = this
@@ -16,10 +18,18 @@ Input_Construct:
 
 ; iy = this
 Input_UpdateIY: PROC
-	ld c,iyl
-	ld b,iyh
-	ld hl,Input.newKey
-	add hl,bc
+	ld e,iyl
+	ld d,iyh
+	ld hl,Input.oldKey
+	add hl,de
+	ex de,hl
+	ld hl,Input.newKey - Input.oldKey
+	add hl,de
+	push hl
+	REPT Input_KEY_MATRIX_ROWS
+	ldi
+	ENDM
+	pop hl
 	ld bc,Input_KEY_MATRIX_ROWS << 8 | Input_PPI_PORT_B
 	di
 	in a,(Input_PPI_PORT_C)
