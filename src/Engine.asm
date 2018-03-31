@@ -2,6 +2,8 @@
 ; Engine
 ;
 Engine: MACRO
+	frame:
+		db 0
 	input:
 		Input
 	video:
@@ -81,6 +83,13 @@ Engine_GetTIMIHook:
 
 ; iy = this
 ; iy <- even draw context
+Engine_GetDrawContextIY:
+	bit 0,(iy + Engine.frame)
+	jr z,Engine_GetDrawContextEvenIY
+	jr Engine_GetDrawContextOddIY
+
+; iy = this
+; iy <- even draw context
 Engine_GetDrawContextEvenIY:
 	ld de,Engine.drawContextEven
 	add iy,de
@@ -108,6 +117,13 @@ Engine_Stop:
 	call Hook_Uninstall
 	pop ix
 	ret
+
+; iy = this
+Engine_SubmitIY:
+	inc (iy + Engine.frame)
+	bit 0,(iy + Engine.frame)
+	jr nz,Engine_SubmitEvenIY
+	jr Engine_SubmitOddIY
 
 ; iy = this
 Engine_SubmitEvenIY:

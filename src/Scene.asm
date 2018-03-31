@@ -142,17 +142,10 @@ Scene_Stop:
 ; ix = this
 Scene_Run:
 	call Scene_GetEngine_IY
-	call Engine_GetDrawContextEvenIY
+	call Engine_GetDrawContextIY
 	call Scene_Update
 	call Scene_GetEngine_IY
-	call Engine_SubmitEvenIY
-
-	call Scene_GetEngine_IY
-	call Engine_GetDrawContextOddIY
-	call Scene_Update
-	call Scene_GetEngine_IY
-	call Engine_SubmitOddIY
-
+	call Engine_SubmitIY
 	jr Scene_Run
 
 ; ix = this
