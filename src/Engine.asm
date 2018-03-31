@@ -34,6 +34,8 @@ Engine: MACRO
 		Video
 	timiHook:
 		TIMIHook
+	spriteColorCopy:
+		VRAMTableCopy 1EC00H, 1E800H, SpriteColorTable_SIZE
 	ENDM
 
 ; ix = this
@@ -217,20 +219,11 @@ Engine_CopySpriteColorToSecondary:
 	PROFILE_BEGIN 3
 	ENDIF
 
-	push ix
-	push iy
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.spriteColorTableEven
-	add ix,de
-	ld de,Engine.spriteColorTableOdd
-	add iy,de
-	ld hl,0
-	ld de,0
-	ld bc,32 * SpriteColor._size
-	call VRAMTable_Copy
-	pop iy
-	pop ix
+	ld hl,Engine.spriteColorCopy
+	add hl,de
+	call VRAMTableCopy_ExecuteHL
 
 	IF DEBUG
 	PROFILE_END 3

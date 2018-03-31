@@ -18,6 +18,8 @@ Player: MACRO
 		dw 0
 	sourcePatterns:
 		SpritePatternTable 18000H
+	patternCopy:
+		VRAMTableCopy 0, 0, 8 * SpritePattern._size
 	ENDM
 
 ; de = tile map
@@ -311,14 +313,23 @@ Player_DrawSpriteColors:
 ; ix = this
 ; iy = sprite pattern table
 Player_DrawSpritePatterns:
+	push iy
+	ld e,ixl
+	ld d,ixh
+	ld iy,Player.patternCopy
+	add iy,de
 	call Player_GetSourcePatternOffset
 	ld de,Player.sourcePatterns
 	add ix,de
-	ld de,Player_PATTERN * SpritePattern._size
-	ld bc,8 * SpritePattern._size
-	call VRAMTable_Copy
+	call VRAMTableCopy_SetSourceIY
 	ld de,-Player.sourcePatterns
 	add ix,de
+	ex (sp),ix
+	ld hl,Player_PATTERN * SpritePattern._size
+	call VRAMTableCopy_SetDestinationIY
+	ex (sp),ix
+	call VRAMTableCopy_ExecuteIY
+	pop iy
 	ret
 
 ; ix = this
