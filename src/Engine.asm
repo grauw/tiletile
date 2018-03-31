@@ -82,25 +82,74 @@ Engine_GetTIMIHook:
 	ret
 
 ; iy = this
-; iy <- even draw context
-Engine_GetDrawContextIY:
-	bit 0,(iy + Engine.frame)
-	jr z,Engine_GetDrawContextEvenIY
-	jr Engine_GetDrawContextOddIY
+; iy <- even sprite pattern table
+Engine_GetSpritePatternTableEvenIY:
+	ld de,Engine.drawContextEven + DrawContext.spritePatternTable
+	add iy,de
+	ret
 
 ; iy = this
-; iy <- even draw context
-Engine_GetDrawContextEvenIY:
+; iy <- odd sprite pattern table
+Engine_GetSpritePatternTableOddIY:
+	ld de,Engine.drawContextOdd + DrawContext.spritePatternTable
+	add iy,de
+	ret
+
+; iy = this
+; iy <- current display offset
+Engine_GetDisplayOffsetIY: PROC
+	bit 0,(iy + Engine.frame)
+	jr nz,Odd
+	ld de,Engine.drawContextEven + DrawContext.displayOffset
+	add iy,de
+	ret
+Odd:
+	ld de,Engine.drawContextOdd + DrawContext.displayOffset
+	add iy,de
+	ret
+	ENDP
+
+; iy = this
+; iy <- current sprite attribute table
+Engine_GetSpriteAttributeTableIY: PROC
+	bit 0,(iy + Engine.frame)
+	jr nz,Odd
 	ld de,Engine.drawContextEven
 	add iy,de
-	ret
-
-; iy = this
-; iy <- odd draw context
-Engine_GetDrawContextOddIY:
+	jp DrawContext_GetSpriteAttributeTableIY
+Odd:
 	ld de,Engine.drawContextOdd
 	add iy,de
+	jp DrawContext_GetSpriteAttributeTableIY
+	ENDP
+
+; iy = this
+; iy <- current sprite color table
+Engine_GetSpriteColorTableIY: PROC
+	bit 0,(iy + Engine.frame)
+	jr nz,Odd
+	ld de,Engine.drawContextEven + DrawContext.spriteColorTable
+	add iy,de
 	ret
+Odd:
+	ld de,Engine.drawContextOdd + DrawContext.spriteColorTable
+	add iy,de
+	ret
+	ENDP
+
+; iy = this
+; iy <- current sprite pattern table
+Engine_GetSpritePatternTableIY: PROC
+	bit 0,(iy + Engine.frame)
+	jr nz,Odd
+	ld de,Engine.drawContextEven + DrawContext.spritePatternTable
+	add iy,de
+	ret
+Odd:
+	ld de,Engine.drawContextOdd + DrawContext.spritePatternTable
+	add iy,de
+	ret
+	ENDP
 
 ; ix = this
 Engine_Start:

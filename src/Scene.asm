@@ -109,14 +109,12 @@ Scene_Start:
 	pop ix
 
 	push iy
-	call Engine_GetDrawContextEvenIY
-	call DrawContext_GetSpritePatternTableIY
+	call Engine_GetSpritePatternTableEvenIY
 	call Scene_InitializeSpritePatterns
 	pop iy
 
 	push iy
-	call Engine_GetDrawContextOddIY
-	call DrawContext_GetSpritePatternTableIY
+	call Engine_GetSpritePatternTableOddIY
 	call Scene_InitializeSpritePatterns
 	pop iy
 
@@ -140,16 +138,16 @@ Scene_Stop:
 	ret
 
 ; ix = this
-Scene_Run:
+Scene_Run: PROC
 	call Scene_GetEngine_IY
-	call Engine_GetDrawContextIY
+Loop:
 	call Scene_Update
-	call Scene_GetEngine_IY
 	call Engine_SubmitIY
-	jr Scene_Run
+	jr Loop
+	ENDP
 
 ; ix = this
-; iy = draw context
+; iy = engine
 Scene_Update:
 	IF DEBUG
 	PROFILE_FRAME_BEGIN
@@ -169,22 +167,22 @@ Scene_Update:
 	ret
 
 ; ix = this
+; iy = engine
 Scene_UpdateInput:
 	push iy
-	call Scene_GetEngine_IY
 	call Engine_GetInputIY
 	call Input_UpdateIY
 	pop iy
 	ret
 
 ; ix = this
+; iy = engine
 Scene_UpdatePlayerPosition:
 	IF DEBUG
 	PROFILE_BEGIN 0
 	ENDIF
 
 	push iy
-	call Scene_GetEngine_IY
 	call Engine_GetInputIY
 
 	push ix
@@ -205,14 +203,14 @@ Scene_UpdatePlayerPosition:
 	ret
 
 ; ix = this
-; iy = draw context
+; iy = engine
 Scene_UpdateMapViewPosition:
 	IF DEBUG
 	PROFILE_BEGIN 1
 	ENDIF
 
 	push iy
-	call DrawContext_GetDisplayOffsetIY
+	call Engine_GetDisplayOffsetIY
 	push ix
 	call Scene_GetPlayer
 	ld l,(ix + Player.x)
@@ -236,14 +234,14 @@ Scene_UpdateMapViewPosition:
 	ret
 
 ; ix = this
-; iy = draw context
+; iy = engine
 Scene_UpdateSpriteAttributes:
 	IF DEBUG
 	PROFILE_BEGIN 2
 	ENDIF
 
 	push iy
-	call DrawContext_GetSpriteAttributeTableIY
+	call Engine_GetSpriteAttributeTableIY
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY
 	push ix
@@ -265,14 +263,14 @@ Scene_UpdateSpriteAttributes:
 	ret
 
 ; ix = this
-; iy = draw context
+; iy = engine
 Scene_UpdateSpriteColors:
 	IF DEBUG
 	PROFILE_BEGIN 3
 	ENDIF
 
 	push iy
-	call DrawContext_GetSpriteColorTableIY
+	call Engine_GetSpriteColorTableIY
 	ld a,0
 	call SpriteColorTable_SetColorWriteIY
 	push ix
@@ -293,14 +291,14 @@ Scene_UpdateSpriteColors:
 	ret
 
 ; ix = this
-; iy = draw context
+; iy = engine
 Scene_UpdateSpritePatterns:
 	IF DEBUG
 	PROFILE_BEGIN 7
 	ENDIF
 
 	push iy
-	call DrawContext_GetSpritePatternTableIY
+	call Engine_GetSpritePatternTableIY
 	push ix
 	call Scene_GetPlayer
 	call Player_DrawSpritePatterns
@@ -313,7 +311,7 @@ Scene_UpdateSpritePatterns:
 	ret
 
 ; ix = this
-; iy = draw context
+; iy = engine
 Scene_UpdateMapViewPixels:
 	IF DEBUG
 	PROFILE_BEGIN 4
