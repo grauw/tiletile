@@ -2,7 +2,6 @@
 ; Video subsystem
 ;
 	INCLUDE "DisplaySettings.asm"
-	INCLUDE "DrawContext.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "PatternNameTable.asm"

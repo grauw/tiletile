@@ -10,10 +10,26 @@ Engine: MACRO
 		Video
 	timiHook:
 		TIMIHook
-	drawContextEven:
-		DrawContext 0H, 1EC00H, 1F800H
-	drawContextOdd:
-		DrawContext 0H, 1E800H, 1F000H
+	displayOffsetEven:
+		DisplayOffset
+	displayOffsetOdd:
+		DisplayOffset
+	patternNameTableEven:
+		PatternNameTable 0H
+	patternNameTableOdd:
+		PatternNameTable 0H
+	spriteAttributeTableEven:
+		SpriteAttributeTable 1EE00H
+	spriteAttributeTableOdd:
+		SpriteAttributeTable 1EA00H
+	spriteColorTableEven:
+		SpriteColorTable 1EC00H
+	spriteColorTableOdd:
+		SpriteColorTable 1E800H
+	spritePatternTableEven:
+		SpritePatternTable 1F800H
+	spritePatternTableOdd:
+		SpritePatternTable 1F000H
 	displaySettingsEven:
 		DisplaySettings
 	displaySettingsOdd:
@@ -43,13 +59,37 @@ Engine_Construct:
 	call TIMIHook_Construct
 	pop ix
 
-	ld de,Engine.drawContextEven
+	ld de,Engine.displayOffsetEven
 	add ix,de
-	call DrawContext_Construct
-	ld de,Engine.drawContextOdd - Engine.drawContextEven
+	call DisplayOffset_Construct
+	ld de,Engine.displayOffsetOdd - Engine.displayOffsetEven
 	add ix,de
-	call DrawContext_Construct
-	ld de,-Engine.drawContextOdd
+	call DisplayOffset_Construct
+	ld de,Engine.patternNameTableEven - Engine.displayOffsetOdd
+	add ix,de
+	call PatternNameTable_Construct
+	ld de,Engine.patternNameTableOdd - Engine.patternNameTableEven
+	add ix,de
+	call PatternNameTable_Construct
+	ld de,Engine.spriteAttributeTableEven - Engine.patternNameTableOdd
+	add ix,de
+	call SpriteAttributeTable_Construct
+	ld de,Engine.spriteAttributeTableOdd - Engine.spriteAttributeTableEven
+	add ix,de
+	call SpriteAttributeTable_Construct
+	ld de,Engine.spriteColorTableEven - Engine.spriteAttributeTableOdd
+	add ix,de
+	call SpriteColorTable_Construct
+	ld de,Engine.spriteColorTableOdd - Engine.spriteColorTableEven
+	add ix,de
+	call SpriteColorTable_Construct
+	ld de,Engine.spritePatternTableEven - Engine.spriteColorTableOdd
+	add ix,de
+	call SpritePatternTable_Construct
+	ld de,Engine.spritePatternTableOdd - Engine.spritePatternTableEven
+	add ix,de
+	call SpritePatternTable_Construct
+	ld de,-Engine.spritePatternTableOdd
 	add ix,de
 	ret
 
@@ -84,14 +124,14 @@ Engine_GetTIMIHook:
 ; iy = this
 ; iy <- even sprite pattern table
 Engine_GetSpritePatternTableEvenIY:
-	ld de,Engine.drawContextEven + DrawContext.spritePatternTable
+	ld de,Engine.spritePatternTableEven
 	add iy,de
 	ret
 
 ; iy = this
 ; iy <- odd sprite pattern table
 Engine_GetSpritePatternTableOddIY:
-	ld de,Engine.drawContextOdd + DrawContext.spritePatternTable
+	ld de,Engine.spritePatternTableOdd
 	add iy,de
 	ret
 
@@ -100,11 +140,11 @@ Engine_GetSpritePatternTableOddIY:
 Engine_GetDisplayOffsetIY: PROC
 	bit 0,(iy + Engine.frame)
 	jr nz,Odd
-	ld de,Engine.drawContextEven + DrawContext.displayOffset
+	ld de,Engine.displayOffsetEven
 	add iy,de
 	ret
 Odd:
-	ld de,Engine.drawContextOdd + DrawContext.displayOffset
+	ld de,Engine.displayOffsetOdd
 	add iy,de
 	ret
 	ENDP
@@ -114,13 +154,17 @@ Odd:
 Engine_GetSpriteAttributeTableIY: PROC
 	bit 0,(iy + Engine.frame)
 	jr nz,Odd
-	ld de,Engine.drawContextEven
+	ld h,(iy + Engine.displayOffsetEven + DisplayOffset.horizontalOffset)
+	ld l,(iy + Engine.displayOffsetEven + DisplayOffset.verticalOffset)
+	ld de,Engine.spriteAttributeTableEven
 	add iy,de
-	jp DrawContext_GetSpriteAttributeTableIY
+	jp SpriteAttributeTable_SetDisplayPositionIY
 Odd:
-	ld de,Engine.drawContextOdd
+	ld h,(iy + Engine.displayOffsetOdd + DisplayOffset.horizontalOffset)
+	ld l,(iy + Engine.displayOffsetOdd + DisplayOffset.verticalOffset)
+	ld de,Engine.spriteAttributeTableOdd
 	add iy,de
-	jp DrawContext_GetSpriteAttributeTableIY
+	jp SpriteAttributeTable_SetDisplayPositionIY
 	ENDP
 
 ; iy = this
@@ -128,11 +172,11 @@ Odd:
 Engine_GetSpriteColorTableIY: PROC
 	bit 0,(iy + Engine.frame)
 	jr nz,Odd
-	ld de,Engine.drawContextEven + DrawContext.spriteColorTable
+	ld de,Engine.spriteColorTableEven
 	add iy,de
 	ret
 Odd:
-	ld de,Engine.drawContextOdd + DrawContext.spriteColorTable
+	ld de,Engine.spriteColorTableOdd
 	add iy,de
 	ret
 	ENDP
@@ -142,11 +186,11 @@ Odd:
 Engine_GetSpritePatternTableIY: PROC
 	bit 0,(iy + Engine.frame)
 	jr nz,Odd
-	ld de,Engine.drawContextEven + DrawContext.spritePatternTable
+	ld de,Engine.spritePatternTableEven
 	add iy,de
 	ret
 Odd:
-	ld de,Engine.drawContextOdd + DrawContext.spritePatternTable
+	ld de,Engine.spritePatternTableOdd
 	add iy,de
 	ret
 	ENDP
@@ -176,18 +220,17 @@ Engine_SubmitIY:
 
 ; iy = this
 Engine_SubmitEvenIY:
-	push ix
+	DisplayOffset_Select (iy + Engine.displayOffsetEven), (iy + Engine.displaySettingsEven)
+	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsEven)
+	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displaySettingsEven)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsEven)
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.displaySettingsEven
-	add ix,de
-	ld de,Engine.drawContextEven
+	ld hl,Engine.displaySettingsEven
+	add hl,de
+	ld de,Engine.video
 	add iy,de
-	call DrawContext_SelectIY
-	ld de,Engine.video - Engine.drawContextEven
-	add iy,de
-	ex (sp),ix
-	pop de
+	ex de,hl
 	call Video_SubmitDisplaySettingsIY
 	ld de,-Engine.video
 	add iy,de
@@ -195,18 +238,17 @@ Engine_SubmitEvenIY:
 
 ; iy = this
 Engine_SubmitOddIY:
-	push ix
+	DisplayOffset_Select (iy + Engine.displayOffsetOdd), (iy + Engine.displaySettingsOdd)
+	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsOdd)
+	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displaySettingsOdd)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsOdd)
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.displaySettingsOdd
-	add ix,de
-	ld de,Engine.drawContextOdd
+	ld hl,Engine.displaySettingsOdd
+	add hl,de
+	ld de,Engine.video
 	add iy,de
-	call DrawContext_SelectIY
-	ld de,Engine.video - Engine.drawContextOdd
-	add iy,de
-	ex (sp),ix
-	pop de
+	ex de,hl
 	call Video_SubmitDisplaySettingsIY
 	ld de,-Engine.video
 	add iy,de
