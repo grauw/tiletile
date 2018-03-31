@@ -77,15 +77,21 @@ NoOverflow:
 ; iy = this
 Video_WaitDisplayedIY:
 	bit 0,(iy + Video.submitted)
-	jr nz,Video_WaitDisplayedIY
-	ret
+	ret z
+	IF DEBUG
+	PROFILE_BEGIN 10
+	ENDIF
+	halt
+	IF DEBUG
+	PROFILE_END 10
+	ENDIF
+	jr Video_WaitDisplayedIY
 
 ; Waits until previous display settings is displayed
 ; iy = this
 ; de = display settings
 Video_SubmitDisplaySettingsIY:
-	bit 0,(iy + Video.submitted)
-	jr nz,Video_SubmitDisplaySettingsIY
+	call Video_WaitDisplayedIY
 	di
 	ld (iy + Video.displaySettings),e
 	ld (iy + Video.displaySettings + 1),d
