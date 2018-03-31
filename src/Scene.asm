@@ -243,13 +243,7 @@ Scene_UpdateSpriteAttributes:
 	ENDIF
 
 	push iy
-	call DrawContext_GetDisplayOffsetIY
-	ld h,(iy + DisplayOffset.horizontalOffset)
-	ld l,(iy + DisplayOffset.verticalOffset)
-	pop iy
-	push iy
 	call DrawContext_GetSpriteAttributeTableIY
-	call SpriteAttributeTable_SetDisplayPositionIY
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY
 	push ix

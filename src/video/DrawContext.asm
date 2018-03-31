@@ -66,18 +66,26 @@ DrawContext_GetPatternNameTableIY:
 	add iy,de
 	ret
 
+; Also updates the position from the display offset.
 ; ix = this
 ; ix <- sprite attribute table
 DrawContext_GetSpriteAttributeTable:
+	ld h,(ix + DrawContext.displayOffset + DisplayOffset.horizontalOffset)
+	ld l,(ix + DrawContext.displayOffset + DisplayOffset.verticalOffset)
 	ld de,DrawContext.spriteAttributeTable
 	add ix,de
+	call SpriteAttributeTable_SetDisplayPositionIY
 	ret
 
+; Also updates the position from the display offset.
 ; iy = this
 ; iy <- sprite attribute table
 DrawContext_GetSpriteAttributeTableIY:
+	ld h,(iy + DrawContext.displayOffset + DisplayOffset.horizontalOffset)
+	ld l,(iy + DrawContext.displayOffset + DisplayOffset.verticalOffset)
 	ld de,DrawContext.spriteAttributeTable
 	add iy,de
+	call SpriteAttributeTable_SetDisplayPositionIY
 	ret
 
 ; ix = this
