@@ -42,3 +42,42 @@ NoClip:
 	ld ixh,d
 	ret
 	ENDP
+
+; bc = x
+; de = y
+; ix = this
+; hl <- tile data pointer
+; Modifies: af, bc, de
+TileMap_GetTileDataPointer: PROC
+	bit 7,d
+	jr nz,Negative
+	call Multiply
+	jr Continue
+Negative:
+	ld a,e
+	neg
+	ld e,a
+	call Multiply
+	ex de,hl
+	ld hl,0
+	and a
+	sbc hl,de
+Continue:
+	add hl,bc
+	add hl,hl
+	ld e,(ix + TileMap.data)
+	ld d,(ix + TileMap.data + 1)
+	add hl,de
+	ret
+Multiply:
+	ld h,(ix + TileMap.width)
+	ld d,0
+	ld l,d
+	REPT 8
+	add hl,hl
+	jr nc,NoAdd
+	add hl,de
+NoAdd:
+	ENDM
+	ret
+	ENDP
