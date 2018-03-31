@@ -159,7 +159,7 @@ Scene_Run:
 ; iy = draw context
 Scene_Update:
 	IF DEBUG
-	in a,(2dh)
+	PROFILE_FRAME_BEGIN
 	ENDIF
 
 	call Scene_UpdateInput
@@ -171,7 +171,7 @@ Scene_Update:
 	call Scene_UpdateMapViewPixels
 
 	IF DEBUG
-	out (2dh),a
+	PROFILE_FRAME_END
 	ENDIF
 	ret
 
@@ -187,8 +187,7 @@ Scene_UpdateInput:
 ; ix = this
 Scene_UpdatePlayerPosition:
 	IF DEBUG
-	ld a,0
-	in a,(2ch)
+	PROFILE_BEGIN 0
 	ENDIF
 
 	push iy
@@ -208,8 +207,7 @@ Scene_UpdatePlayerPosition:
 	pop iy
 
 	IF DEBUG
-	ld a,0
-	out (2ch),a
+	PROFILE_END 0
 	ENDIF
 	ret
 
@@ -217,8 +215,7 @@ Scene_UpdatePlayerPosition:
 ; iy = draw context
 Scene_UpdateMapViewPosition:
 	IF DEBUG
-	ld a,1
-	in a,(2ch)
+	PROFILE_BEGIN 1
 	ENDIF
 
 	push iy
@@ -241,8 +238,7 @@ Scene_UpdateMapViewPosition:
 	pop iy
 
 	IF DEBUG
-	ld a,1
-	out (2ch),a
+	PROFILE_END 1
 	ENDIF
 	ret
 
@@ -250,8 +246,7 @@ Scene_UpdateMapViewPosition:
 ; iy = draw context
 Scene_UpdateSpriteAttributes:
 	IF DEBUG
-	ld a,2
-	in a,(2ch)
+	PROFILE_BEGIN 2
 	ENDIF
 
 	push iy
@@ -278,8 +273,7 @@ Scene_UpdateSpriteAttributes:
 	pop iy
 
 	IF DEBUG
-	ld a,2
-	out (2ch),a
+	PROFILE_END 2
 	ENDIF
 	ret
 
@@ -287,8 +281,7 @@ Scene_UpdateSpriteAttributes:
 ; iy = draw context
 Scene_UpdateSpriteColors:
 	IF DEBUG
-	ld a,3
-	in a,(2ch)
+	PROFILE_BEGIN 3
 	ENDIF
 
 	push iy
@@ -308,8 +301,7 @@ Scene_UpdateSpriteColors:
 	pop iy
 
 	IF DEBUG
-	ld a,3
-	out (2ch),a
+	PROFILE_END 3
 	ENDIF
 	ret
 
@@ -317,8 +309,7 @@ Scene_UpdateSpriteColors:
 ; iy = draw context
 Scene_UpdateSpritePatterns:
 	IF DEBUG
-	ld a,7
-	in a,(2ch)
+	PROFILE_BEGIN 7
 	ENDIF
 
 	push iy
@@ -330,8 +321,7 @@ Scene_UpdateSpritePatterns:
 	pop iy
 
 	IF DEBUG
-	ld a,7
-	out (2ch),a
+	PROFILE_END 7
 	ENDIF
 	ret
 
@@ -339,8 +329,7 @@ Scene_UpdateSpritePatterns:
 ; iy = draw context
 Scene_UpdateMapViewPixels:
 	IF DEBUG
-	ld a,4
-	in a,(2ch)
+	PROFILE_BEGIN 4
 	ENDIF
 
 	push iy
@@ -351,7 +340,6 @@ Scene_UpdateMapViewPixels:
 	pop iy
 
 	IF DEBUG
-	ld a,4
-	out (2ch),a
+	PROFILE_END 4
 	ENDIF
 	ret

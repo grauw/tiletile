@@ -5,6 +5,7 @@
 ;
 
 	INCLUDE "Macros.asm"
+	INCLUDE "DebugMacros.asm"
 
 DEBUG: equ 1
 

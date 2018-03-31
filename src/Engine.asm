@@ -150,8 +150,7 @@ Engine_SubmitOddIY:
 ; ix = this
 Engine_TIMIInterruptEntry:
 	IF DEBUG
-	ld a,6
-	in a,(2ch)
+	PROFILE_BEGIN 6
 	ENDIF
 
 	ld a,0FFH
@@ -163,7 +162,6 @@ Engine_TIMIInterruptEntry:
 	pop ix
 
 	IF DEBUG
-	ld a,6
-	out (2ch),a
+	PROFILE_END 6
 	ENDIF
 	ret
