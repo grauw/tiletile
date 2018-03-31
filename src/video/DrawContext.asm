@@ -2,8 +2,6 @@
 ; A drawing context
 ;
 DrawContext: MACRO ?patternNameAddress, ?spriteColorAddress, ?spritePatternAddress
-	submitted:
-		db 0
 	displayOffset:
 		DisplayOffset
 	patternNameTable:
@@ -111,36 +109,7 @@ DrawContext_GetSpritePatternTableIY:
 	ret
 
 ; ix = this
-; f <- nz: submitted
-DrawContext_IsSubmitted:
-	bit 0,(ix + DrawContext.submitted)
-	ret
-
-; iy = this
-; f <- nz: submitted
-DrawContext_IsSubmittedIY:
-	bit 0,(iy + DrawContext.submitted)
-	ret
-
-; ix = this
-DrawContext_Submit:
-	ld (ix + DrawContext.submitted),1
-	ret
-
-; iy = this
-DrawContext_SubmitIY:
-	ld (iy + DrawContext.submitted),1
-	ret
-
-; ix = this
-DrawContext_Release:
-	ld (ix + DrawContext.submitted),0
-	ret
-
-; ix = this
 DrawContext_Select:
-	call DrawContext_IsSubmitted
-	call z,System_ThrowException
 	push ix
 	call DrawContext_GetDisplayOffset
 	call DisplayOffset_Select

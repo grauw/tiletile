@@ -13,10 +13,10 @@
 	INCLUDE "SpritePatternTable.asm"
 
 Video: MACRO
-	currentDrawContext:
-		dw drawContextEven
-	displayDrawContext:
-		dw drawContextOdd
+	submitted:
+		db 0
+	drawContext:
+		dw 0
 	drawContextEven:
 		DrawContext 0H, 1EC00H, 1F800H
 	drawContextOdd:
@@ -86,24 +86,6 @@ NoOverflow:
 	ret
 	ENDP
 
-; ix = this
-; ix <- current draw context
-Video_GetCurrentDrawContext:
-	ld e,(ix + Video.currentDrawContext)
-	ld d,(ix + Video.currentDrawContext + 1)
-	ld ixl,e
-	ld ixh,d
-	ret
-
-; iy = this
-; iy <- current draw context
-Video_GetCurrentDrawContextIY:
-	ld e,(iy + Video.currentDrawContext)
-	ld d,(iy + Video.currentDrawContext + 1)
-	ld iyl,e
-	ld iyh,d
-	ret
-
 ; iy = this
 ; iy <- even draw context
 Video_GetDrawContextEvenIY:
@@ -118,39 +100,31 @@ Video_GetDrawContextOddIY:
 	add iy,de
 	ret
 
-; Waits until one is available
+; Waits until draw context is displayed
 ; iy = this
-; iy <- draw context
-Video_GetNewDrawContextIY:
-	push iy
-	call Video_GetCurrentDrawContextIY
-	call DrawContext_IsSubmittedIY
-	pop iy
-	jr nz,Video_GetNewDrawContextIY
-	ld iyl,e
-	ld iyh,d
-	ret
-
-; ix = this
-Video_UpdateVSync: PROC
-	push ix
-	call Video_GetCurrentDrawContext
-	call DrawContext_IsSubmitted
-	jr z,Skip
-	call DrawContext_Select
-	pop ix
-	ld c,(ix + Video.currentDrawContext)
-	ld b,(ix + Video.currentDrawContext + 1)
-	ld e,(ix + Video.displayDrawContext)
-	ld d,(ix + Video.displayDrawContext + 1)
-	ld (ix + Video.currentDrawContext),e
-	ld (ix + Video.currentDrawContext + 1),d
-	ld (ix + Video.displayDrawContext),c
-	ld (ix + Video.displayDrawContext + 1),d
-	push ix
-	call Video_GetCurrentDrawContext
-	call DrawContext_Release
-Skip:
-	pop ix
+; de = draw context
+Video_SubmitDrawContextIY: PROC
+	di
+	ld (iy + Video.drawContext),e
+	ld (iy + Video.drawContext + 1),d
+	ei
+	ld (iy + Video.submitted),1
+Wait:
+	bit 0,(iy + Video.submitted)
+	jr nz,Wait
 	ret
 	ENDP
+
+; ix = this
+Video_UpdateVSync:
+	bit 0,(ix + Video.submitted)
+	ret z
+	push ix
+	ld e,(ix + Video.drawContext)
+	ld d,(ix + Video.drawContext + 1)
+	ld ixl,e
+	ld ixh,d
+	call DrawContext_Select
+	pop ix
+	ld (ix + Video.submitted),0
+	ret

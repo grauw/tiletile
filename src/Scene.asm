@@ -144,9 +144,23 @@ Scene_Stop:
 Scene_Run:
 	call Scene_GetEngine_IY
 	call Engine_GetVideoIY
-	call Video_GetNewDrawContextIY
-
+	call Video_GetDrawContextEvenIY
+	push iy
 	call Scene_Update
+	call Scene_GetEngine_IY
+	call Engine_GetVideoIY
+	pop de
+	call Video_SubmitDrawContextIY
+
+	call Scene_GetEngine_IY
+	call Engine_GetVideoIY
+	call Video_GetDrawContextOddIY
+	push iy
+	call Scene_Update
+	call Scene_GetEngine_IY
+	call Engine_GetVideoIY
+	pop de
+	call Video_SubmitDrawContextIY
 
 	jr Scene_Run
 
@@ -168,7 +182,6 @@ Scene_Update:
 	call Scene_UpdateSpritePatterns
 	call Scene_UpdateSpriteAttributes
 	call Scene_UpdateSpriteColors
-	call Scene_SubmitDrawContext
 	call Scene_UpdateMapViewPixels
 
 	IF DEBUG
@@ -344,22 +357,6 @@ Scene_UpdateMapViewPixels:
 
 	IF DEBUG
 	ld a,4
-	out (2ch),a
-	ENDIF
-	ret
-
-; ix = this
-; iy = draw context
-Scene_SubmitDrawContext:
-	IF DEBUG
-	ld a,5
-	in a,(2ch)
-	ENDIF
-
-	call DrawContext_SubmitIY
-
-	IF DEBUG
-	ld a,5
 	out (2ch),a
 	ENDIF
 	ret
