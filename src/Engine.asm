@@ -335,7 +335,8 @@ Engine_TIMIInterruptEntry:
 	PROFILE_BEGIN 6
 	ENDIF
 
-	ld a,0FFH
+	xor a  ; disable part of the BIOS ISR
+	ld (INTCNT),a
 	ld (SCNCNT),a
 
 	push ix
