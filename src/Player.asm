@@ -17,7 +17,7 @@ Player: MACRO
 	tileMap:
 		dw 0
 	sourcePatterns:
-		SpritePatternTable 1D000H
+		SpritePatternTable 18000H
 	ENDM
 
 ; de = tile map
