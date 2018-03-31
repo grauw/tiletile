@@ -6,10 +6,6 @@ Engine: MACRO
 		db 0
 	input:
 		Input
-	video:
-		Video
-	timiHook:
-		TIMIHook
 	displayOffsetEven:
 		DisplayOffset
 	displayOffsetOdd:
@@ -34,6 +30,10 @@ Engine: MACRO
 		DisplaySettings
 	displaySettingsOdd:
 		DisplaySettings
+	video:
+		Video
+	timiHook:
+		TIMIHook
 	ENDM
 
 ; ix = this
@@ -42,21 +42,6 @@ Engine_Construct:
 	ld de,Engine.input
 	add ix,de
 	call Input_Construct
-	pop ix
-
-	push ix
-	call Engine_GetVideo
-	call Video_Construct
-	pop ix
-
-	ld e,ixl
-	ld d,ixh
-	ld hl,Engine_TIMIInterruptEntry
-	push ix
-	push de
-	call Engine_GetTIMIHook
-	pop de
-	call TIMIHook_Construct
 	pop ix
 
 	ld de,Engine.displayOffsetEven
@@ -91,6 +76,21 @@ Engine_Construct:
 	call SpritePatternTable_Construct
 	ld de,-Engine.spritePatternTableOdd
 	add ix,de
+
+	push ix
+	call Engine_GetVideo
+	call Video_Construct
+	pop ix
+
+	ld e,ixl
+	ld d,ixh
+	ld hl,Engine_TIMIInterruptEntry
+	push ix
+	push de
+	call Engine_GetTIMIHook
+	pop de
+	call TIMIHook_Construct
+	pop ix
 	ret
 
 ; iy = this
@@ -98,27 +98,6 @@ Engine_Construct:
 Engine_GetInputIY:
 	ld de,Engine.input
 	add iy,de
-	ret
-
-; ix = this
-; ix <- video
-Engine_GetVideo:
-	ld de,Engine.video
-	add ix,de
-	ret
-
-; iy = this
-; iy <- video
-Engine_GetVideoIY:
-	ld de,Engine.video
-	add iy,de
-	ret
-
-; ix = this
-; ix <- TIMI hook
-Engine_GetTIMIHook:
-	ld de,Engine.timiHook
-	add ix,de
 	ret
 
 ; iy = this
@@ -194,6 +173,27 @@ Odd:
 	add iy,de
 	ret
 	ENDP
+
+; ix = this
+; ix <- video
+Engine_GetVideo:
+	ld de,Engine.video
+	add ix,de
+	ret
+
+; iy = this
+; iy <- video
+Engine_GetVideoIY:
+	ld de,Engine.video
+	add iy,de
+	ret
+
+; ix = this
+; ix <- TIMI hook
+Engine_GetTIMIHook:
+	ld de,Engine.timiHook
+	add ix,de
+	ret
 
 ; ix = this
 Engine_Start:
