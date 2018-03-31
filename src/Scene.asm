@@ -142,7 +142,6 @@ Scene_Run: PROC
 	call Scene_GetEngine_IY
 Loop:
 	call Scene_Update
-	call Engine_SubmitIY
 	jr Loop
 	ENDP
 
@@ -179,6 +178,8 @@ Scene_Update:
 	IF DEBUG
 	PROFILE_FRAME_END
 	ENDIF
+
+	call Engine_SubmitIY
 	ret
 
 ; ix = this
