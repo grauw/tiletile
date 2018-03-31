@@ -184,7 +184,7 @@ Odd:
 ; iy = this
 ; iy <- current sprite pattern table
 Engine_GetSpritePatternTableIY: PROC
-	bit 0,(iy + Engine.frame)
+	bit 1,(iy + Engine.frame)
 	jr nz,Odd
 	ld de,Engine.spritePatternTableEven
 	add iy,de
@@ -212,14 +212,16 @@ Engine_Stop:
 	ret
 
 ; iy = this
-Engine_SubmitIY:
-	inc (iy + Engine.frame)
+Engine_SubmitPrimaryIY:
 	bit 0,(iy + Engine.frame)
-	jr nz,Engine_SubmitEvenIY
-	jr Engine_SubmitOddIY
+	call nz,System_ThrowException
+	inc (iy + Engine.frame)
+	bit 1,(iy + Engine.frame)
+	jr nz,Engine_SubmitPrimaryEvenIY
+	jr Engine_SubmitPrimaryOddIY
 
 ; iy = this
-Engine_SubmitEvenIY:
+Engine_SubmitPrimaryEvenIY:
 	DisplayOffset_Select (iy + Engine.displayOffsetEven), (iy + Engine.displaySettingsEven)
 	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsEven)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displaySettingsEven)
@@ -232,13 +234,58 @@ Engine_SubmitEvenIY:
 	add iy,de
 	ex de,hl
 	call Video_SubmitDisplaySettingsIY
+	ld de,-Engine.video
+	add iy,de
+	ret
+
+; iy = this
+Engine_SubmitPrimaryOddIY:
+	DisplayOffset_Select (iy + Engine.displayOffsetEven), (iy + Engine.displaySettingsEven)
+	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsOdd)
+	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displaySettingsEven)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsOdd)
+	ld e,iyl
+	ld d,iyh
+	ld hl,Engine.displaySettingsEven
+	add hl,de
+	ld de,Engine.video
+	add iy,de
+	ex de,hl
+	call Video_SubmitDisplaySettingsIY
+	ld de,-Engine.video
+	add iy,de
+	ret
+
+; iy = this
+Engine_SubmitSecondaryIY:
+	bit 0,(iy + Engine.frame)
+	call z,System_ThrowException
+	inc (iy + Engine.frame)
+	bit 1,(iy + Engine.frame)
+	jr nz,Engine_SubmitSecondaryEvenIY
+	jr Engine_SubmitSecondaryOddIY
+
+; iy = this
+Engine_SubmitSecondaryEvenIY:
+	DisplayOffset_Select (iy + Engine.displayOffsetOdd), (iy + Engine.displaySettingsOdd)
+	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsEven)
+	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displaySettingsOdd)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsEven)
+	ld e,iyl
+	ld d,iyh
+	ld hl,Engine.displaySettingsOdd
+	add hl,de
+	ld de,Engine.video
+	add iy,de
+	ex de,hl
+	call Video_SubmitDisplaySettingsIY
 	call Video_WaitDisplayedIY
 	ld de,-Engine.video
 	add iy,de
 	ret
 
 ; iy = this
-Engine_SubmitOddIY:
+Engine_SubmitSecondaryOddIY:
 	DisplayOffset_Select (iy + Engine.displayOffsetOdd), (iy + Engine.displaySettingsOdd)
 	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsOdd)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displaySettingsOdd)

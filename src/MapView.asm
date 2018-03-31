@@ -162,6 +162,10 @@ MapView_GetTile:
 MapView_Move:
 	call MapView_MoveHorizontal
 	call MapView_MoveHorizontal
+	call MapView_MoveHorizontal
+	call MapView_MoveHorizontal
+	call MapView_MoveVertical
+	call MapView_MoveVertical
 	call MapView_MoveVertical
 	call MapView_MoveVertical
 	ret

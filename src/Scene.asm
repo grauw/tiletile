@@ -173,13 +173,36 @@ Scene_Update:
 	call Engine_GetSpriteAttributeTableIY
 	call Scene_UpdateSpriteAttributes
 	pop iy
+	call Engine_SubmitPrimaryIY
+
+	push iy
+	call Engine_GetInputIY
+	call Scene_UpdatePlayerPosition
+	pop iy
+	push iy
+	call Engine_GetDisplayOffsetIY
+	call Scene_UpdateMapViewPosition
+	pop iy
 	call Scene_UpdateMapViewPixels
+
+	push iy
+	call Engine_GetVideoIY
+	call Video_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
+	pop iy
+	push iy
+	call Engine_GetSpriteColorTableIY
+	call Scene_UpdateSpriteColors
+	pop iy
+	push iy
+	call Engine_GetSpriteAttributeTableIY
+	call Scene_UpdateSpriteAttributes
+	pop iy
 
 	IF DEBUG
 	PROFILE_FRAME_END
 	ENDIF
 
-	call Engine_SubmitIY
+	call Engine_SubmitSecondaryIY
 	ret
 
 ; ix = this

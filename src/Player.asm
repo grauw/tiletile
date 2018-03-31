@@ -336,7 +336,6 @@ Moving:
 	ld (ix + Player.movingStep),a
 	srl a
 	srl a
-	srl a
 	and 00000011B
 	inc a
 Continue:
