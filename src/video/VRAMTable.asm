@@ -82,6 +82,6 @@ VRAMTable_Copy:
 ;
 	SECTION RAM
 
-VRAMTable_copyCommand: VDPCommand 0, 0, 0, 0, 0, 0, 0, 0, VDPCommand_YMMM
+VRAMTable_copyCommand: VDPCommand 0, 0, 0, 0, 100H, 0, 0, 0, VDPCommand_YMMM
 
 	ENDS
