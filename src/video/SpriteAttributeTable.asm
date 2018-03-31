@@ -1,6 +1,8 @@
 ;
 ; Sprite attribute table in VRAM
 ;
+SpriteAttributeTable_SIZE: equ 32 * SpriteAttribute._size
+
 SpriteAttributeTable: MACRO ?address
 	super: VRAMTable ?address
 	baseRegister5:

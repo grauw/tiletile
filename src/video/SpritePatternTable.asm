@@ -1,6 +1,8 @@
 ;
 ; Sprite pattern table in VRAM
 ;
+SpritePatternTable_SIZE: equ 64 * SpritePattern._size
+
 SpritePatternTable: MACRO ?address
 	super: VRAMTable ?address
 	baseRegister6:

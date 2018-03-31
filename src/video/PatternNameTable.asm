@@ -1,6 +1,8 @@
 ;
 ; Pattern name table in VRAM
 ;
+PatternNameTable_SIZE: equ 8000H
+
 PatternNameTable: MACRO ?address
 	super: VRAMTable ?address
 	baseRegister2:

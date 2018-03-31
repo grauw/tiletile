@@ -1,6 +1,8 @@
 ;
 ; Sprite color table in VRAM
 ;
+SpriteColorTable_SIZE: equ 32 * SpriteColor._size
+
 SpriteColorTable: MACRO ?address
 	super: VRAMTable ?address
 	baseRegister5:
