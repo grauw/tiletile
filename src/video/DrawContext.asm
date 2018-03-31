@@ -16,32 +16,22 @@ DrawContext: MACRO ?patternNameAddress, ?spriteColorAddress, ?spritePatternAddre
 
 ; ix = this
 DrawContext_Construct:
-	push ix
-	call DrawContext_GetDisplayOffset
-	call DisplayOffset_Construct
-	pop ix
-	push ix
-	call DrawContext_GetPatternNameTable
-	call PatternNameTable_Construct
-	pop ix
-	push ix
-	call DrawContext_GetSpriteAttributeTable
-	call SpriteAttributeTable_Construct
-	pop ix
-	push ix
-	call DrawContext_GetSpriteColorTable
-	call SpriteColorTable_Construct
-	pop ix
-	push ix
-	call DrawContext_GetSpritePatternTable
-	call SpritePatternTable_Construct
-	pop ix
-	ret
-
-; ix = this
-; ix <- display offset
-DrawContext_GetDisplayOffset:
 	ld de,DrawContext.displayOffset
+	add ix,de
+	call DisplayOffset_Construct
+	ld de,DrawContext.patternNameTable - DrawContext.displayOffset
+	add ix,de
+	call PatternNameTable_Construct
+	ld de,DrawContext.spriteAttributeTable - DrawContext.patternNameTable
+	add ix,de
+	call SpriteAttributeTable_Construct
+	ld de,DrawContext.spriteColorTable - DrawContext.spriteAttributeTable
+	add ix,de
+	call SpriteColorTable_Construct
+	ld de,DrawContext.spritePatternTable - DrawContext.spriteColorTable
+	add ix,de
+	call SpritePatternTable_Construct
+	ld de,-DrawContext.spritePatternTable
 	add ix,de
 	ret
 
@@ -52,29 +42,11 @@ DrawContext_GetDisplayOffsetIY:
 	add iy,de
 	ret
 
-; ix = this
-; ix <- pattern name table
-DrawContext_GetPatternNameTable:
-	ld de,DrawContext.patternNameTable
-	add ix,de
-	ret
-
 ; iy = this
 ; iy <- pattern name table
 DrawContext_GetPatternNameTableIY:
 	ld de,DrawContext.patternNameTable
 	add iy,de
-	ret
-
-; Also updates the position from the display offset.
-; ix = this
-; ix <- sprite attribute table
-DrawContext_GetSpriteAttributeTable:
-	ld h,(ix + DrawContext.displayOffset + DisplayOffset.horizontalOffset)
-	ld l,(ix + DrawContext.displayOffset + DisplayOffset.verticalOffset)
-	ld de,DrawContext.spriteAttributeTable
-	add ix,de
-	call SpriteAttributeTable_SetDisplayPositionIY
 	ret
 
 ; Also updates the position from the display offset.
@@ -88,25 +60,11 @@ DrawContext_GetSpriteAttributeTableIY:
 	call SpriteAttributeTable_SetDisplayPositionIY
 	ret
 
-; ix = this
-; ix <- sprite color table
-DrawContext_GetSpriteColorTable:
-	ld de,DrawContext.spriteColorTable
-	add ix,de
-	ret
-
 ; iy = this
 ; iy <- sprite color table
 DrawContext_GetSpriteColorTableIY:
 	ld de,DrawContext.spriteColorTable
 	add iy,de
-	ret
-
-; ix = this
-; ix <- sprite pattern table
-DrawContext_GetSpritePatternTable:
-	ld de,DrawContext.spritePatternTable
-	add ix,de
 	ret
 
 ; iy = this
