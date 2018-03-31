@@ -189,10 +189,7 @@ Scene_Update:
 	call Engine_GetVideoIY
 	call Video_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
 	pop iy
-	push iy
-	call Engine_GetSpriteColorTableIY
-	call Scene_UpdateSpriteColors
-	pop iy
+	call Engine_CopySpriteColorToSecondary
 	push iy
 	call Engine_GetSpriteAttributeTableIY
 	call Scene_UpdateSpriteAttributes

@@ -212,6 +212,32 @@ Engine_Stop:
 	ret
 
 ; iy = this
+Engine_CopySpriteColorToSecondary:
+	IF DEBUG
+	PROFILE_BEGIN 3
+	ENDIF
+
+	push ix
+	push iy
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.spriteColorTableEven
+	add ix,de
+	ld de,Engine.spriteColorTableOdd
+	add iy,de
+	ld hl,0
+	ld de,0
+	ld bc,32 * SpriteColor._size
+	call VRAMTable_Copy
+	pop iy
+	pop ix
+
+	IF DEBUG
+	PROFILE_END 3
+	ENDIF
+	ret
+
+; iy = this
 Engine_SubmitPrimaryIY:
 	bit 0,(iy + Engine.frame)
 	call nz,System_ThrowException
