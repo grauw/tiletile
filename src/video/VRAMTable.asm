@@ -36,8 +36,8 @@ VRAMTable_SetWriteIY:
 ; hl = source offset
 ; de = destination offset
 ; bc = byte count
-; ix = this
-; iy = other table
+; ix = source table (this)
+; iy = destination table
 VRAMTable_Copy:
 	ld a,l
 	or e
