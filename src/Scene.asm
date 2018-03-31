@@ -153,12 +153,27 @@ Scene_Update:
 	PROFILE_FRAME_BEGIN
 	ENDIF
 
-	call Scene_UpdateInput
+	push iy
+	call Engine_GetInputIY
+	call Input_UpdateIY
 	call Scene_UpdatePlayerPosition
+	pop iy
+	push iy
+	call Engine_GetDisplayOffsetIY
 	call Scene_UpdateMapViewPosition
+	pop iy
+	push iy
+	call Engine_GetSpritePatternTableIY
 	call Scene_UpdateSpritePatterns
+	pop iy
+	push iy
+	call Engine_GetSpriteAttributeTableIY
 	call Scene_UpdateSpriteAttributes
+	pop iy
+	push iy
+	call Engine_GetSpriteColorTableIY
 	call Scene_UpdateSpriteColors
+	pop iy
 	call Scene_UpdateMapViewPixels
 
 	IF DEBUG
@@ -167,23 +182,11 @@ Scene_Update:
 	ret
 
 ; ix = this
-; iy = engine
-Scene_UpdateInput:
-	push iy
-	call Engine_GetInputIY
-	call Input_UpdateIY
-	pop iy
-	ret
-
-; ix = this
-; iy = engine
+; iy = input
 Scene_UpdatePlayerPosition:
 	IF DEBUG
 	PROFILE_BEGIN 0
 	ENDIF
-
-	push iy
-	call Engine_GetInputIY
 
 	push ix
 	call Scene_GetPlayer
@@ -195,7 +198,6 @@ Scene_UpdatePlayerPosition:
 	call Scene_GetRain
 	call Rain_Tick
 	pop ix
-	pop iy
 
 	IF DEBUG
 	PROFILE_END 0
@@ -203,14 +205,12 @@ Scene_UpdatePlayerPosition:
 	ret
 
 ; ix = this
-; iy = engine
+; iy = display offset
 Scene_UpdateMapViewPosition:
 	IF DEBUG
 	PROFILE_BEGIN 1
 	ENDIF
 
-	push iy
-	call Engine_GetDisplayOffsetIY
 	push ix
 	call Scene_GetPlayer
 	ld l,(ix + Player.x)
@@ -226,7 +226,6 @@ Scene_UpdateMapViewPosition:
 	call MapView_SetTargetY
 	call MapView_Update
 	pop ix
-	pop iy
 
 	IF DEBUG
 	PROFILE_END 1
@@ -234,14 +233,12 @@ Scene_UpdateMapViewPosition:
 	ret
 
 ; ix = this
-; iy = engine
+; iy = sprite attribute table
 Scene_UpdateSpriteAttributes:
 	IF DEBUG
 	PROFILE_BEGIN 2
 	ENDIF
 
-	push iy
-	call Engine_GetSpriteAttributeTableIY
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY
 	push ix
@@ -255,7 +252,6 @@ Scene_UpdateSpriteAttributes:
 	call Player_DrawSpriteAttributes
 	pop ix
 	call SpriteAttributeTable_FinishWriteIY
-	pop iy
 
 	IF DEBUG
 	PROFILE_END 2
@@ -263,14 +259,12 @@ Scene_UpdateSpriteAttributes:
 	ret
 
 ; ix = this
-; iy = engine
+; iy = sprite color table
 Scene_UpdateSpriteColors:
 	IF DEBUG
 	PROFILE_BEGIN 3
 	ENDIF
 
-	push iy
-	call Engine_GetSpriteColorTableIY
 	ld a,0
 	call SpriteColorTable_SetColorWriteIY
 	push ix
@@ -283,7 +277,6 @@ Scene_UpdateSpriteColors:
 	call Player_DrawSpriteColors
 	call Player_DrawSpriteColors
 	pop ix
-	pop iy
 
 	IF DEBUG
 	PROFILE_END 3
@@ -291,19 +284,16 @@ Scene_UpdateSpriteColors:
 	ret
 
 ; ix = this
-; iy = engine
+; iy = sprite pattern table
 Scene_UpdateSpritePatterns:
 	IF DEBUG
 	PROFILE_BEGIN 7
 	ENDIF
 
-	push iy
-	call Engine_GetSpritePatternTableIY
 	push ix
 	call Scene_GetPlayer
 	call Player_DrawSpritePatterns
 	pop ix
-	pop iy
 
 	IF DEBUG
 	PROFILE_END 7
