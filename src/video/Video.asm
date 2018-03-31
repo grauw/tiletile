@@ -74,20 +74,24 @@ NoOverflow:
 	ret
 	ENDP
 
-; Waits until display settings is displayed
+; iy = this
+Video_WaitDisplayedIY:
+	bit 0,(iy + Video.submitted)
+	jr nz,Video_WaitDisplayedIY
+	ret
+
+; Waits until previous display settings is displayed
 ; iy = this
 ; de = display settings
-Video_SubmitDisplaySettingsIY: PROC
+Video_SubmitDisplaySettingsIY:
+	bit 0,(iy + Video.submitted)
+	jr nz,Video_SubmitDisplaySettingsIY
 	di
 	ld (iy + Video.displaySettings),e
 	ld (iy + Video.displaySettings + 1),d
 	ei
 	ld (iy + Video.submitted),1
-Wait:
-	bit 0,(iy + Video.submitted)
-	jr nz,Wait
 	ret
-	ENDP
 
 ; ix = this
 Video_UpdateVSync:

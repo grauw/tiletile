@@ -232,6 +232,7 @@ Engine_SubmitEvenIY:
 	add iy,de
 	ex de,hl
 	call Video_SubmitDisplaySettingsIY
+	call Video_WaitDisplayedIY
 	ld de,-Engine.video
 	add iy,de
 	ret
@@ -250,6 +251,7 @@ Engine_SubmitOddIY:
 	add iy,de
 	ex de,hl
 	call Video_SubmitDisplaySettingsIY
+	call Video_WaitDisplayedIY
 	ld de,-Engine.video
 	add iy,de
 	ret
