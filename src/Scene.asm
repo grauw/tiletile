@@ -166,12 +166,12 @@ Scene_Update:
 	call Scene_UpdateSpritePatterns
 	pop iy
 	push iy
-	call Engine_GetSpriteAttributeTableIY
-	call Scene_UpdateSpriteAttributes
-	pop iy
-	push iy
 	call Engine_GetSpriteColorTableIY
 	call Scene_UpdateSpriteColors
+	pop iy
+	push iy
+	call Engine_GetSpriteAttributeTableIY
+	call Scene_UpdateSpriteAttributes
 	pop iy
 	call Scene_UpdateMapViewPixels
 
