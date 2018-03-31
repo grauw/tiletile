@@ -1,9 +1,13 @@
 ;
 ; Input processing
 ;
+Input_KEY_MATRIX_ROWS: equ 11
+Input_PPI_PORT_B: equ 0A9H
+Input_PPI_PORT_C: equ 0AAH
+
 Input: MACRO
 	newKey:
-		ds 11,0FFH
+		ds Input_KEY_MATRIX_ROWS, 0FFH
 	ENDM
 
 ; ix = this
@@ -16,12 +20,12 @@ Input_UpdateIY: PROC
 	ld b,iyh
 	ld hl,Input.newKey
 	add hl,bc
-	ld bc,11 << 8 | 0A9H
+	ld bc,Input_KEY_MATRIX_ROWS << 8 | Input_PPI_PORT_B
 	di
-	in a,(0AAH)
+	in a,(Input_PPI_PORT_C)
 	and 0F0H
 Loop:
-	out (0AAH),a
+	out (Input_PPI_PORT_C),a
 	inc a
 	ini
 	jr nz,Loop
