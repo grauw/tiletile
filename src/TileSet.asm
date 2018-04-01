@@ -47,10 +47,6 @@ TileSet_GetTile:
 ; ix = this
 TileSet_Load:
 	call TileSet_LoadTiles
-	push ix
-	call TileSet_GetPalette
-	call Palette_Set
-	pop ix
 	ret
 
 ; ix = this

@@ -26,6 +26,10 @@ Engine: MACRO
 		SpritePatternTable 1F800H
 	spritePatternTableOdd:
 		SpritePatternTable 1F000H
+	paletteEven:
+		dw DisplaySettings_defaultPalette
+	paletteOdd:
+		dw DisplaySettings_defaultPalette
 	displaySettingsEven:
 		DisplaySettings
 	displaySettingsOdd:
@@ -187,6 +191,20 @@ Odd:
 	ret
 	ENDP
 
+; de = palette
+; iy = this
+Engine_SetPaletteEvenIY:
+	ld (iy + Engine.paletteEven),e
+	ld (iy + Engine.paletteEven + 1),d
+	ret
+
+; de = palette
+; iy = this
+Engine_SetPaletteOddIY:
+	ld (iy + Engine.paletteOdd),e
+	ld (iy + Engine.paletteOdd + 1),d
+	ret
+
 ; ix = this
 ; ix <- video
 Engine_GetVideo:
@@ -276,6 +294,10 @@ Engine_SubmitPrimaryEvenIY:
 	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsEven)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displaySettingsEven)
 	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsEven)
+	ld e,(iy + Engine.paletteEven)
+	ld d,(iy + Engine.paletteEven + 1)
+	ld (iy + Engine.displaySettingsEven + DisplaySettings.palette),e
+	ld (iy + Engine.displaySettingsEven + DisplaySettings.palette + 1),d
 	ld e,iyl
 	ld d,iyh
 	ld hl,Engine.displaySettingsEven
@@ -294,6 +316,10 @@ Engine_SubmitPrimaryOddIY:
 	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsOdd)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displaySettingsEven)
 	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsOdd)
+	ld e,(iy + Engine.paletteOdd)
+	ld d,(iy + Engine.paletteOdd + 1)
+	ld (iy + Engine.displaySettingsEven + DisplaySettings.palette),e
+	ld (iy + Engine.displaySettingsEven + DisplaySettings.palette + 1),d
 	ld e,iyl
 	ld d,iyh
 	ld hl,Engine.displaySettingsEven
@@ -321,6 +347,10 @@ Engine_SubmitSecondaryEvenIY:
 	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsEven)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displaySettingsOdd)
 	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsEven)
+	ld e,(iy + Engine.paletteEven)
+	ld d,(iy + Engine.paletteEven + 1)
+	ld (iy + Engine.displaySettingsOdd + DisplaySettings.palette),e
+	ld (iy + Engine.displaySettingsOdd + DisplaySettings.palette + 1),d
 	ld e,iyl
 	ld d,iyh
 	ld hl,Engine.displaySettingsOdd
@@ -340,6 +370,10 @@ Engine_SubmitSecondaryOddIY:
 	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsOdd)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displaySettingsOdd)
 	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsOdd)
+	ld e,(iy + Engine.paletteOdd)
+	ld d,(iy + Engine.paletteOdd + 1)
+	ld (iy + Engine.displaySettingsOdd + DisplaySettings.palette),e
+	ld (iy + Engine.displaySettingsOdd + DisplaySettings.palette + 1),d
 	ld e,iyl
 	ld d,iyh
 	ld hl,Engine.displaySettingsOdd

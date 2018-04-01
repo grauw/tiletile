@@ -23,6 +23,11 @@ DisplaySettings: MACRO
 	spritePattern:
 		db 0
 		db 6 | VDP_REGISTER
+	paletteNumber:
+		db 0
+		db 16 | VDP_REGISTER
+	palette:
+		dw DisplaySettings_defaultPalette
 	_size:
 	ENDM
 
@@ -34,7 +39,20 @@ DisplaySettings_ApplyHL:
 	ENDM
 	ld a,(hl)
 	ld (VDP_MIRROR_8 + 23),a
-	REPT 10
+	REPT 12
+	outi
+	ENDM
+	inc c
+	ld a,(hl)
+	inc hl
+	ld h,(hl)
+	ld l,a
+	REPT 32
 	outi
 	ENDM
 	ret
+
+;
+DisplaySettings_defaultPalette:
+	Palette #000, #000, #611, #733, #077, #327, #151, #627,
+	        #171, #373, #661, #664, #411, #265, #555, #777

@@ -118,6 +118,15 @@ Scene_Start:
 	call Scene_InitializeSpritePatterns
 	pop iy
 
+	push iy
+	push ix
+	call Scene_GetTileSet
+	call TileSet_GetPalette
+	call Engine_SetPaletteEvenIY
+	call Engine_SetPaletteOddIY
+	pop ix
+	pop iy
+
 	push ix
 	call Scene_GetMapView
 	call MapView_Start
