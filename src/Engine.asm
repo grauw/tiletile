@@ -205,18 +205,27 @@ Engine_GetTIMIHook:
 	add ix,de
 	ret
 
-; ix = this
-Engine_Start:
+; iy = this
+; ix <- TIMI hook
+Engine_GetTIMIHookIY_IX:
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.timiHook
+	add ix,de
+	ret
+
+; iy = this
+Engine_StartIY:
 	push ix
-	call Engine_GetTIMIHook
+	call Engine_GetTIMIHookIY_IX
 	call Hook_Install
 	pop ix
 	ret
 
-; ix = this
-Engine_Stop:
+; iy = this
+Engine_StopIY:
 	push ix
-	call Engine_GetTIMIHook
+	call Engine_GetTIMIHookIY_IX
 	call Hook_Uninstall
 	pop ix
 	ret

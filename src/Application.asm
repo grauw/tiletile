@@ -89,10 +89,8 @@ Application_GetScene:
 ; ix = this
 Application_EnterMainLoop:
 	call VDP_EnableBlank
-	push ix
-	call Application_GetEngine
-	call Engine_Start
-	pop ix
+	call Application_GetEngine_IY
+	call Engine_StartIY
 
 	push ix
 	call Application_GetScene
@@ -103,10 +101,8 @@ Application_EnterMainLoop:
 	call Scene_Stop
 	pop ix
 
-	push ix
-	call Application_GetEngine
-	call Engine_Stop
-	pop ix
+	call Application_GetEngine_IY
+	call Engine_StopIY
 	call VDP_DisableBlank
 	ret
 
