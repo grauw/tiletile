@@ -29,6 +29,9 @@ Input_Construct:
 Input_UpdateIY:
 	call Input_UpdateKeyboardIY
 	call Input_UpdateJoystickIY
+	call Input_GetKeyboardAsJoystickIY
+	and (iy + Input.newStick)
+	ld (iy + Input.newStick),a
 	ret
 
 ; iy = this
@@ -79,8 +82,7 @@ Input_UpdateJoystickIY:
 ; bc <- x (-1 left, 1 right)
 ; de <- y (-1 up, 1 down)
 Input_GetDirectionIY: PROC
-	call Input_GetKeyboardAsJoystickIY
-	and (iy + Input.newStick)
+	ld a,(iy + Input.newStick)
 	ld b,0
 	ld c,b
 	ld d,b
