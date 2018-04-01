@@ -142,7 +142,13 @@ Scene_Run: PROC
 	call Scene_GetEngine_IY
 Loop:
 	call Scene_Update
-	jr Loop
+
+	push iy
+	call Engine_GetInputIY
+	bit 2,(iy + Input.newKey + 7)  ; ESC
+	pop iy
+	jr nz,Loop
+	ret
 	ENDP
 
 ; ix = this
