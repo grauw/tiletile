@@ -160,7 +160,7 @@ Scene_Update:
 
 	push iy
 	call Engine_GetInputIY
-	call Input_UpdateIY
+	call Scene_UpdateInput
 	call Scene_UpdatePlayerPosition
 	pop iy
 	push iy
@@ -206,6 +206,36 @@ Scene_Update:
 	ENDIF
 
 	call Engine_SubmitSecondaryIY
+	ret
+
+; ix = this
+; iy = input
+Scene_UpdateInput:
+	IF DEBUG
+	PROFILE_BEGIN 8
+	ENDIF
+
+	call Input_UpdateIY
+
+	call Scene_UpdateDisplayFrequency
+
+	IF DEBUG
+	PROFILE_END 8
+	ENDIF
+	ret
+
+; ix = this
+; iy = input
+Scene_UpdateDisplayFrequency:
+	bit 6,(iy + Input.newKey + 7)  ; SELECT
+	ret nz
+	bit 6,(iy + Input.oldKey + 7)  ; key down
+	ret z
+	push iy
+	call Scene_GetEngine_IY
+	call Engine_GetVideoIY
+	call Video_ToggleFrequencyIY
+	pop iy
 	ret
 
 ; ix = this

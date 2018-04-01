@@ -49,7 +49,6 @@ Video_Construct:
 	call VDP_InitScreen
 	call VDP_Enable212Lines
 	call VDP_EnableSprites
-	call VDP_Enable60Hz
 	ld a,0F1H
 	call VDP_SetColor
 	ld a,(VDP_MIRROR_0 + 1)
@@ -102,6 +101,15 @@ NoOverflow:
 	call VDP_SetRegister
 	ret
 	ENDP
+
+; iy = this
+Video_ToggleFrequencyIY:
+	ld a,(VDP_MIRROR_8 + 9)
+	xor 00000010B
+	ld (VDP_MIRROR_8 + 9),a
+	ld b,9
+	call VDP_SetRegister
+	ret
 
 ; iy = this
 Video_WaitDisplayedIY:
