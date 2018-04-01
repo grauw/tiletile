@@ -2,6 +2,8 @@
 ; Top-level program class
 ;
 Application: MACRO
+	originalKeyClick:
+		db 0
 	engine:
 		Engine
 	scene:
@@ -23,12 +25,13 @@ Application_Main:
 	ld ix,Application_instance
 	call Application_Construct
 	call Application_EnterMainLoop
-
-	call KILBUF
+	call Application_Destruct
 	ret
 
 ; ix = this
 Application_Construct:
+	ld a,(CLIKSW)
+	ld (ix + Application.originalKeyClick),a
 	ld a,0
 	ld (CLIKSW),a  ; disable key click
 
@@ -46,6 +49,13 @@ Application_Construct:
 	pop de
 	call Scene_Construct
 	pop ix
+	ret
+
+; ix = this
+Application_Destruct:
+	ld a,(ix + Application.originalKeyClick)
+	ld (CLIKSW),a
+	call KILBUF
 	ret
 
 ; ix = this
