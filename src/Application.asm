@@ -53,6 +53,11 @@ Application_Construct:
 
 ; ix = this
 Application_Destruct:
+	push ix
+	call Application_GetEngine
+	call Engine_Destruct
+	pop ix
+
 	ld a,(ix + Application.originalKeyClick)
 	ld (CLIKSW),a
 	call KILBUF

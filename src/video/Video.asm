@@ -55,6 +55,11 @@ Video_Construct:
 	ret
 
 ; ix = this
+Video_Destruct:
+	call VDP_InitText
+	ret
+
+; ix = this
 Video_Recenter: PROC
 	ld a,(VDP_MIRROR_8 + 18)
 	ld b,a

@@ -95,6 +95,14 @@ Engine_Construct:
 	pop ix
 	ret
 
+; ix = this
+Engine_Destruct:
+	push ix
+	call Engine_GetVideo
+	call Video_Destruct
+	pop ix
+	ret
+
 ; iy = this
 ; iy <- input
 Engine_GetInputIY:
