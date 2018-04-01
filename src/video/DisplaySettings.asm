@@ -29,7 +29,12 @@ DisplaySettings: MACRO
 ; hl = this
 DisplaySettings_ApplyHL:
 	ld c,VDP_PORT_1
-	REPT 14  ; DisplaySettings._size
+	REPT 4
+	outi
+	ENDM
+	ld a,(hl)
+	ld (VDP_MIRROR_8 + 23),a
+	REPT 10
 	outi
 	ENDM
 	ret

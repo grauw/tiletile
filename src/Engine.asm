@@ -32,6 +32,8 @@ Engine: MACRO
 		DisplaySettings
 	video:
 		Video
+	interrupt:
+		Interrupt
 	timiHook:
 		TIMIHook
 	spriteColorCopy:
@@ -84,15 +86,11 @@ Engine_Construct:
 	call Video_Construct
 	pop ix
 
-	ld e,ixl
-	ld d,ixh
-	ld hl,Engine_TIMIInterruptEntry
-	push ix
-	push de
-	call Engine_GetTIMIHook
-	pop de
-	call TIMIHook_Construct
-	pop ix
+	ld de,Engine.interrupt
+	add ix,de
+	call Interrupt_Construct
+	ld de,-Engine.interrupt
+	add ix,de
 	ret
 
 ; ix = this
@@ -101,6 +99,11 @@ Engine_Destruct:
 	call Engine_GetVideo
 	call Video_Destruct
 	pop ix
+	ld de,Engine.interrupt
+	add ix,de
+	call Interrupt_Destruct
+	ld de,-Engine.interrupt
+	add ix,de
 	ret
 
 ; iy = this
@@ -198,13 +201,6 @@ Engine_GetVideoIY:
 	add iy,de
 	ret
 
-; ix = this
-; ix <- TIMI hook
-Engine_GetTIMIHook:
-	ld de,Engine.timiHook
-	add ix,de
-	ret
-
 ; iy = this
 ; ix <- TIMI hook
 Engine_GetTIMIHookIY_IX:
@@ -217,6 +213,15 @@ Engine_GetTIMIHookIY_IX:
 ; iy = this
 Engine_StartIY:
 	push ix
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.interrupt
+	add ix,de
+	push iy
+	call Engine_GetVideoIY
+	call Video_InstallInterruptIY
+	pop iy
+
 	call Engine_GetTIMIHookIY_IX
 	call Hook_Install
 	pop ix
@@ -225,6 +230,15 @@ Engine_StartIY:
 ; iy = this
 Engine_StopIY:
 	push ix
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.interrupt
+	add ix,de
+	push iy
+	call Engine_GetVideoIY
+	call Video_UninstallInterruptIY
+	pop iy
+
 	call Engine_GetTIMIHookIY_IX
 	call Hook_Uninstall
 	pop ix
@@ -337,24 +351,4 @@ Engine_SubmitSecondaryOddIY:
 	call Video_WaitDisplayedIY
 	ld de,-Engine.video
 	add iy,de
-	ret
-
-; ix = this
-Engine_TIMIInterruptEntry:
-	IF DEBUG
-	PROFILE_BEGIN 6
-	ENDIF
-
-	xor a  ; disable part of the BIOS ISR
-	ld (INTCNT),a
-	ld (SCNCNT),a
-
-	push ix
-	call Engine_GetVideo
-	call Video_UpdateVSync
-	pop ix
-
-	IF DEBUG
-	PROFILE_END 6
-	ENDIF
 	ret

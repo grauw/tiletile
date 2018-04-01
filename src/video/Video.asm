@@ -12,12 +12,35 @@
 	INCLUDE "SpriteColorTable.asm"
 	INCLUDE "SpritePattern.asm"
 	INCLUDE "SpritePatternTable.asm"
+	INCLUDE "LineInterrupt.asm"
 
 Video: MACRO
+	this:
 	submitted:
 		db 0
 	displaySettings:
 		dw 0
+	lineInterrupt:
+		LineInterrupt 212, InterruptEntry
+	InterruptEntry:
+		ld a,(submitted)
+		and a
+		ret z
+		IF DEBUG
+		PROFILE_BEGIN 6
+		ENDIF
+		push bc
+		push hl
+		ld hl,(displaySettings)
+		call DisplaySettings_ApplyHL
+		xor a
+		ld (submitted),a
+		pop hl
+		pop bc
+		IF DEBUG
+		PROFILE_END 6
+		ENDIF
+		ret
 	ENDM
 
 ; ix = this
@@ -105,12 +128,22 @@ Video_SubmitDisplaySettingsIY:
 	ld (iy + Video.submitted),1
 	ret
 
-; ix = this
-Video_UpdateVSync:
-	bit 0,(ix + Video.submitted)
-	ret z
-	ld l,(ix + Video.displaySettings)
-	ld h,(ix + Video.displaySettings + 1)
-	call DisplaySettings_ApplyHL
-	ld (ix + Video.submitted),0
+; ix = interrupt
+; iy = this
+Video_InstallInterruptIY:
+	ld de,Video.lineInterrupt
+	add iy,de
+	call LineInterrupt_InstallIY
+	ld de,-Video.lineInterrupt
+	add iy,de
+	ret
+
+; ix = interrupt
+; iy = this
+Video_UninstallInterruptIY:
+	ld de,Video.lineInterrupt
+	add iy,de
+	call LineInterrupt_UninstallIY
+	ld de,-Video.lineInterrupt
+	add iy,de
 	ret
