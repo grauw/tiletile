@@ -255,22 +255,18 @@ Engine_GetTIMIHook:
 
 ; iy = this
 Engine_StartIY:
-	push ix
 	push iy
 	call Engine_GetVideoIY
 	call Video_StartIY
 	pop iy
-	pop ix
 	ret
 
 ; iy = this
 Engine_StopIY:
-	push ix
 	push iy
 	call Engine_GetVideoIY
 	call Video_StopIY
 	pop iy
-	pop ix
 	ret
 
 ; iy = this

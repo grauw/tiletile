@@ -88,8 +88,10 @@ Application_GetScene:
 
 ; ix = this
 Application_EnterMainLoop:
+	push ix
 	call Application_GetEngine_IY
 	call Engine_StartIY
+	pop ix
 
 	push ix
 	call Application_GetScene
@@ -98,8 +100,10 @@ Application_EnterMainLoop:
 	call Scene_Stop
 	pop ix
 
+	push ix
 	call Application_GetEngine_IY
 	call Engine_StopIY
+	pop ix
 	ret
 
 ;
