@@ -90,11 +90,10 @@ Engine_Construct:
 	call Video_Construct
 	pop ix
 
-	ld de,Engine.interrupt
-	add ix,de
+	push ix
+	call Engine_GetInterrupt
 	call Interrupt_Construct
-	ld de,-Engine.interrupt
-	add ix,de
+	pop ix
 
 	push ix
 	call Engine_GetTIMIHook
@@ -113,11 +112,11 @@ Engine_Destruct:
 	call Engine_GetVideo
 	call Video_Destruct
 	pop ix
-	ld de,Engine.interrupt
-	add ix,de
+
+	push ix
+	call Engine_GetInterrupt
 	call Interrupt_Destruct
-	ld de,-Engine.interrupt
-	add ix,de
+	pop ix
 	ret
 
 ; iy = this
@@ -216,6 +215,22 @@ Engine_SetPaletteOddIY:
 	ret
 
 ; ix = this
+; ix <- interrupt
+Engine_GetInterrupt:
+	ld de,Engine.interrupt
+	add ix,de
+	ret
+
+; iy = this
+; ix <- interrupt
+Engine_GetInterruptIY_IX:
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.interrupt
+	add ix,de
+	ret
+
+; ix = this
 ; ix <- video
 Engine_GetVideo:
 	ld de,Engine.video
@@ -239,11 +254,8 @@ Engine_GetTIMIHook:
 ; iy = this
 Engine_StartIY:
 	push ix
-	ld e,iyl
-	ld d,iyh
-	ld ix,Engine.interrupt
-	add ix,de
 	push iy
+	call Engine_GetInterruptIY_IX
 	call Engine_GetVideoIY
 	call Video_InstallInterruptIY
 	pop iy
@@ -253,11 +265,8 @@ Engine_StartIY:
 ; iy = this
 Engine_StopIY:
 	push ix
-	ld e,iyl
-	ld d,iyh
-	ld ix,Engine.interrupt
-	add ix,de
 	push iy
+	call Engine_GetInterruptIY_IX
 	call Engine_GetVideoIY
 	call Video_UninstallInterruptIY
 	pop iy
