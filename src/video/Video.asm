@@ -12,6 +12,8 @@
 	INCLUDE "SpriteColorTable.asm"
 	INCLUDE "SpritePattern.asm"
 	INCLUDE "SpritePatternTable.asm"
+	INCLUDE "Palette.asm"
+	INCLUDE "PaletteColor.asm"
 	INCLUDE "LineInterrupt.asm"
 
 Video: MACRO

@@ -27,9 +27,9 @@ Engine: MACRO
 	spritePatternTableOdd:
 		SpritePatternTable 1F000H
 	paletteEven:
-		dw DisplaySettings_defaultPalette
+		dw Palette_system
 	paletteOdd:
-		dw DisplaySettings_defaultPalette
+		dw Palette_system
 	displaySettingsEven:
 		DisplaySettings
 	displaySettingsOdd:

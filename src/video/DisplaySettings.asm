@@ -27,7 +27,7 @@ DisplaySettings: MACRO
 		db 0
 		db 16 | VDP_REGISTER
 	palette:
-		dw DisplaySettings_defaultPalette
+		dw Palette_system
 	_size:
 	ENDM
 
@@ -51,8 +51,3 @@ DisplaySettings_ApplyHL:
 	outi
 	ENDM
 	ret
-
-;
-DisplaySettings_defaultPalette:
-	Palette #000, #000, #611, #733, #077, #327, #151, #627,
-	        #171, #373, #661, #664, #411, #265, #555, #777

@@ -49,7 +49,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "MemoryTest.asm"
 	INCLUDE "VDP.asm"
 	INCLUDE "VDPCommand.asm"
-	INCLUDE "Palette.asm"
 	INCLUDE "Engine.asm"
 	INCLUDE "video/Video.asm"
 	INCLUDE "Interrupt.asm"

@@ -195,7 +195,7 @@ class PaletteColor {
 	}
 
 	getWord() {
-		return this.g << 8 | this.r << 4 | this.b;
+		return this.r << 8 | this.g << 4 | this.b;
 	}
 }
 
