@@ -56,6 +56,11 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Hook.asm"
 	INCLUDE "TIMIHook.asm"
 	INCLUDE "Input.asm"
+
+	ENDS
+
+	SECTION ROM_BANK1
+
 	INCLUDE "Tile.asm"
 	INCLUDE "TileSet.asm"
 	INCLUDE "TileMap.asm"
@@ -63,11 +68,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Player.asm"
 	INCLUDE "Scene.asm"
 	INCLUDE "Rain.asm"
-
-	ENDS
-
-	SECTION ROM_BANK1
-
 	INCLUDE "FieldMap.asm"
 
 	ENDS
