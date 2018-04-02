@@ -1,6 +1,7 @@
 /gen/
 /bin/
 /node_modules/
+/doc/experiments/
 
 /.project
 /.externalToolBuilders/
