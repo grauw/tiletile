@@ -46,17 +46,39 @@ Video: MACRO
 	ENDM
 
 ; ix = this
+; iy = interrupt
 Video_Construct:
+	push ix
+	ex (sp),iy
+	pop ix
+	ld de,Video.lineInterrupt
+	add iy,de
+	call LineInterrupt_InstallIY
+	ld de,-Video.lineInterrupt
+	add iy,de
+	push ix
+	ex (sp),iy
+	pop ix
 	ret
 
 ; ix = this
+; iy = interrupt
 Video_Destruct:
+	push ix
+	ex (sp),iy
+	pop ix
+	ld de,Video.lineInterrupt
+	add iy,de
+	call LineInterrupt_UninstallIY
+	ld de,-Video.lineInterrupt
+	add iy,de
+	push ix
+	ex (sp),iy
+	pop ix
 	ret
 
-; ix = interrupt
 ; iy = this
 Video_StartIY:
-	call Video_InstallInterruptIY
 	ld a,5
 	call VDP_InitScreen
 	call VDP_Enable212Lines
@@ -88,11 +110,9 @@ Video_StartIY:
 	call Video_Recenter
 	ret
 
-; ix = interrupt
 ; iy = this
 Video_StopIY:
 	call VDP_InitText
-	call Video_UninstallInterruptIY
 	ret
 
 ; ix = this
@@ -148,24 +168,4 @@ Video_SubmitDisplaySettingsIY:
 	ld (iy + Video.displaySettings + 1),d
 	ei
 	ld (iy + Video.submitted),1
-	ret
-
-; ix = interrupt
-; iy = this
-Video_InstallInterruptIY:
-	ld de,Video.lineInterrupt
-	add iy,de
-	call LineInterrupt_InstallIY
-	ld de,-Video.lineInterrupt
-	add iy,de
-	ret
-
-; ix = interrupt
-; iy = this
-Video_UninstallInterruptIY:
-	ld de,Video.lineInterrupt
-	add iy,de
-	call LineInterrupt_UninstallIY
-	ld de,-Video.lineInterrupt
-	add iy,de
 	ret

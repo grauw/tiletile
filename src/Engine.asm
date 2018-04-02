@@ -86,13 +86,14 @@ Engine_Construct:
 	add ix,de
 
 	push ix
-	call Engine_GetVideo
-	call Video_Construct
+	call Engine_GetInterrupt
+	call Interrupt_Construct
 	pop ix
 
 	push ix
-	call Engine_GetInterrupt
-	call Interrupt_Construct
+	call Engine_GetInterrupt_IY
+	call Engine_GetVideo
+	call Video_Construct
 	pop ix
 
 	push ix
@@ -109,6 +110,7 @@ Engine_Destruct:
 	pop ix
 
 	push ix
+	call Engine_GetInterrupt_IY
 	call Engine_GetVideo
 	call Video_Destruct
 	pop ix
@@ -221,13 +223,13 @@ Engine_GetInterrupt:
 	add ix,de
 	ret
 
-; iy = this
-; ix <- interrupt
-Engine_GetInterruptIY_IX:
-	ld e,iyl
-	ld d,iyh
-	ld ix,Engine.interrupt
-	add ix,de
+; ix = this
+; iy <- interrupt
+Engine_GetInterrupt_IY:
+	ld e,ixl
+	ld d,ixh
+	ld iy,Engine.interrupt
+	add iy,de
 	ret
 
 ; ix = this
@@ -255,7 +257,6 @@ Engine_GetTIMIHook:
 Engine_StartIY:
 	push ix
 	push iy
-	call Engine_GetInterruptIY_IX
 	call Engine_GetVideoIY
 	call Video_StartIY
 	pop iy
@@ -266,7 +267,6 @@ Engine_StartIY:
 Engine_StopIY:
 	push ix
 	push iy
-	call Engine_GetInterruptIY_IX
 	call Engine_GetVideoIY
 	call Video_StopIY
 	pop iy
