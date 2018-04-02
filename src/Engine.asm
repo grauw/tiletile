@@ -95,10 +95,20 @@ Engine_Construct:
 	call Interrupt_Construct
 	ld de,-Engine.interrupt
 	add ix,de
+
+	push ix
+	call Engine_GetTIMIHook
+	call Hook_Install
+	pop ix
 	ret
 
 ; ix = this
 Engine_Destruct:
+	push ix
+	call Engine_GetTIMIHook
+	call Hook_Uninstall
+	pop ix
+
 	push ix
 	call Engine_GetVideo
 	call Video_Destruct
@@ -219,12 +229,10 @@ Engine_GetVideoIY:
 	add iy,de
 	ret
 
-; iy = this
+; ix = this
 ; ix <- TIMI hook
-Engine_GetTIMIHookIY_IX:
-	ld e,iyl
-	ld d,iyh
-	ld ix,Engine.timiHook
+Engine_GetTIMIHook:
+	ld de,Engine.timiHook
 	add ix,de
 	ret
 
@@ -239,9 +247,6 @@ Engine_StartIY:
 	call Engine_GetVideoIY
 	call Video_InstallInterruptIY
 	pop iy
-
-	call Engine_GetTIMIHookIY_IX
-	call Hook_Install
 	pop ix
 	ret
 
@@ -256,9 +261,6 @@ Engine_StopIY:
 	call Engine_GetVideoIY
 	call Video_UninstallInterruptIY
 	pop iy
-
-	call Engine_GetTIMIHookIY_IX
-	call Hook_Uninstall
 	pop ix
 	ret
 
