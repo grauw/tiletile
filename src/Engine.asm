@@ -292,7 +292,7 @@ Engine_SubmitPrimaryIY:
 	call nz,System_ThrowException
 	inc (iy + Engine.frame)
 	bit 1,(iy + Engine.frame)
-	jr nz,Engine_SubmitPrimaryEvenIY
+	jr z,Engine_SubmitPrimaryEvenIY
 	jr Engine_SubmitPrimaryOddIY
 
 ; iy = this
