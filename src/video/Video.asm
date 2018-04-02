@@ -47,6 +47,16 @@ Video: MACRO
 
 ; ix = this
 Video_Construct:
+	ret
+
+; ix = this
+Video_Destruct:
+	ret
+
+; ix = interrupt
+; iy = this
+Video_StartIY:
+	call Video_InstallInterruptIY
 	ld a,5
 	call VDP_InitScreen
 	call VDP_Enable212Lines
@@ -78,9 +88,11 @@ Video_Construct:
 	call Video_Recenter
 	ret
 
-; ix = this
-Video_Destruct:
+; ix = interrupt
+; iy = this
+Video_StopIY:
 	call VDP_InitText
+	call Video_UninstallInterruptIY
 	ret
 
 ; ix = this

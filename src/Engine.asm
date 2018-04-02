@@ -257,7 +257,7 @@ Engine_StartIY:
 	push iy
 	call Engine_GetInterruptIY_IX
 	call Engine_GetVideoIY
-	call Video_InstallInterruptIY
+	call Video_StartIY
 	pop iy
 	pop ix
 	ret
@@ -268,7 +268,7 @@ Engine_StopIY:
 	push iy
 	call Engine_GetInterruptIY_IX
 	call Engine_GetVideoIY
-	call Video_UninstallInterruptIY
+	call Video_StopIY
 	pop iy
 	pop ix
 	ret
