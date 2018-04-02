@@ -320,9 +320,9 @@ Engine_SubmitPrimaryEvenIY:
 ; iy = this
 Engine_SubmitPrimaryOddIY:
 	DisplayOffset_Select (iy + Engine.displayOffsetEven), (iy + Engine.displaySettingsEven)
-	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsOdd)
+	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsEven)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displaySettingsEven)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsOdd)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsEven)
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 	ld (iy + Engine.displaySettingsEven + DisplaySettings.palette),e
@@ -351,9 +351,9 @@ Engine_SubmitSecondaryIY:
 ; iy = this
 Engine_SubmitSecondaryEvenIY:
 	DisplayOffset_Select (iy + Engine.displayOffsetOdd), (iy + Engine.displaySettingsOdd)
-	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsEven)
+	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsOdd)
 	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displaySettingsOdd)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsEven)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsOdd)
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	ld (iy + Engine.displaySettingsOdd + DisplaySettings.palette),e
