@@ -25,6 +25,8 @@ Video: MACRO
 		dw 0
 	initialDisplaySettings:
 		DisplaySettings
+	initialPalette:
+		Palette
 	lineInterrupt:
 		LineInterrupt 212, InterruptEntry
 	InterruptEntry:
@@ -82,18 +84,7 @@ Video_Destruct:
 
 ; iy = this
 Video_StartIY:
-	push iy
-	ld de,Video.initialDisplaySettings
-	add iy,de
-	call DisplaySettings_InitializeFromSystemVariablesIY
-	ld (iy + DisplaySettings.palette),Palette_black
-	ld (iy + DisplaySettings.palette + 1),Palette_black >> 8
-	ld e,iyl
-	ld d,iyh
-	pop iy
-	call Video_SubmitDisplaySettingsIY
-	call Video_WaitDisplayedIY
-
+	call Video_StartFadeOutIY
 	ld a,5
 	call VDP_InitScreen
 	call VDP_Enable212Lines
@@ -124,6 +115,47 @@ Video_StartIY:
 	call VDP_SetRegister
 	call Video_Recenter
 	ret
+
+; iy = this
+Video_StartFadeOutIY: PROC
+	push ix
+	ld e,iyl
+	ld d,iyh
+	ld ix,Video.initialPalette
+	add ix,de
+	push iy
+	ld de,Video.initialDisplaySettings
+	add iy,de
+	call DisplaySettings_InitializeFromSystemVariablesIY
+	ld e,iyl
+	ld d,iyh
+	pop iy
+	ld a,77H
+Loop:
+	push af
+	push de
+	push ix
+	ld b,a
+	ld c,a
+	ld hl,Palette_black
+	ld de,Palette_system
+	call Palette_Interpolate
+	pop ix
+	ld e,ixl
+	ld d,ixh
+	ld (iy + Video.initialDisplaySettings + DisplaySettings.palette),e
+	ld (iy + Video.initialDisplaySettings + DisplaySettings.palette + 1),d
+	pop de
+	call Video_SubmitDisplaySettingsIY
+	call Video_WaitDisplayedIY
+	call Video_SubmitDisplaySettingsIY
+	call Video_WaitDisplayedIY
+	pop af
+	sub 11H
+	jr nc,Loop
+	pop ix
+	ret
+	ENDP
 
 ; iy = this
 Video_StopIY:
