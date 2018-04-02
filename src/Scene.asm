@@ -8,12 +8,18 @@ Scene: MACRO ?tileset, ?tilemap
 		dw ?tileset
 	tileMap:
 		dw ?tilemap
+	exiting:
+		db 0
+	exit:
+		db 0
 	mapView:
 		MapView
 	player:
 		Player
 	rain:
 		Rain
+	paletteFader:
+		PaletteFader
 	ENDM
 
 ; de = engine
@@ -41,6 +47,18 @@ Scene_Construct:
 	push ix
 	call Scene_GetRain
 	call Rain_Construct
+	pop ix
+
+	push ix
+	call Scene_GetTileSet
+	call TileSet_GetPalette
+	pop ix
+	push ix
+	push de
+	call Scene_GetPaletteFader
+	pop de
+	ld hl,Palette_black
+	call PaletteFader_Construct
 	pop ix
 	ret
 
@@ -100,6 +118,13 @@ Scene_GetRain:
 	ret
 
 ; ix = this
+; ix <- palette fader
+Scene_GetPaletteFader:
+	ld de,Scene.paletteFader
+	add ix,de
+	ret
+
+; ix = this
 Scene_Start:
 	call Scene_GetEngine_IY
 
@@ -116,15 +141,6 @@ Scene_Start:
 	push iy
 	call Engine_GetSpritePatternTableOddIY
 	call Scene_InitializeSpritePatterns
-	pop iy
-
-	push iy
-	push ix
-	call Scene_GetTileSet
-	call TileSet_GetPalette
-	call Engine_SetPaletteEvenIY
-	call Engine_SetPaletteOddIY
-	pop ix
 	pop iy
 
 	push ix
@@ -151,12 +167,9 @@ Scene_Run: PROC
 	call Scene_GetEngine_IY
 Loop:
 	call Scene_Update
-
-	push iy
-	call Engine_GetInputIY
-	bit 2,(iy + Input.newKey + 7)  ; ESC
-	pop iy
-	jr nz,Loop
+	bit 0,(ix + Scene.exit)
+	jr z,Loop
+	call Video_WaitDisplayedIY
 	ret
 	ENDP
 
@@ -168,6 +181,7 @@ Scene_Update:
 	ENDIF
 
 	call Scene_UpdateInput
+	call Scene_UpdatePalette
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
 	call Scene_UpdateSpritePatterns
@@ -203,12 +217,21 @@ Scene_UpdateInput:
 
 	call Input_UpdateIY
 
+	call Scene_UpdateExit
 	call Scene_UpdateDisplayFrequency
 
 	pop iy
 	IF DEBUG
 	PROFILE_END 8
 	ENDIF
+	ret
+
+; ix = this
+; iy = input
+Scene_UpdateExit:
+	bit 2,(iy + Input.newKey + 7)  ; ESC
+	ret nz
+	ld (ix + Scene.exiting),1
 	ret
 
 ; ix = this
@@ -250,6 +273,33 @@ Scene_UpdatePlayerPosition:
 	PROFILE_END 0
 	ENDIF
 	ret
+
+; ix = this
+; iy = engine
+Scene_UpdatePalette: PROC
+	bit 0,(ix + Scene.exiting)
+	jr nz,Exiting
+	push ix
+	call Scene_GetPaletteFader
+	call PaletteFader_GetNextPalette
+	ld e,ixl
+	ld d,ixh
+	call Engine_SetPaletteIY
+	pop ix
+	ret
+Exiting:
+	push ix
+	call Scene_GetPaletteFader
+	call PaletteFader_GetPreviousPalette
+	ld e,ixl
+	ld d,ixh
+	call Engine_SetPaletteIY
+	pop ix
+	and a
+	ret nz
+	ld (ix + Scene.exit),1
+	ret
+	ENDP
 
 ; ix = this
 ; iy = engine

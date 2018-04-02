@@ -14,6 +14,7 @@
 	INCLUDE "SpritePatternTable.asm"
 	INCLUDE "Palette.asm"
 	INCLUDE "PaletteColor.asm"
+	INCLUDE "PaletteFader.asm"
 	INCLUDE "LineInterrupt.asm"
 
 Video: MACRO
@@ -126,14 +127,6 @@ Video_StartIY:
 
 ; iy = this
 Video_StopIY:
-	ld e,iyl
-	ld d,iyh
-	ld hl,Video.initialDisplaySettings
-	add hl,de
-	ex de,hl
-	call Video_SubmitDisplaySettingsIY
-	call Video_WaitDisplayedIY
-
 	call VDP_InitText
 	ret
 

@@ -204,6 +204,20 @@ Odd:
 
 ; de = palette
 ; iy = this
+Engine_SetPaletteIY: PROC
+	bit 1,(iy + Engine.frame)
+	jr nz,Odd
+	ld (iy + Engine.paletteEven),e
+	ld (iy + Engine.paletteEven + 1),d
+	ret
+Odd:
+	ld (iy + Engine.paletteOdd),e
+	ld (iy + Engine.paletteOdd + 1),d
+	ret
+	ENDP
+
+; de = palette
+; iy = this
 Engine_SetPaletteEvenIY:
 	ld (iy + Engine.paletteEven),e
 	ld (iy + Engine.paletteEven + 1),d

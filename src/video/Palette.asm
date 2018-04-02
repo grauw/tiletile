@@ -25,6 +25,19 @@ Palette: MACRO ?0 = 0, ?1 = 0, ?2 = 0, ?3 = 0, ?4 = 0, ?5 = 0, ?6 = 0, ?7 = 0,
 	_size:
 	ENDM
 
+; bc = colour step (000H...777H)
+; de = end palette
+; hl = start palette
+; ix = result palette
+; bc <- incremented
+; de <- incremented
+; ix <- incremented
+Palette_Interpolate:
+	REPT 16
+	call PaletteColor_Interpolate
+	ENDM
+	ret
+
 ;
 Palette_black:
 	Palette 000H, 000H, 000H, 000H, 000H, 000H, 000H, 000H,
