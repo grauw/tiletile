@@ -31,6 +31,26 @@ DisplaySettings: MACRO
 	_size:
 	ENDM
 
+; iy = this
+DisplaySettings_InitializeFromSystemVariablesIY:
+	ld a,(VDP_MIRROR_25 + 26)
+	ld (iy + DisplaySettings.horizontalOffsetCharacters),a
+	ld a,(VDP_MIRROR_25 + 27)
+	ld (iy + DisplaySettings.horizontalOffsetDots),a
+	ld a,(VDP_MIRROR_8 + 23)
+	ld (iy + DisplaySettings.verticalOffset),a
+	ld a,(VDP_MIRROR_0 + 2)
+	ld (iy + DisplaySettings.patternName),a
+	ld a,(VDP_MIRROR_0 + 5)
+	ld (iy + DisplaySettings.spriteAttributeLSB),a
+	ld a,(VDP_MIRROR_8 + 11)
+	ld (iy + DisplaySettings.spriteAttributeMSB),a
+	ld a,(VDP_MIRROR_0 + 6)
+	ld (iy + DisplaySettings.spritePattern),a
+	ld (iy + DisplaySettings.palette),Palette_system
+	ld (iy + DisplaySettings.palette + 1),Palette_system >> 8
+	ret
+
 ; hl = this
 DisplaySettings_ApplyHL:
 	ld c,VDP_PORT_1

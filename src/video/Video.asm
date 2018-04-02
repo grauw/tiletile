@@ -22,6 +22,8 @@ Video: MACRO
 		db 0
 	displaySettings:
 		dw 0
+	initialDisplaySettings:
+		DisplaySettings
 	lineInterrupt:
 		LineInterrupt 212, InterruptEntry
 	InterruptEntry:
@@ -79,6 +81,18 @@ Video_Destruct:
 
 ; iy = this
 Video_StartIY:
+	push iy
+	ld de,Video.initialDisplaySettings
+	add iy,de
+	call DisplaySettings_InitializeFromSystemVariablesIY
+	ld (iy + DisplaySettings.palette),Palette_black
+	ld (iy + DisplaySettings.palette + 1),Palette_black >> 8
+	ld e,iyl
+	ld d,iyh
+	pop iy
+	call Video_SubmitDisplaySettingsIY
+	call Video_WaitDisplayedIY
+
 	ld a,5
 	call VDP_InitScreen
 	call VDP_Enable212Lines
@@ -112,6 +126,14 @@ Video_StartIY:
 
 ; iy = this
 Video_StopIY:
+	ld e,iyl
+	ld d,iyh
+	ld hl,Video.initialDisplaySettings
+	add hl,de
+	ex de,hl
+	call Video_SubmitDisplaySettingsIY
+	call Video_WaitDisplayedIY
+
 	call VDP_InitText
 	ret
 
