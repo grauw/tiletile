@@ -244,9 +244,9 @@ class Tmx {
 
 	parseTile(tileXml, image) {
 		checkTypes(arguments, Object, Image);
-		let objectGroup = (tileXml.objectgroup || [])[0] || { $: {} };
-		let collision = ~~this.parseProperty(objectGroup, "collision", 0);
-		return new Tile(~~tileXml.$.id, objectGroup.$.name || null, image, collision);
+		let name = this.parseProperty(tileXml, "name", null);
+		let collision = ~~this.parseProperty(tileXml, "collision", 0);
+		return new Tile(~~tileXml.$.id, name, image, collision);
 	}
 
 	parseProperty(xml, name, default_) {
