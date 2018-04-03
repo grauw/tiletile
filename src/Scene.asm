@@ -16,8 +16,8 @@ Scene: MACRO ?tileset, ?tilemap
 		MapView
 	player:
 		Player
-	rain:
-		Rain
+	weather:
+		Weather
 	paletteFader:
 		PaletteFader
 	ENDM
@@ -45,8 +45,8 @@ Scene_Construct:
 	pop ix
 
 	push ix
-	call Scene_GetRain
-	call Rain_Construct
+	call Scene_GetWeather
+	call Weather_Construct
 	pop ix
 
 	push ix
@@ -111,9 +111,9 @@ Scene_GetPlayer:
 	ret
 
 ; ix = this
-; ix <- rain
-Scene_GetRain:
-	ld de,Scene.rain
+; ix <- weather
+Scene_GetWeather:
+	ld de,Scene.weather
 	add ix,de
 	ret
 
@@ -153,8 +153,8 @@ Scene_Start:
 ; iy = sprite pattern table
 Scene_InitializeSpritePatterns:
 	push ix
-	call Scene_GetRain
-	call Rain_InitializeSpritePatterns
+	call Scene_GetWeather
+	call Weather_InitializeSpritePatterns
 	pop ix
 	ret
 
@@ -198,6 +198,7 @@ Scene_Update:
 	pop iy
 	call Engine_CopySpriteColorToSecondary
 	call Scene_UpdateSpriteAttributes
+	call Scene_UpdateTriggers
 
 	IF DEBUG
 	PROFILE_FRAME_END
@@ -264,8 +265,8 @@ Scene_UpdatePlayerPosition:
 	pop ix
 
 	push ix
-	call Scene_GetRain
-	call Rain_Tick
+	call Scene_GetWeather
+	call Weather_Tick
 	pop ix
 
 	pop iy
@@ -340,8 +341,8 @@ Scene_UpdateSpriteAttributes:
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY
 	push ix
-	call Scene_GetRain
-	call Rain_DrawSpriteAttributes
+	call Scene_GetWeather
+	call Weather_DrawSpriteAttributes
 	pop ix
 	push ix
 	call Scene_GetPlayer
@@ -369,8 +370,8 @@ Scene_UpdateSpriteColors:
 	ld a,0
 	call SpriteColorTable_SetColorWriteIY
 	push ix
-	call Scene_GetRain
-	call Rain_DrawSpriteColors
+	call Scene_GetWeather
+	call Weather_DrawSpriteColors
 	pop ix
 	push ix
 	call Scene_GetPlayer
@@ -423,3 +424,54 @@ Scene_UpdateMapViewPixels:
 	PROFILE_END 4
 	ENDIF
 	ret
+
+; ix = this
+; iy = engine
+Scene_UpdateTriggers: PROC
+	IF DEBUG
+	PROFILE_BEGIN 9
+	ENDIF
+
+	push ix
+	call Scene_GetPlayer
+	call Player_GetPosition
+	pop ix
+	push ix
+	push de
+	call Scene_GetTileMap
+	pop de
+	call TileMap_PixelToTilePosition
+	call TileMap_GetTile
+	call Tile_GetCollision
+	pop ix
+	push ix
+	call Process
+	pop ix
+
+	IF DEBUG
+	PROFILE_END 9
+	ENDIF
+	ret
+Process:
+	cp 1
+	jr z,ProcessSunny
+	cp 2
+	jr z,ProcessRain
+	cp 3
+	jr z,ProcessMoonlit
+	cp 4
+	jr z,ProcessLightning
+	ret
+ProcessSunny:
+	call Scene_GetWeather
+	jp Weather_Sunny
+ProcessRain:
+	call Scene_GetWeather
+	jp Weather_Rain
+ProcessMoonlit:
+	call Scene_GetWeather
+	jp Weather_Moonlit
+ProcessLightning:
+	call Scene_GetWeather
+	jp Weather_Lightning
+	ENDP
