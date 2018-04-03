@@ -83,6 +83,17 @@ MapView_GetTileCopyCommand_IY:
 	add iy,de
 	ret
 
+; bc = x
+; de = y
+; ix = this
+MapView_SetTargetPosition:
+	push bc
+	ex de,hl
+	call MapView_SetTargetY
+	pop hl
+	call MapView_SetTargetX
+	ret
+
 ; hl = target x
 ; ix = this
 MapView_SetTargetX: PROC

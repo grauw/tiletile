@@ -312,17 +312,13 @@ Scene_UpdateMapViewPosition:
 
 	push ix
 	call Scene_GetPlayer
-	ld l,(ix + Player.x)
-	ld h,(ix + Player.x + 1)
-	ld e,(ix + Player.y)
-	ld d,(ix + Player.y + 1)
+	call Player_GetPosition
 	pop ix
 	push ix
 	push de
 	call Scene_GetMapView
-	call MapView_SetTargetX
-	pop hl
-	call MapView_SetTargetY
+	pop de
+	call MapView_SetTargetPosition
 	call MapView_Update
 	pop ix
 

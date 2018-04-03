@@ -126,6 +126,16 @@ Player_GetTileMap:
 	ld ixh,d
 	ret
 
+; ix = this
+; bc <- x
+; de <- y
+Player_GetPosition:
+	ld c,(ix + Player.x)
+	ld b,(ix + Player.x + 1)
+	ld e,(ix + Player.y)
+	ld d,(ix + Player.y + 1)
+	ret
+
 ; bc = dx (-1 left, 1 right)
 ; de = dy (-1 up, 1 down)
 ; ix = this
