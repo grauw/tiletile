@@ -261,7 +261,7 @@ Player_DrawSpriteAttributes:
 	ld h,a
 	ld a,(ix + Player.y)
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
-	add a,-24
+	add a,-30
 	ld l,a
 	ld b,Player_PATTERN + 0 << 2
 	call SpriteAttributeTable_WriteAttributeIY
