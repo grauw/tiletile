@@ -12,6 +12,29 @@ TileMap: MACRO ?width, ?height, ?data, ?dataRows
 		dw ?dataRows
 	ENDM
 
+; bc = x (pixels)
+; de = y (pixels)
+; bc <- x (tiles)
+; de <- y (tiles)
+TileMap_PixelToTilePosition:
+	srl b
+	rr c
+	srl b
+	rr c
+	srl b
+	rr c
+	srl b
+	rr c
+	srl d
+	rr e
+	srl d
+	rr e
+	srl d
+	rr e
+	srl d
+	rr e
+	ret
+
 ; bc = x
 ; de = y
 ; ix = this

@@ -240,25 +240,10 @@ Player_CanMove:
 	push bc
 	push de
 	push ix
-	srl b
-	rr c
-	srl b
-	rr c
-	srl b
-	rr c
-	srl b
-	rr c
-	srl d
-	rr e
-	srl d
-	rr e
-	srl d
-	rr e
-	srl d
-	rr e
 	push de
 	call Player_GetTileMap
 	pop de
+	call TileMap_PixelToTilePosition
 	call TileMap_GetTile
 	call Tile_CanMove
 	pop ix
