@@ -18,10 +18,9 @@ Tile: MACRO ?imageindex, ?tilesbank, ?collision
 	ENDM
 
 ; ix = this
-; f <- c: can
-Tile_CanMove:
+; a <- collision ID
+Tile_GetCollision:
 	ld a,(ix + Tile.collision)
-	sub 128
 	ret
 
 ; ix = this

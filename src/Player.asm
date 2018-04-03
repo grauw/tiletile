@@ -245,7 +245,8 @@ Player_CanMove:
 	pop de
 	call TileMap_PixelToTilePosition
 	call TileMap_GetTile
-	call Tile_CanMove
+	call Tile_GetCollision
+	cp 128
 	pop ix
 	pop de
 	pop bc
