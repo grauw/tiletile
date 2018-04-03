@@ -154,7 +154,7 @@ Scene_Start:
 Scene_InitializeSpritePatterns:
 	push ix
 	call Scene_GetRain
-	call Rain_DrawSpritePatterns
+	call Rain_InitializeSpritePatterns
 	pop ix
 	ret
 

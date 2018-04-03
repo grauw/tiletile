@@ -68,7 +68,7 @@ Rain_DrawSpriteColors:
 
 ; ix = this
 ; iy = sprite pattern table
-Rain_DrawSpritePatterns:
+Rain_InitializeSpritePatterns:
 	ld a,Rain_PATTERN
 	call SpritePatternTable_SetPatternWriteIY
 	ld hl,Rain_pattern
