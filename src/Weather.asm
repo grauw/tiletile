@@ -3,7 +3,7 @@
 ;
 Weather_SUNNY: equ 0
 Weather_RAIN: equ 1
-Weather_MOONLIT: equ 2
+Weather_MANASHROUD: equ 2
 Weather_LIGHTNING: equ 3
 
 Weather: MACRO
@@ -11,6 +11,8 @@ Weather: MACRO
 		db 0
 	rain:
 		Rain
+	manaShroud:
+		ManaShroud
 	lightning:
 		Lightning
 	ENDM
@@ -23,6 +25,13 @@ Weather_Construct:
 ; ix <- rain
 Weather_GetRain:
 	ld de,Weather.rain
+	add ix,de
+	ret
+
+; ix = this
+; ix <- mana shroud
+Weather_GetManaShroud:
+	ld de,Weather.manaShroud
 	add ix,de
 	ret
 
@@ -44,8 +53,8 @@ Weather_Rain:
 	ret
 
 ; ix = this
-Weather_Moonlit:
-	ld (ix + Weather.type),Weather_MOONLIT
+Weather_ManaShroud:
+	ld (ix + Weather.type),Weather_MANASHROUD
 	ret
 
 ; ix = this
@@ -114,6 +123,8 @@ Weather_UpdatePalette: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,UpdateRain
+	cp Weather_MANASHROUD
+	jr z,UpdateManaShroud
 	cp Weather_LIGHTNING
 	jr z,UpdateLightning
 UpdateSunny:
@@ -123,6 +134,11 @@ UpdateRain:
 	call Weather_GetRain
 	pop de
 	jp Rain_UpdatePalette
+UpdateManaShroud:
+	push de
+	call Weather_GetManaShroud
+	pop de
+	jp ManaShroud_UpdatePalette
 UpdateLightning:
 	push de
 	call Weather_GetLightning

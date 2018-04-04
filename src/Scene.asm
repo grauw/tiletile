@@ -480,7 +480,7 @@ Process:
 	cp 2
 	jr z,ProcessRain
 	cp 3
-	jr z,ProcessMoonlit
+	jr z,ProcessManaShroud
 	cp 4
 	jr z,ProcessLightning
 	ret
@@ -490,9 +490,9 @@ ProcessSunny:
 ProcessRain:
 	call Scene_GetWeather
 	jp Weather_Rain
-ProcessMoonlit:
+ProcessManaShroud:
 	call Scene_GetWeather
-	jp Weather_Moonlit
+	jp Weather_ManaShroud
 ProcessLightning:
 	call Scene_GetWeather
 	jp Weather_Lightning
