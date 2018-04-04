@@ -56,7 +56,9 @@ TickRain:
 	jp Rain_Tick
 	ENDP
 
+; c = write port
 ; ix = this
+; iy = sprite attribute table
 Weather_DrawSpriteAttributes: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
@@ -68,7 +70,9 @@ DrawRain:
 	jp Rain_DrawSpriteAttributes
 	ENDP
 
+; c = write port
 ; ix = this
+; iy = sprite color table
 Weather_DrawSpriteColors: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
@@ -81,6 +85,7 @@ DrawRain:
 	ENDP
 
 ; ix = this
+; iy = sprite pattern table
 Weather_InitializeSpritePatterns:
 	push ix
 	call Weather_GetRain
