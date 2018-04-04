@@ -3,6 +3,8 @@
 ;
 ; Colour components specified as #rgb
 ;
+Palette_COLORS: equ 16
+
 Palette: MACRO ?0 = 0, ?1 = 0, ?2 = 0, ?3 = 0, ?4 = 0, ?5 = 0, ?6 = 0, ?7 = 0,
                ?8 = 0, ?9 = 0, ?10 = 0, ?11 = 0, ?12 = 0, ?13 = 0, ?14 = 0, ?15 = 0
 	colors:
@@ -33,7 +35,7 @@ Palette: MACRO ?0 = 0, ?1 = 0, ?2 = 0, ?3 = 0, ?4 = 0, ?5 = 0, ?6 = 0, ?7 = 0,
 ; de <- incremented
 ; ix <- incremented
 Palette_Interpolate:
-	REPT 16
+	REPT Palette_COLORS
 	call PaletteColor_Interpolate
 	ENDM
 	ret
