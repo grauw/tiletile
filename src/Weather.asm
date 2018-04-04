@@ -11,6 +11,8 @@ Weather: MACRO
 		db 0
 	rain:
 		Rain
+	lightning:
+		Lightning
 	ENDM
 
 ; ix = this
@@ -21,6 +23,13 @@ Weather_Construct:
 ; ix <- rain
 Weather_GetRain:
 	ld de,Weather.rain
+	add ix,de
+	ret
+
+; ix = this
+; ix <- lightning
+Weather_GetLightning:
+	ld de,Weather.lightning
 	add ix,de
 	ret
 
@@ -49,8 +58,13 @@ Weather_Tick: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,TickRain
+	cp Weather_LIGHTNING
+	jr z,TickLightning
 TickSunny:
 	ret
+TickLightning:
+	call Weather_GetLightning
+	jp Lightning_Tick
 TickRain:
 	call Weather_GetRain
 	jp Rain_Tick
@@ -100,6 +114,8 @@ Weather_UpdatePalette: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,UpdateRain
+	cp Weather_LIGHTNING
+	jr z,UpdateLightning
 UpdateSunny:
 	ret
 UpdateRain:
@@ -107,4 +123,9 @@ UpdateRain:
 	call Weather_GetRain
 	pop de
 	jp Rain_UpdatePalette
+UpdateLightning:
+	push de
+	call Weather_GetLightning
+	pop de
+	jp Lightning_UpdatePalette
 	ENDP

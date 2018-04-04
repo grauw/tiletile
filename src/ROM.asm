@@ -68,6 +68,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Scene.asm"
 	INCLUDE "Weather.asm"
 	INCLUDE "Rain.asm"
+	INCLUDE "Lightning.asm"
 	INCLUDE "FieldMap.asm"
 
 	ENDS

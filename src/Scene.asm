@@ -181,12 +181,12 @@ Scene_Update:
 	ENDIF
 
 	call Scene_UpdateInput
-	call Scene_UpdatePalette
 	call Scene_UpdatePlayerPosition
 	call Scene_UpdateMapViewPosition
 	call Scene_UpdateSpritePatterns
 	call Scene_UpdateSpriteColors
 	call Scene_UpdateSpriteAttributes
+	call Scene_UpdatePalette
 	call Engine_SubmitPrimaryIY
 
 	call Scene_UpdatePlayerPosition
