@@ -11,6 +11,8 @@ Rain: MACRO
 		db 0
 	dropOffset:
 		dw 2B20H
+	palette:
+		Palette
 	ENDM
 
 ; ix = this
@@ -73,6 +75,18 @@ Rain_InitializeSpritePatterns:
 	call SpritePatternTable_SetPatternWriteIY
 	ld hl,Rain_pattern
 	call SpritePatternTable_WritePatternIY
+	ret
+
+; de = palette
+; ix = this
+; de <- palette
+Rain_UpdatePalette:
+	ld bc,Rain.palette
+	add ix,bc
+	push ix
+	ld bc,120H
+	call Palette_SubtractConstant
+	pop de
 	ret
 
 ;

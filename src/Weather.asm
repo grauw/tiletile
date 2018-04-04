@@ -92,3 +92,19 @@ Weather_InitializeSpritePatterns:
 	call Rain_InitializeSpritePatterns
 	pop ix
 	ret
+
+; de = palette
+; ix = this
+; de <- palette
+Weather_UpdatePalette: PROC
+	ld a,(ix + Weather.type)
+	cp Weather_RAIN
+	jr z,UpdateRain
+UpdateSunny:
+	ret
+UpdateRain:
+	push de
+	call Weather_GetRain
+	pop de
+	jp Rain_UpdatePalette
+	ENDP

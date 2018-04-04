@@ -284,6 +284,12 @@ Scene_UpdatePalette: PROC
 
 	ld de,Palette_black
 	call Scene_UpdatePaletteFade
+	push ix
+	push de
+	call Scene_GetWeather
+	pop de
+	call Weather_UpdatePalette
+	pop ix
 	call Engine_SetPaletteIY
 
 	IF DEBUG

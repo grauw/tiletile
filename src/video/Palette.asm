@@ -27,6 +27,54 @@ Palette: MACRO ?0 = 0, ?1 = 0, ?2 = 0, ?3 = 0, ?4 = 0, ?5 = 0, ?6 = 0, ?7 = 0,
 	_size:
 	ENDM
 
+; de = palette reference
+; hl = palette reference
+; ix = result palette reference (this)
+; hl <- incremented
+; ix <- incremented
+Palette_Add: PROC
+	ld b,Palette_COLORS
+Loop:
+	call PaletteColor_Add
+	djnz Loop
+	ret
+	ENDP
+
+; bc = color (#grb)
+; de = palette reference
+; ix = result palette reference (this)
+; hl <- incremented
+; ix <- incremented
+Palette_AddConstant:
+	REPT Palette_COLORS
+	call PaletteColor_AddConstant
+	ENDM
+	ret
+
+; de = minuend palette reference
+; hl = subtrahend palette reference
+; ix = result palette reference (this)
+; hl <- incremented
+; ix <- incremented
+Palette_Subtract: PROC
+	ld b,Palette_COLORS
+Loop:
+	call PaletteColor_Subtract
+	djnz Loop
+	ret
+	ENDP
+
+; bc = subtrahend color (#grb)
+; de = minuend palette reference
+; ix = result palette reference (this)
+; hl <- incremented
+; ix <- incremented
+Palette_SubtractConstant:
+	REPT Palette_COLORS
+	call PaletteColor_SubtractConstant
+	ENDM
+	ret
+
 ; bc = colour step (000H...777H)
 ; de = end palette
 ; hl = start palette

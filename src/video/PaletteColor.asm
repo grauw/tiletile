@@ -5,6 +5,96 @@ PaletteColor: MACRO ?r, ?g, ?b
 	dw ?g << 8 | ?r << 4 | ?b
 	ENDM
 
+; de = color reference
+; hl = color reference
+; ix = result color reference (this)
+; hl <- incremented
+; ix <- incremented
+PaletteColor_Add:
+	ld c,(hl)
+	inc hl
+	ld b,(hl)
+	inc hl
+	jr PaletteColor_AddConstant
+
+; bc = color (#grb)
+; de = color reference
+; ix = result color reference (this)
+; hl <- incremented
+; ix <- incremented
+PaletteColor_AddConstant: PROC
+	ld a,(de)
+	inc de
+	add a,c
+	jp p,NoSaturateRed
+	or 70H
+NoSaturateRed:
+	bit 3,a
+	jr z,NoSaturateBlue
+	or 07H
+NoSaturateBlue:
+	and 77H
+	ld (ix),a
+	inc ix
+	ld a,(de)
+	inc de
+	add a,b
+	bit 3,a
+	jr z,NoSaturateGreen
+	or 07H
+NoSaturateGreen:
+	and 07H
+	ld (ix),a
+	inc ix
+	ret
+	ENDP
+
+; de = minuend color reference
+; hl = subtrahend color reference
+; ix = result color reference (this)
+; hl <- incremented
+; ix <- incremented
+PaletteColor_Subtract:
+	ld c,(hl)
+	inc hl
+	ld b,(hl)
+	inc hl
+	jr PaletteColor_SubtractConstant
+
+; bc = subtrahend color (#grb)
+; de = minuend color reference
+; ix = result color reference (this)
+; hl <- incremented
+; ix <- incremented
+PaletteColor_SubtractConstant: PROC
+	ld a,(de)
+	inc de
+	or 88H
+	sub c
+	jp m,NoSaturateRed
+	and 0FH
+NoSaturateRed:
+	bit 3,a
+	jr nz,NoSaturateBlue
+	and 0F0H
+NoSaturateBlue:
+	and 77H
+	ld (ix),a
+	inc ix
+	ld a,(de)
+	inc de
+	or 88H
+	sub b
+	bit 3,a
+	jr nz,NoSaturateGreen
+	xor a
+NoSaturateGreen:
+	and 07H
+	ld (ix),a
+	inc ix
+	ret
+	ENDP
+
 ; bc = colour step (000H..777H)
 ; de = end color reference
 ; hl = start color reference
