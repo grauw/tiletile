@@ -278,6 +278,24 @@ Scene_UpdatePlayerPosition:
 ; ix = this
 ; iy = engine
 Scene_UpdatePalette: PROC
+	IF DEBUG
+	PROFILE_BEGIN 5
+	ENDIF
+
+	ld de,Palette_black
+	call Scene_UpdatePaletteFade
+	call Engine_SetPaletteIY
+
+	IF DEBUG
+	PROFILE_END 5
+	ENDIF
+	ret
+	ENDP
+
+; de = palette
+; ix = this
+; de <- palette
+Scene_UpdatePaletteFade: PROC
 	bit 0,(ix + Scene.exiting)
 	jr nz,Exiting
 	push ix
@@ -285,7 +303,6 @@ Scene_UpdatePalette: PROC
 	call PaletteFader_GetNextPalette
 	ld e,ixl
 	ld d,ixh
-	call Engine_SetPaletteIY
 	pop ix
 	ret
 Exiting:
@@ -294,7 +311,6 @@ Exiting:
 	call PaletteFader_GetPreviousPalette
 	ld e,ixl
 	ld d,ixh
-	call Engine_SetPaletteIY
 	pop ix
 	and a
 	ret nz
