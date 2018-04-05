@@ -335,8 +335,8 @@ NotMoving:
 	ld (ix + Player.movingStep),a
 	jr Continue
 Moving:
-	inc (ix + Player.movingStep)
 	ld a,(ix + Player.movingStep)
+	inc (ix + Player.movingStep)
 	rra
 	rra
 	and 00000011B
