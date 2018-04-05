@@ -259,6 +259,9 @@ Player_CanMove:
 ; b <- sprites remaining
 ; c <- write port
 Player_DrawSpriteAttributes:
+	ld a,b
+	cp 8
+	ret c
 	ld a,(ix + Player.x)
 	add a,(iy + SpriteAttributeTable.worldOffsetX)
 	add a,-8
