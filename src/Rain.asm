@@ -51,10 +51,10 @@ Rain_DrawSpriteAttributes:
 	ld b,Rain_PATTERN << 2
 	ld e,(ix + Rain.dropOffset)
 	ld d,(ix + Rain.dropOffset + 1)
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, l, b
 	REPT Rain_SPRITES - 1
 	add hl,de
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, l, b
 	ENDM
 	ret
 

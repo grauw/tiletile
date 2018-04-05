@@ -83,20 +83,16 @@ SpriteAttributeTable_SetAttributeWriteIY:
 	call VRAMTable_SetWriteIY
 	ret
 
-; b = pattern number
 ; c = write port
-; h = x
-; l = y
-; iy = this
-SpriteAttributeTable_WriteAttributeIY:
-	out (c),l
+SpriteAttributeTable_WriteAttribute_M: MACRO ?x, ?y, ?pattern
+	out (c),?y
 	nop
-	out (c),h
+	out (c),?x
 	nop
-	out (c),b
+	out (c),?pattern
 	nop
 	out (c),a
-	ret
+	ENDM
 
 ; c = write port
 ; iy = this

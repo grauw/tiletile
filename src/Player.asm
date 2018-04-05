@@ -263,25 +263,23 @@ Player_DrawSpriteAttributes:
 	ld a,(ix + Player.y)
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
 	add a,-30
-	ld l,a
 	ld b,Player_PATTERN + 0 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	ld b,Player_PATTERN + 1 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	ld b,Player_PATTERN + 2 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	ld b,Player_PATTERN + 3 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	add a,16
-	ld l,a
 	ld b,Player_PATTERN + 4 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	ld b,Player_PATTERN + 5 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	ld b,Player_PATTERN + 6 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	ld b,Player_PATTERN + 7 << 2
-	call SpriteAttributeTable_WriteAttributeIY
+	SpriteAttributeTable_WriteAttribute_M h, a, b
 	ret
 
 ; c = write port
