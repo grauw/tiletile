@@ -301,8 +301,7 @@ Player_DrawSpriteColors:
 	ld hl,SpriteColor_solid4CC
 	call SpriteColorTable_DrawIY
 	ld hl,SpriteColor_solid8CC
-	call SpriteColorTable_DrawIY
-	ret
+	jp SpriteColorTable_DrawIY
 
 ; ix = this
 ; iy = sprite pattern table

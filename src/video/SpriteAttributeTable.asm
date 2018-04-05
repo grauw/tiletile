@@ -69,8 +69,7 @@ SpriteAttributeTable_SetAttributeWrite:
 	add a,a
 	ld l,a
 	ld h,0
-	call VRAMTable_SetWrite
-	ret
+	jp VRAMTable_SetWrite
 
 ; a = sprite number
 ; iy = this
@@ -80,8 +79,7 @@ SpriteAttributeTable_SetAttributeWriteIY:
 	add a,a
 	ld l,a
 	ld h,0
-	call VRAMTable_SetWriteIY
-	ret
+	jp VRAMTable_SetWriteIY
 
 ; c = write port
 SpriteAttributeTable_WriteAttribute_M: MACRO ?x, ?y, ?pattern

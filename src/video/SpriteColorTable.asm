@@ -51,8 +51,7 @@ SpriteColorTable_SetColorWrite:
 	ld l,a
 	ld h,0
 	rl h
-	call VRAMTable_SetWrite
-	ret
+	jp VRAMTable_SetWrite
 
 ; a = sprite number
 ; iy = this
@@ -65,8 +64,7 @@ SpriteColorTable_SetColorWriteIY:
 	ld l,a
 	ld h,0
 	rl h
-	call VRAMTable_SetWriteIY
-	ret
+	jp VRAMTable_SetWriteIY
 
 ; c = write port
 ; hl = sprite color

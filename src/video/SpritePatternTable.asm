@@ -47,8 +47,7 @@ SpritePatternTable_SetPatternWrite:
 	add hl,hl
 	add hl,hl
 	add hl,hl
-	call VRAMTable_SetWrite
-	ret
+	jp VRAMTable_SetWrite
 
 ; a = sprite pattern number
 ; iy = this
@@ -63,8 +62,7 @@ SpritePatternTable_SetPatternWriteIY:
 	add hl,hl
 	add hl,hl
 	add hl,hl
-	call VRAMTable_SetWriteIY
-	ret
+	jp VRAMTable_SetWriteIY
 
 ; c = write port
 ; hl = sprite pattern

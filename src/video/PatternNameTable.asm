@@ -43,8 +43,7 @@ PatternNameTable_SetPatternNameWrite:
 	add a,a
 	ld l,a
 	ld h,0
-	call VRAMTable_SetWrite
-	ret
+	jp VRAMTable_SetWrite
 
 ; hl = offset
 ; iy = this
@@ -54,5 +53,4 @@ PatternNameTable_SetPatternNameWriteIY:
 	add a,a
 	ld l,a
 	ld h,0
-	call VRAMTable_SetWriteIY
-	ret
+	jp VRAMTable_SetWriteIY

@@ -91,8 +91,7 @@ MapView_SetTargetPosition:
 	ex de,hl
 	call MapView_SetTargetY
 	pop hl
-	call MapView_SetTargetX
-	ret
+	jp MapView_SetTargetX
 
 ; hl = target x
 ; ix = this
@@ -171,8 +170,7 @@ MapView_GetTileDataPointer:
 ; ix = this
 MapView_Move:
 	call MapView_MoveHorizontal
-	call MapView_MoveVertical
-	ret
+	jp MapView_MoveVertical
 
 ; ix = this
 MapView_MoveHorizontal: PROC
@@ -264,8 +262,7 @@ MapView_Update:
 	ld a,(ix + MapView.targetY)
 	call DisplayOffset_SetVerticalOffsetIY
 	ld a,(ix + MapView.targetX)
-	call DisplayOffset_SetHorizontalOffsetIY
-	ret
+	jp DisplayOffset_SetHorizontalOffsetIY
 
 ; ix = this
 MapView_Draw: PROC
