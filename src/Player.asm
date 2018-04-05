@@ -287,21 +287,21 @@ Player_DrawSpriteAttributes:
 ; iy = sprite color table
 Player_DrawSpriteColors:
 	ld hl,SpriteColor_solid1
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid2CC
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid4CC
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid8CC
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid1
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid2CC
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid4CC
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid8CC
-	jp SpriteColorTable_DrawIY
+	jp SpriteColorTable_WriteColorIY
 
 ; ix = this
 ; iy = sprite pattern table

@@ -56,7 +56,7 @@ SpriteColorTable_SetColorWriteIY:
 ; c = write port
 ; hl = sprite color
 ; iy = this
-SpriteColorTable_DrawIY:
+SpriteColorTable_WriteColorIY:
 	REPT 16
 	outi
 	ENDM

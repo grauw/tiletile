@@ -64,7 +64,7 @@ Rain_DrawSpriteAttributes:
 Rain_DrawSpriteColors:
 	REPT Rain_SPRITES
 	ld hl,SpriteColor_solid1
-	call SpriteColorTable_DrawIY
+	call SpriteColorTable_WriteColorIY
 	ENDM
 	ret
 
