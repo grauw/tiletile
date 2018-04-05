@@ -335,11 +335,10 @@ NotMoving:
 	ld (ix + Player.movingStep),a
 	jr Continue
 Moving:
+	inc (ix + Player.movingStep)
 	ld a,(ix + Player.movingStep)
-	inc a
-	ld (ix + Player.movingStep),a
-	srl a
-	srl a
+	rra
+	rra
 	and 00000011B
 	inc a
 Continue:

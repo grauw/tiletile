@@ -29,16 +29,15 @@ DisplayOffset_Select: MACRO ?this, ?displaySettings
 ; iy = this
 DisplayOffset_SetHorizontalOffsetIY:
 	ld (iy + DisplayOffset.horizontalOffset),a
-	push af
+	ld b,a
 	neg
 	and 07H
 	ld (iy + DisplayOffset.horizontalOffsetDots),a
-	pop af
-	dec a
-	srl a
-	srl a
-	srl a
-	ld (iy + DisplayOffset.horizontalOffsetCharacters),a
+	dec b
+	srl b
+	srl b
+	srl b
+	ld (iy + DisplayOffset.horizontalOffsetCharacters),b
 	ret
 
 ; a = offset

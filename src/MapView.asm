@@ -300,17 +300,17 @@ MapView_DrawTileColumn: PROC
 	ENDIF
 	ld hl,MapView_OFFSET_Y
 	add hl,de
-	push hl
 	call MapView_GetTileCopyCommand_IY
-	pop de
+	ld d,h
+	ld e,l
 	ld a,c
 	sub e
 	and 0FH
-	ld l,a
-	ld h,0
-	add hl,de
-	ld e,l
-	ld d,h
+	add a,e
+	ld e,a
+	ld a,d
+	adc a,0
+	ld d,a
 	ld a,e
 	and 0F0H
 	ld e,a
@@ -325,11 +325,11 @@ MapView_DrawTileColumn: PROC
 	and 0CH
 	ld c,a
 	ld b,16
+	push ix
 Loop:
 	push bc
 	push de
 	push hl
-	push ix
 	ld e,(hl)
 	inc hl
 	ld d,(hl)
@@ -344,12 +344,12 @@ Loop:
 	ld a,(iy + VDPCommand.dy)
 	add a,16
 	ld (iy + VDPCommand.dy),a
-	pop ix
 	pop hl
 	pop de
 	pop bc
 	add hl,de
 	djnz Loop
+	pop ix
 	ret
 	ENDP
 
@@ -365,17 +365,16 @@ MapView_DrawTileRow: PROC
 	ENDIF
 	ld hl,MapView_OFFSET_Y
 	add hl,de
-	push hl
 	call MapView_GetTileCopyCommand_IY
-	pop de
+	ex de,hl
 	ld a,e
 	sub c
 	and 0FH
-	ld l,a
-	ld h,0
-	add hl,bc
-	ld c,l
-	ld b,h
+	add a,c
+	ld c,a
+	ld a,b
+	adc a,0
+	ld b,a
 	ld a,e
 	and 0F0H
 	ld e,a
@@ -390,10 +389,10 @@ MapView_DrawTileRow: PROC
 	and 0CH
 	ld c,a
 	ld b,16
+	push ix
 Loop:
 	push bc
 	push hl
-	push ix
 	ld e,(hl)
 	inc hl
 	ld d,(hl)
@@ -408,11 +407,11 @@ Loop:
 	ld a,(iy + VDPCommand.dx)
 	add a,16
 	ld (iy + VDPCommand.dx),a
-	pop ix
 	pop hl
 	pop bc
 	inc hl
 	inc hl
 	djnz Loop
+	pop ix
 	ret
 	ENDP
