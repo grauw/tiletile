@@ -1,7 +1,8 @@
 ;
 ; Sprite attribute table in VRAM
 ;
-SpriteAttributeTable_SIZE: equ 32 * SpriteAttribute._size
+SpriteAttributeTable_COUNT: equ 32
+SpriteAttributeTable_SIZE: equ SpriteAttributeTable_COUNT * SpriteAttribute._size
 
 SpriteAttributeTable: MACRO ?address
 	super: VRAMTable ?address
@@ -63,28 +64,47 @@ SpriteAttributeTable_Select: MACRO ?this, ?displaySettings
 
 ; a = sprite number
 ; iy = this
+; b <- sprites remaining
 ; c <- write port
 SpriteAttributeTable_SetAttributeWriteIY:
+	ld b,a
 	add a,a
 	add a,a
 	ld l,a
 	ld h,0
-	jp VRAMTable_SetWriteIY
+	call VRAMTable_SetWriteIY
+	ld a,SpriteAttributeTable_COUNT
+	sub b
+	ld b,a
+	ret
 
+; b = sprites remaining
 ; c = write port
+; b <- sprites remaining
+; c <- write port
+; f <- z: no sprites remaining
 SpriteAttributeTable_WriteAttribute_M: MACRO ?x, ?y, ?pattern
 	out (c),?y
 	nop
 	out (c),?x
 	nop
 	out (c),?pattern
-	nop
+	dec b
 	out (c),a
 	ENDM
 
+; b = sprites remaining
 ; c = write port
 ; iy = this
-SpriteAttributeTable_FinishWriteIY:
+SpriteAttributeTable_FinishWriteIY: PROC
+	ld a,b
+	and a
+	ret z
+	call m,System_ThrowException
+Loop:
 	ld a,216
-	out (c),a
+	ld hl,0
+	SpriteAttributeTable_WriteAttribute_M h, a, l
+	jr nz,Loop
 	ret
+	ENDP

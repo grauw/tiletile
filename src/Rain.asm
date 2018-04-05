@@ -38,9 +38,12 @@ NoOne:
 	ret
 	ENDP
 
+; b = sprites remaining
 ; c = write port
 ; ix = this
 ; iy = sprite attribute table
+; b <- sprites remaining
+; c <- write port
 Rain_DrawSpriteAttributes:
 	ld a,(ix + Rain.x)
 	add a,(iy + SpriteAttributeTable.cameraOffsetX)
@@ -48,13 +51,13 @@ Rain_DrawSpriteAttributes:
 	ld a,(ix + Rain.y)
 	add a,(iy + SpriteAttributeTable.cameraOffsetY)
 	ld l,a
-	ld b,Rain_PATTERN << 2
+	ld a,Rain_PATTERN << 2
 	ld e,(ix + Rain.dropOffset)
 	ld d,(ix + Rain.dropOffset + 1)
-	SpriteAttributeTable_WriteAttribute_M h, l, b
+	SpriteAttributeTable_WriteAttribute_M h, l, a
 	REPT Rain_SPRITES - 1
 	add hl,de
-	SpriteAttributeTable_WriteAttribute_M h, l, b
+	SpriteAttributeTable_WriteAttribute_M h, l, a
 	ENDM
 	ret
 

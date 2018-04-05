@@ -369,8 +369,6 @@ Scene_UpdateSpriteAttributes:
 	push ix
 	call Scene_GetPlayer
 	call Player_DrawSpriteAttributes
-	call Player_DrawSpriteAttributes
-	call Player_DrawSpriteAttributes
 	pop ix
 	call SpriteAttributeTable_FinishWriteIY
 

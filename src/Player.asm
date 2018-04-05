@@ -252,9 +252,12 @@ Player_CanMove:
 	pop bc
 	ret
 
+; b = sprites remaining
 ; c = write port
 ; ix = this
 ; iy = sprite attribute table
+; b <- sprites remaining
+; c <- write port
 Player_DrawSpriteAttributes:
 	ld a,(ix + Player.x)
 	add a,(iy + SpriteAttributeTable.worldOffsetX)
@@ -263,23 +266,23 @@ Player_DrawSpriteAttributes:
 	ld a,(ix + Player.y)
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
 	add a,-30
-	ld b,Player_PATTERN + 0 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
-	ld b,Player_PATTERN + 1 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
-	ld b,Player_PATTERN + 2 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
-	ld b,Player_PATTERN + 3 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
+	ld l,Player_PATTERN + 0 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
+	ld l,Player_PATTERN + 1 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
+	ld l,Player_PATTERN + 2 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
+	ld l,Player_PATTERN + 3 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
 	add a,16
-	ld b,Player_PATTERN + 4 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
-	ld b,Player_PATTERN + 5 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
-	ld b,Player_PATTERN + 6 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
-	ld b,Player_PATTERN + 7 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, b
+	ld l,Player_PATTERN + 4 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
+	ld l,Player_PATTERN + 5 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
+	ld l,Player_PATTERN + 6 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
+	ld l,Player_PATTERN + 7 << 2
+	SpriteAttributeTable_WriteAttribute_M h, a, l
 	ret
 
 ; c = write port

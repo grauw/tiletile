@@ -79,9 +79,12 @@ TickRain:
 	jp Rain_Tick
 	ENDP
 
+; b = sprites remaining
 ; c = write port
 ; ix = this
 ; iy = sprite attribute table
+; b <- sprites remaining
+; c <- write port
 Weather_DrawSpriteAttributes: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
