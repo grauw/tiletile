@@ -35,21 +35,6 @@ SpritePatternTable_Select: MACRO ?this, ?displaySettings
 	ENDM
 
 ; a = sprite pattern number
-; ix = this
-; c <- write port
-SpritePatternTable_SetPatternWrite:
-	add a,a
-	call c,System_ThrowException
-	add a,a
-	call c,System_ThrowException
-	ld l,a
-	ld h,0
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	jp VRAMTable_SetWrite
-
-; a = sprite pattern number
 ; iy = this
 ; c <- write port
 SpritePatternTable_SetPatternWriteIY:

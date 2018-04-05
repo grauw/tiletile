@@ -36,16 +36,6 @@ PatternNameTable_Select: MACRO ?this, ?displaySettings
 	ENDM
 
 ; hl = offset
-; ix = this
-; c <- write port
-PatternNameTable_SetPatternNameWrite:
-	add a,a
-	add a,a
-	ld l,a
-	ld h,0
-	jp VRAMTable_SetWrite
-
-; hl = offset
 ; iy = this
 ; c <- write port
 PatternNameTable_SetPatternNameWriteIY:

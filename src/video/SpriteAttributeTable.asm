@@ -62,16 +62,6 @@ SpriteAttributeTable_Select: MACRO ?this, ?displaySettings
 	ENDM
 
 ; a = sprite number
-; ix = this
-; c <- write port
-SpriteAttributeTable_SetAttributeWrite:
-	add a,a
-	add a,a
-	ld l,a
-	ld h,0
-	jp VRAMTable_SetWrite
-
-; a = sprite number
 ; iy = this
 ; c <- write port
 SpriteAttributeTable_SetAttributeWriteIY:

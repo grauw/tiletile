@@ -41,19 +41,6 @@ SpriteColorTable_Select: MACRO ?this, ?displaySettings
 	ENDM
 
 ; a = sprite number
-; ix = this
-; c <- write port
-SpriteColorTable_SetColorWrite:
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld l,a
-	ld h,0
-	rl h
-	jp VRAMTable_SetWrite
-
-; a = sprite number
 ; iy = this
 ; c <- write port
 SpriteColorTable_SetColorWriteIY:
