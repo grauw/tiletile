@@ -81,29 +81,22 @@ Input_UpdateJoystickIY:
 ; iy = this
 ; bc <- x (-1 left, 1 right)
 ; de <- y (-1 up, 1 down)
-Input_GetDirectionIY: PROC
+Input_GetDirectionIY:
 	ld a,(iy + Input.newStick)
-	ld b,0
-	ld c,b
-	ld d,b
-	ld e,b
-	rrca
-	jr c,NoUp
-	dec de
-NoUp:
-	rrca
-	jr c,NoDown
-	inc de
-NoDown:
-	rrca
-	jr c,NoLeft
-	dec bc
-NoLeft:
-	rrca
-	ret c
-	inc bc
+	and 0FH
+	add a,a
+	add a,a
+	add a,Input_directionLUT & 0FFH
+	ld l,a
+	ld h,Input_directionLUT >> 8
+	ld c,(hl)
+	inc l
+	ld b,(hl)
+	inc l
+	ld e,(hl)
+	inc l
+	ld d,(hl)
 	ret
-	ENDP
 
 ; iy = this
 ; a <- keyboard mapped as joystick
@@ -136,3 +129,23 @@ Input_GetKeyboardAsJoystickIY:
 	rr b
 	ld a,b
 	ret
+
+;
+	ALIGN_FIT8 16 * 4
+Input_directionLUT:
+	dw  0,  0  ; RLUD
+	dw  0,  1  ; RLD.
+	dw  0, -1  ; RL.U
+	dw  0,  0  ; RL..
+	dw  1,  0  ; R.UD
+	dw  1,  1  ; R.D.
+	dw  1, -1  ; R..U
+	dw  1,  0  ; R...
+	dw -1,  0  ; .LUD
+	dw -1,  1  ; .LD.
+	dw -1, -1  ; .L.U
+	dw -1,  0  ; .L..
+	dw  0,  0  ; ..UD
+	dw  0,  1  ; ..D.
+	dw  0, -1  ; ...U
+	dw  0,  0  ; ....
