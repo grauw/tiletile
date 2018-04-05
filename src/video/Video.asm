@@ -28,7 +28,7 @@ Video: MACRO
 	initialPalette:
 		Palette
 	lineInterrupt:
-		LineInterrupt 212, InterruptEntry
+		LineInterrupt 228, InterruptEntry
 	InterruptEntry:
 		ld a,(submitted)
 		and a
