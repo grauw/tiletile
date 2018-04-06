@@ -69,7 +69,6 @@ Weather_TickPrimary: PROC
 	jr z,TickRain
 	cp Weather_LIGHTNING
 	jr z,TickLightning
-TickSunny:
 	ret
 TickLightning:
 	call Weather_GetLightning
@@ -84,7 +83,6 @@ Weather_TickSecondary: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,TickRain
-TickSunny:
 	ret
 TickRain:
 	call Weather_GetRain
@@ -101,7 +99,6 @@ Weather_DrawSpriteAttributes: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,DrawRain
-DrawSunny:
 	ret
 DrawRain:
 	call Weather_GetRain
@@ -118,7 +115,6 @@ Weather_DrawSpriteColors: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,DrawRain
-DrawSunny:
 	ret
 DrawRain:
 	call Weather_GetRain
@@ -149,7 +145,6 @@ Weather_UpdatePalette: PROC
 	jr z,UpdateManaShroud
 	cp Weather_LIGHTNING
 	jr z,UpdateLightning
-UpdateSunny:
 	ret
 UpdateRain:
 	push de
