@@ -35,7 +35,6 @@ Player_Construct:
 	add iy,de
 	ld a,0
 	call SpritePatternTable_SetPatternWriteIY
-	ld b,255  ; override max patterns
 	push ix
 	ld ix,FieldSet_may0_standDown
 	call Tile_LoadToSpritePatternTable
@@ -318,11 +317,11 @@ Player_DrawSpriteColors:
 	ld hl,SpriteColor_solid8CC
 	jp SpriteColorTable_WriteColorIY
 
-; b = patterns remaining
+; b = patterns remaining (x4)
 ; c = write port
 ; ix = this
 ; iy = sprite pattern table
-; b <- patterns remaining
+; b <- patterns remaining (x4)
 ; c <- write port
 Player_InitializeSpritePatterns:
 	ld a,b
@@ -330,8 +329,6 @@ Player_InitializeSpritePatterns:
 	call nz,System_ThrowException
 	ld a,SpritePatternTable_COUNT
 	sub b
-	add a,a
-	add a,a
 	ld (ix + Player.patternBase),a
 	REPT Player_PATTERNS
 	ld hl,SpritePattern_blank

@@ -77,17 +77,15 @@ Rain_DrawSpriteColors:
 	ENDM
 	ret
 
-; b = patterns remaining
+; b = patterns remaining (x4)
 ; c = write port
 ; ix = this
 ; iy = sprite pattern table
-; b <- patterns remaining
+; b <- patterns remaining (x4)
 ; c <- write port
 Rain_InitializeSpritePatterns:
 	ld a,SpritePatternTable_COUNT
 	sub b
-	add a,a
-	add a,a
 	ld (ix + Rain.patternBase),a
 	ld hl,Rain_pattern
 	call SpritePatternTable_WritePatternIY
