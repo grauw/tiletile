@@ -34,7 +34,7 @@ Video: MACRO
 		and a
 		ret z
 		IF DEBUG
-		PROFILE_BEGIN 6
+		PROFILE_BEGIN 10
 		ENDIF
 		push bc
 		push hl
@@ -45,7 +45,7 @@ Video: MACRO
 		pop hl
 		pop bc
 		IF DEBUG
-		PROFILE_END 6
+		PROFILE_END 10
 		ENDIF
 		ret
 	ENDM
@@ -197,11 +197,11 @@ Video_WaitDisplayedIY:
 	bit 0,(iy + Video.submitted)
 	ret z
 	IF DEBUG
-	PROFILE_BEGIN 10
+	PROFILE_BEGIN 29
 	ENDIF
 	halt
 	IF DEBUG
-	PROFILE_END 10
+	PROFILE_END 29
 	ENDIF
 	jr Video_WaitDisplayedIY
 

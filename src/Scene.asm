@@ -218,7 +218,7 @@ Scene_Update:
 ; iy = engine
 Scene_UpdateInput:
 	IF DEBUG
-	PROFILE_BEGIN 8
+	PROFILE_BEGIN 0
 	ENDIF
 	push iy
 	call Engine_GetInputIY
@@ -240,7 +240,7 @@ Scene_UpdateInput:
 
 	pop iy
 	IF DEBUG
-	PROFILE_END 8
+	PROFILE_END 0
 	ENDIF
 	ret
 
@@ -270,7 +270,7 @@ Scene_UpdateDisplayFrequency:
 ; iy = engine
 Scene_TickPrimary:
 	IF DEBUG
-	PROFILE_BEGIN 0
+	PROFILE_BEGIN 1
 	ENDIF
 
 	push ix
@@ -284,7 +284,7 @@ Scene_TickPrimary:
 	pop ix
 
 	IF DEBUG
-	PROFILE_END 0
+	PROFILE_END 1
 	ENDIF
 	ret
 
@@ -292,7 +292,7 @@ Scene_TickPrimary:
 ; iy = engine
 Scene_TickSecondary:
 	IF DEBUG
-	PROFILE_BEGIN 0
+	PROFILE_BEGIN 1
 	ENDIF
 
 	push ix
@@ -306,7 +306,7 @@ Scene_TickSecondary:
 	pop ix
 
 	IF DEBUG
-	PROFILE_END 0
+	PROFILE_END 1
 	ENDIF
 	ret
 
@@ -314,7 +314,7 @@ Scene_TickSecondary:
 ; iy = engine
 Scene_UpdatePalette: PROC
 	IF DEBUG
-	PROFILE_BEGIN 5
+	PROFILE_BEGIN 6
 	ENDIF
 
 	ld de,Palette_black
@@ -328,7 +328,7 @@ Scene_UpdatePalette: PROC
 	call Engine_SetPaletteIY
 
 	IF DEBUG
-	PROFILE_END 5
+	PROFILE_END 6
 	ENDIF
 	ret
 	ENDP
@@ -363,7 +363,7 @@ Exiting:
 ; iy = engine
 Scene_UpdateDisplayOffset:
 	IF DEBUG
-	PROFILE_BEGIN 1
+	PROFILE_BEGIN 2
 	ENDIF
 	push iy
 	call Engine_GetDisplayOffsetIY
@@ -382,7 +382,7 @@ Scene_UpdateDisplayOffset:
 
 	pop iy
 	IF DEBUG
-	PROFILE_END 1
+	PROFILE_END 2
 	ENDIF
 	ret
 
@@ -390,7 +390,7 @@ Scene_UpdateDisplayOffset:
 ; iy = engine
 Scene_DrawSpriteAttributes:
 	IF DEBUG
-	PROFILE_BEGIN 2
+	PROFILE_BEGIN 5
 	ENDIF
 	push iy
 	call Engine_GetSpriteAttributeTableIY
@@ -409,7 +409,7 @@ Scene_DrawSpriteAttributes:
 
 	pop iy
 	IF DEBUG
-	PROFILE_END 2
+	PROFILE_END 5
 	ENDIF
 	ret
 
@@ -417,7 +417,7 @@ Scene_DrawSpriteAttributes:
 ; iy = engine
 Scene_DrawSpriteColors:
 	IF DEBUG
-	PROFILE_BEGIN 3
+	PROFILE_BEGIN 4
 	ENDIF
 	push iy
 	call Engine_GetSpriteColorTableIY
@@ -436,7 +436,7 @@ Scene_DrawSpriteColors:
 
 	pop iy
 	IF DEBUG
-	PROFILE_END 3
+	PROFILE_END 4
 	ENDIF
 	ret
 
@@ -444,7 +444,7 @@ Scene_DrawSpriteColors:
 ; iy = engine
 Scene_DrawSpritePatterns:
 	IF DEBUG
-	PROFILE_BEGIN 7
+	PROFILE_BEGIN 3
 	ENDIF
 	push iy
 	call Engine_GetSpritePatternTableIY
@@ -456,7 +456,7 @@ Scene_DrawSpritePatterns:
 
 	pop iy
 	IF DEBUG
-	PROFILE_END 7
+	PROFILE_END 3
 	ENDIF
 	ret
 
@@ -464,7 +464,7 @@ Scene_DrawSpritePatterns:
 ; iy = engine
 Scene_DrawBitmap:
 	IF DEBUG
-	PROFILE_BEGIN 4
+	PROFILE_BEGIN 7
 	ENDIF
 
 	push iy
@@ -475,7 +475,7 @@ Scene_DrawBitmap:
 	pop iy
 
 	IF DEBUG
-	PROFILE_END 4
+	PROFILE_END 7
 	ENDIF
 	ret
 
@@ -483,7 +483,7 @@ Scene_DrawBitmap:
 ; iy = engine
 Scene_UpdateTriggers:
 	IF DEBUG
-	PROFILE_BEGIN 9
+	PROFILE_BEGIN 8
 	ENDIF
 
 	push ix
@@ -505,6 +505,6 @@ Scene_UpdateTriggers:
 	pop ix
 
 	IF DEBUG
-	PROFILE_END 9
+	PROFILE_END 8
 	ENDIF
 	ret
