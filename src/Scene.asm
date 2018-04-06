@@ -476,7 +476,7 @@ Scene_DrawBitmap:
 
 ; ix = this
 ; iy = engine
-Scene_UpdateTriggers: PROC
+Scene_UpdateTriggers:
 	IF DEBUG
 	PROFILE_BEGIN 9
 	ENDIF
@@ -493,34 +493,13 @@ Scene_UpdateTriggers: PROC
 	call TileMap_GetTile
 	call Tile_GetCollision
 	pop ix
+
 	push ix
-	call Process
+	call Scene_GetWeather
+	call Weather_UpdateTriggers
 	pop ix
 
 	IF DEBUG
 	PROFILE_END 9
 	ENDIF
 	ret
-Process:
-	cp 1
-	jr z,ProcessSunny
-	cp 2
-	jr z,ProcessRain
-	cp 3
-	jr z,ProcessManaShroud
-	cp 4
-	jr z,ProcessLightning
-	ret
-ProcessSunny:
-	call Scene_GetWeather
-	jp Weather_Sunny
-ProcessRain:
-	call Scene_GetWeather
-	jp Weather_Rain
-ProcessManaShroud:
-	call Scene_GetWeather
-	jp Weather_ManaShroud
-ProcessLightning:
-	call Scene_GetWeather
-	jp Weather_Lightning
-	ENDP

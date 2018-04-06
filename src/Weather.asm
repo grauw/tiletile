@@ -43,26 +43,6 @@ Weather_GetLightning:
 	ret
 
 ; ix = this
-Weather_Sunny:
-	ld (ix + Weather.type),Weather_SUNNY
-	ret
-
-; ix = this
-Weather_Rain:
-	ld (ix + Weather.type),Weather_RAIN
-	ret
-
-; ix = this
-Weather_ManaShroud:
-	ld (ix + Weather.type),Weather_MANASHROUD
-	ret
-
-; ix = this
-Weather_Lightning:
-	ld (ix + Weather.type),Weather_LIGHTNING
-	ret
-
-; ix = this
 ; iy = input
 Weather_UpdateInput: PROC
 	ld a,(ix + Weather.type)
@@ -102,6 +82,31 @@ TickRain:
 	call Weather_GetRain
 	jp Rain_Tick
 	ENDP
+
+; a = collision ID
+; ix = this
+Weather_UpdateTriggers:
+	cp 1
+	jr z,TriggerSunny
+	cp 2
+	jr z,TriggerRain
+	cp 3
+	jr z,TriggerManaShroud
+	cp 4
+	jr z,TriggerLightning
+	ret
+TriggerSunny:
+	ld (ix + Weather.type),Weather_SUNNY
+	ret
+TriggerRain:
+	ld (ix + Weather.type),Weather_RAIN
+	ret
+TriggerManaShroud:
+	ld (ix + Weather.type),Weather_MANASHROUD
+	ret
+TriggerLightning:
+	ld (ix + Weather.type),Weather_LIGHTNING
+	ret
 
 ; b = sprites remaining
 ; c = write port
