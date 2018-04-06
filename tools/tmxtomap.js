@@ -14,6 +14,7 @@ function main() {
 	let name = process.argv[3];
 
 	new Tmx(name, path).parse((tileMap) => {
+		tileMap.optimize();
 		console.log(tileMap.toAsm());
 	});
 }
@@ -31,6 +32,10 @@ class TileMap {
 	addTileByIndex(index) {
 		checkTypes(arguments, "number");
 		this.tiles.push(this.tileSet.getTileByIndex(index));
+	}
+
+	optimize() {
+		this.tileSet.optimize(this.tiles);
 	}
 
 	toAsm() {
@@ -75,6 +80,23 @@ class TileSet {
 		if (index < 0 || index >= this.tiles.length)
 			throw new Error(`Tile not found: ${index}`);
 		return this.tiles[index];
+	}
+
+	optimize(tiles) {
+		checkTypes(arguments, Array);
+		let counts = new Array(this.tiles.length).fill(0);
+		for (let tile of tiles) {
+			counts[tile.index]++;
+		}
+		let newIndex = 0;
+		let newTiles = [];
+		for (let i = 0; i < counts.length; i++) {
+			if (counts[i] > 0 || this.tiles[i].name) {
+				this.tiles[i].index = newTiles.length;
+				newTiles.push(this.tiles[i]);
+			}
+		}
+		this.tiles = newTiles;
 	}
 
 	toAsm() {
