@@ -47,9 +47,9 @@ Weather_GetLightning:
 Weather_UpdateInput: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
-	jr z,TickRain
+	jr z,UpdateRain
 	ret
-TickRain:
+UpdateRain:
 	call Weather_GetRain
 	jp Rain_UpdateInput
 	ENDP
@@ -62,10 +62,15 @@ Weather_TickPrimary: PROC
 	jr z,TickRain
 	cp Weather_LIGHTNING
 	jr z,TickLightning
+	cp Weather_MANASHROUD
+	jr z,TickManaShroud
 	ret
 TickLightning:
 	call Weather_GetLightning
 	jp Lightning_TickPrimary
+TickManaShroud:
+	call Weather_GetManaShroud
+	jp ManaShroud_Tick
 TickRain:
 	call Weather_GetRain
 	jp Rain_Tick
@@ -77,7 +82,12 @@ Weather_TickSecondary: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,TickRain
+	cp Weather_MANASHROUD
+	jr z,TickManaShroud
 	ret
+TickManaShroud:
+	call Weather_GetManaShroud
+	jp ManaShroud_Tick
 TickRain:
 	call Weather_GetRain
 	jp Rain_Tick
@@ -118,7 +128,12 @@ Weather_DrawSpriteAttributes: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,DrawRain
+	cp Weather_MANASHROUD
+	jr z,DrawManaShroud
 	ret
+DrawManaShroud:
+	call Weather_GetManaShroud
+	jp ManaShroud_DrawSpriteAttributes
 DrawRain:
 	call Weather_GetRain
 	jp Rain_DrawSpriteAttributes
@@ -134,7 +149,12 @@ Weather_DrawSpriteColors: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,DrawRain
+	cp Weather_MANASHROUD
+	jr z,DrawManaShroud
 	ret
+DrawManaShroud:
+	call Weather_GetManaShroud
+	jp ManaShroud_DrawSpriteColors
 DrawRain:
 	call Weather_GetRain
 	jp Rain_DrawSpriteColors
@@ -150,6 +170,10 @@ Weather_InitializeSpritePatterns:
 	push ix
 	call Weather_GetRain
 	call Rain_InitializeSpritePatterns
+	pop ix
+	push ix
+	call Weather_GetManaShroud
+	call ManaShroud_InitializeSpritePatterns
 	pop ix
 	ret
 
