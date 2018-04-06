@@ -74,13 +74,15 @@ NoClip:
 TileMap_GetTileDataPointer: PROC
 	bit 7,d
 	jr nz,Negative
-	call Multiply
+	ld h,(ix + TileMap.width)
+	call Math_Multiply8x8
 	jr Continue
 Negative:
 	ld a,e
 	neg
 	ld e,a
-	call Multiply
+	ld h,(ix + TileMap.width)
+	call Math_Multiply8x8
 	ex de,hl
 	ld hl,0
 	and a
@@ -91,16 +93,5 @@ Continue:
 	ld e,(ix + TileMap.data)
 	ld d,(ix + TileMap.data + 1)
 	add hl,de
-	ret
-Multiply:
-	ld h,(ix + TileMap.width)
-	ld d,0
-	ld l,d
-	REPT 8
-	add hl,hl
-	jr nc,NoAdd
-	add hl,de
-NoAdd:
-	ENDM
 	ret
 	ENDP
