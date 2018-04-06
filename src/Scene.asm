@@ -225,6 +225,11 @@ Scene_UpdateInput:
 
 	call Input_UpdateIY
 
+	push ix
+	call Scene_GetWeather
+	call Weather_UpdateInput
+	pop ix
+
 	call Scene_UpdateExit
 	call Scene_UpdateDisplayFrequency
 
@@ -262,13 +267,10 @@ Scene_TickPrimary:
 	IF DEBUG
 	PROFILE_BEGIN 0
 	ENDIF
-	push iy
-	call Engine_GetInputIY
 
 	push ix
 	call Scene_GetPlayer
-	call Input_GetDirectionIY
-	call Player_Move
+	call Player_Tick
 	pop ix
 
 	push ix
@@ -276,7 +278,6 @@ Scene_TickPrimary:
 	call Weather_TickPrimary
 	pop ix
 
-	pop iy
 	IF DEBUG
 	PROFILE_END 0
 	ENDIF
@@ -288,13 +289,10 @@ Scene_TickSecondary:
 	IF DEBUG
 	PROFILE_BEGIN 0
 	ENDIF
-	push iy
-	call Engine_GetInputIY
 
 	push ix
 	call Scene_GetPlayer
-	call Input_GetDirectionIY
-	call Player_Move
+	call Player_Tick
 	pop ix
 
 	push ix
@@ -302,7 +300,6 @@ Scene_TickSecondary:
 	call Weather_TickSecondary
 	pop ix
 
-	pop iy
 	IF DEBUG
 	PROFILE_END 0
 	ENDIF

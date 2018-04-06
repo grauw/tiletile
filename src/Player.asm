@@ -141,7 +141,12 @@ Player_GetPosition:
 ; bc = dx (-1 left, 1 right)
 ; de = dy (-1 up, 1 down)
 ; ix = this
-Player_Move: PROC
+; iy = engine
+Player_Tick: PROC
+	push iy
+	call Engine_GetInputIY
+	call Input_GetDirectionIY
+	pop iy
 	sla c  ; speed x2
 	rl b
 	sla e

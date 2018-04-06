@@ -22,13 +22,7 @@ Rain_Construct:
 
 ; ix = this
 ; iy = input (debug control with 1/2 keys)
-Rain_Tick: PROC
-	ld a,(ix + Rain.x)
-	add a,128 - 2
-	ld (ix + Rain.x),a
-	ld a,(ix + Rain.y)
-	add a,8
-	ld (ix + Rain.y),a
+Rain_UpdateInput: PROC
 	bit 1,(iy + Input.newKey)
 	jr nz,NoOne
 	dec (ix + Rain.dropOffset + 1)
@@ -38,6 +32,17 @@ NoOne:
 	inc (ix + Rain.dropOffset + 1)
 	ret
 	ENDP
+
+; ix = this
+; iy = engine
+Rain_Tick:
+	ld a,(ix + Rain.x)
+	add a,128 - 2
+	ld (ix + Rain.x),a
+	ld a,(ix + Rain.y)
+	add a,8
+	ld (ix + Rain.y),a
+	ret
 
 ; b = sprites remaining
 ; c = write port

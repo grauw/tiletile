@@ -63,6 +63,19 @@ Weather_Lightning:
 	ret
 
 ; ix = this
+; iy = input
+Weather_UpdateInput: PROC
+	ld a,(ix + Weather.type)
+	cp Weather_RAIN
+	jr z,TickRain
+	ret
+TickRain:
+	call Weather_GetRain
+	jp Rain_UpdateInput
+	ENDP
+
+; ix = this
+; iy = engine
 Weather_TickPrimary: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
@@ -79,6 +92,7 @@ TickRain:
 	ENDP
 
 ; ix = this
+; iy = engine
 Weather_TickSecondary: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
