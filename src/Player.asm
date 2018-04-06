@@ -167,7 +167,7 @@ Player_UpdateInput:
 
 ; ix = this
 ; iy = engine
-Player_Tick: PROC
+Player_TickPrimary: PROC
 	ld c,(ix + Player.velocityX)
 	ld b,(ix + Player.velocityX + 1)
 	ld e,(ix + Player.velocityY)
@@ -202,23 +202,43 @@ Continue:
 	ld l,(ix + Player.x)
 	ld h,(ix + Player.x + 1)
 	add hl,bc
+	add hl,bc
 	ld c,l
 	ld b,h
 	ld l,(ix + Player.y)
 	ld h,(ix + Player.y + 1)
 	add hl,de
+	add hl,de
 	ex de,hl
 	call Player_CanMove16x16
-	jr nc,Blocked
-	ld (ix + Player.x),c
-	ld (ix + Player.x + 1),b
-	ld (ix + Player.y),e
-	ld (ix + Player.y + 1),d
-	ret
+	jr c,Player_TickSecondary
 Blocked:
+	ld (ix + Player.velocityX),0
+	ld (ix + Player.velocityX + 1),0
+	ld (ix + Player.velocityY),0
+	ld (ix + Player.velocityY + 1),0
 	ld (ix + Player.moving),0
 	ret
 	ENDP
+
+; ix = this
+; iy = engine
+Player_TickSecondary:
+	ld l,(ix + Player.x)
+	ld h,(ix + Player.x + 1)
+	ld c,(ix + Player.velocityX)
+	ld b,(ix + Player.velocityX + 1)
+	add hl,bc
+	ld (ix + Player.x),l
+	ld (ix + Player.x + 1),h
+	ld l,(ix + Player.y)
+	ld h,(ix + Player.y + 1)
+	ld c,(ix + Player.velocityY)
+	ld b,(ix + Player.velocityY + 1)
+	add hl,bc
+	ld (ix + Player.y),l
+	ld (ix + Player.y + 1),h
+	ret
 
 ; bc = x
 ; de = y

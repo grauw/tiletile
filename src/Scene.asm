@@ -275,7 +275,7 @@ Scene_TickPrimary:
 
 	push ix
 	call Scene_GetPlayer
-	call Player_Tick
+	call Player_TickPrimary
 	pop ix
 
 	push ix
@@ -297,7 +297,7 @@ Scene_TickSecondary:
 
 	push ix
 	call Scene_GetPlayer
-	call Player_Tick
+	call Player_TickSecondary
 	pop ix
 
 	push ix
