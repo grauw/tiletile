@@ -184,13 +184,14 @@ MapView_MoveHorizontal: PROC
 	res 1,c
 	and a
 	sbc hl,bc
-	ret z
+	jr z,Idle
 	jr nc,Right
 Left:
 	dec bc
 	dec bc
 	dec bc
 	dec bc
+Idle:
 	ld (ix + MapView.x),c
 	ld (ix + MapView.x + 1),b
 	ld e,(ix + MapView.y)
@@ -224,13 +225,14 @@ MapView_MoveVertical: PROC
 	res 1,e
 	and a
 	sbc hl,de
-	ret z
-	jp nc,Down
+	jr z,Idle
+	jr nc,Down
 Up:
 	dec de
 	dec de
 	dec de
 	dec de
+Idle:
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
 	ld c,(ix + MapView.x)
