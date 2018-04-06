@@ -226,6 +226,11 @@ Scene_UpdateInput:
 	call Input_UpdateIY
 
 	push ix
+	call Scene_GetPlayer
+	call Player_UpdateInput
+	pop ix
+
+	push ix
 	call Scene_GetWeather
 	call Weather_UpdateInput
 	pop ix

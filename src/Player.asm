@@ -8,6 +8,10 @@ Player: MACRO
 		dw 124
 	y:
 		dw 106
+	velocityX:
+		dw 0
+	velocityY:
+		dw 0
 	direction:
 		db 0  ; 0 = down, 5 = left, 10 = up, 15 = right
 	moving:
@@ -138,19 +142,36 @@ Player_GetPosition:
 	ld d,(ix + Player.y + 1)
 	ret
 
-; bc = dx (-1 left, 1 right)
-; de = dy (-1 up, 1 down)
+; ix = this
+; iy = input
+Player_UpdateInput:
+	ld a,(iy + Input.newStick)
+	and 0FH
+	add a,a
+	add a,a
+	add a,Player_velocityLUT & 0FFH
+	ld l,a
+	ld h,Player_velocityLUT >> 8
+	ld c,(hl)
+	inc l
+	ld b,(hl)
+	inc l
+	ld e,(hl)
+	inc l
+	ld d,(hl)
+	ld (ix + Player.velocityX),c
+	ld (ix + Player.velocityX + 1),b
+	ld (ix + Player.velocityY),e
+	ld (ix + Player.velocityY + 1),d
+	ret
+
 ; ix = this
 ; iy = engine
 Player_Tick: PROC
-	push iy
-	call Engine_GetInputIY
-	call Input_GetDirectionIY
-	pop iy
-	sla c  ; speed x2
-	rl b
-	sla e
-	rl d
+	ld c,(ix + Player.velocityX)
+	ld b,(ix + Player.velocityX + 1)
+	ld e,(ix + Player.velocityY)
+	ld d,(ix + Player.velocityY + 1)
 	ld a,c
 	and a
 	jp m,Left
@@ -389,3 +410,23 @@ Continue:
 	ld h,a
 	ret
 	ENDP
+
+;
+	ALIGN_FIT8 16 * 4
+Player_velocityLUT:
+	dw  0,  0  ; RLUD
+	dw  0,  2  ; RLD.
+	dw  0, -2  ; RL.U
+	dw  0,  0  ; RL..
+	dw  2,  0  ; R.UD
+	dw  2,  2  ; R.D.
+	dw  2, -2  ; R..U
+	dw  2,  0  ; R...
+	dw -2,  0  ; .LUD
+	dw -2,  2  ; .LD.
+	dw -2, -2  ; .L.U
+	dw -2,  0  ; .L..
+	dw  0,  0  ; ..UD
+	dw  0,  2  ; ..D.
+	dw  0, -2  ; ...U
+	dw  0,  0  ; ....
