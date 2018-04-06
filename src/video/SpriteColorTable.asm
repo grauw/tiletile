@@ -1,7 +1,8 @@
 ;
 ; Sprite color table in VRAM
 ;
-SpriteColorTable_SIZE: equ 32 * SpriteColor._size
+SpriteColorTable_COUNT: equ 32
+SpriteColorTable_SIZE: equ SpriteColorTable_COUNT * SpriteColor._size
 
 SpriteColorTable: MACRO ?address
 	super: VRAMTable ?address
@@ -42,8 +43,10 @@ SpriteColorTable_Select: MACRO ?this, ?displaySettings
 
 ; a = sprite number
 ; iy = this
+; b <- sprites remaining
 ; c <- write port
 SpriteColorTable_SetColorWriteIY:
+	ld b,a
 	add a,a
 	add a,a
 	add a,a
@@ -51,13 +54,40 @@ SpriteColorTable_SetColorWriteIY:
 	ld l,a
 	ld h,0
 	rl h
-	jp VRAMTable_SetWriteIY
+	call VRAMTable_SetWriteIY
+	ld a,SpriteColorTable_COUNT
+	sub b
+	ld b,a
+	ret
 
+; b = sprites remaining
 ; c = write port
 ; hl = sprite color
 ; iy = this
+; b <- sprites remaining
+; c <- write port
+; f <- z: no sprites remaining
 SpriteColorTable_WriteColorIY:
+	ld a,b
 	REPT 16
 	outi
 	ENDM
+	sub 1
+	ld b,a
+	ret nc
+	call System_ThrowException
+
+; b = sprites remaining
+; c = write port
+; iy = this
+SpriteColorTable_FinishWriteIY: PROC
+	ld a,b
+	and a
+	ret z
+	call m,System_ThrowException
+Loop:
+	ld hl,SpriteColor_solid0
+	call SpriteColorTable_WriteColorIY
+	jr nz,Loop
 	ret
+	ENDP

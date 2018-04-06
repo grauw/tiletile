@@ -96,9 +96,12 @@ DrawRain:
 	jp Rain_DrawSpriteAttributes
 	ENDP
 
+; b = sprites remaining
 ; c = write port
 ; ix = this
 ; iy = sprite color table
+; b <- sprites remaining
+; c <- write port
 Weather_DrawSpriteColors: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN

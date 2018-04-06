@@ -288,10 +288,16 @@ Player_DrawSpriteAttributes:
 	SpriteAttributeTable_WriteAttribute_M h, a, l
 	ret
 
+; b = sprites remaining
 ; c = write port
 ; ix = this
 ; iy = sprite color table
+; b <- sprites remaining
+; c <- write port
 Player_DrawSpriteColors:
+	ld a,b
+	cp 8
+	ret c
 	ld hl,SpriteColor_solid1
 	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid2CC

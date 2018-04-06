@@ -61,13 +61,18 @@ Rain_DrawSpriteAttributes:
 	ENDM
 	ret
 
+; b = sprites remaining
 ; c = write port
 ; ix = this
 ; iy = sprite color table
+; b <- sprites remaining
+; c <- write port
 Rain_DrawSpriteColors:
-	REPT Rain_SPRITES
 	ld hl,SpriteColor_solid1
 	call SpriteColorTable_WriteColorIY
+	REPT Rain_SPRITES - 1
+	ld hl,SpriteColor_solid1
+	call nz,SpriteColorTable_WriteColorIY
 	ENDM
 	ret
 

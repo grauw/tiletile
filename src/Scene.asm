@@ -396,9 +396,8 @@ Scene_UpdateSpriteColors:
 	push ix
 	call Scene_GetPlayer
 	call Player_DrawSpriteColors
-	call Player_DrawSpriteColors
-	call Player_DrawSpriteColors
 	pop ix
+	call SpriteColorTable_FinishWriteIY
 
 	pop iy
 	IF DEBUG
