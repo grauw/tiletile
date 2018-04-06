@@ -1,12 +1,11 @@
 ;
 ; Lightning effect
 ;
-Lightning_PATTERN: equ 8
-Lightning_SPRITES: equ 8
-
 Lightning: MACRO
 	counter:
 		db 1
+	random:
+		db 175
 	palette:
 		Palette
 	ENDM
@@ -20,7 +19,9 @@ Lightning_Construct:
 Lightning_TickPrimary:
 	dec (ix + Lightning.counter)
 	ret nz
-	ld a,r
+	ld a,(ix + Lightning.random)
+	Math_XorShift_M 3, 5, 7
+	ld (ix + Lightning.random),a
 	ld (ix + Lightning.counter),a
 	ret
 
