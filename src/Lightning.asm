@@ -17,15 +17,10 @@ Lightning_Construct:
 
 ; ix = this
 ; iy = input
-Lightning_Tick:
+Lightning_TickPrimary:
 	dec (ix + Lightning.counter)
 	ret nz
 	ld a,r
-	srl a
-	ld b,a
-	srl a
-	add a,b
-	add a,66
 	ld (ix + Lightning.counter),a
 	ret
 
@@ -49,25 +44,25 @@ Lightning_UpdatePalette:
 Lightning_GetColor:
 	ld bc,563H
 	ld a,(ix + Lightning.counter)
-	cp 32
-	ret nc
-	ld bc,230H
-	cp 30
-	ret nc
-	ld bc,341H
-	cp 28
-	ret nc
-	ld bc,230H
-	cp 18
-	ret nc
-	ld bc,341H
 	cp 16
 	ret nc
 	ld bc,230H
-	cp 8
+	cp 15
 	ret nc
 	ld bc,341H
+	cp 14
+	ret nc
+	ld bc,230H
+	cp 9
+	ret nc
+	ld bc,341H
+	cp 8
+	ret nc
+	ld bc,230H
 	cp 4
+	ret nc
+	ld bc,341H
+	cp 2
 	ret nc
 	ld bc,452H
 	ret

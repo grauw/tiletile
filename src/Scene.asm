@@ -188,7 +188,7 @@ Scene_Update:
 	ENDIF
 
 	call Scene_UpdateInput
-	call Scene_Tick
+	call Scene_TickPrimary
 	call Scene_UpdateDisplayOffset
 	call Scene_DrawSpritePatterns
 	call Scene_DrawSpriteColors
@@ -196,7 +196,7 @@ Scene_Update:
 	call Scene_UpdatePalette
 	call Engine_SubmitPrimaryIY
 
-	call Scene_Tick
+	call Scene_TickSecondary
 	call Scene_UpdateDisplayOffset
 	call Scene_DrawBitmap
 	push iy
@@ -258,7 +258,7 @@ Scene_UpdateDisplayFrequency:
 
 ; ix = this
 ; iy = engine
-Scene_Tick:
+Scene_TickPrimary:
 	IF DEBUG
 	PROFILE_BEGIN 0
 	ENDIF
@@ -273,7 +273,33 @@ Scene_Tick:
 
 	push ix
 	call Scene_GetWeather
-	call Weather_Tick
+	call Weather_TickPrimary
+	pop ix
+
+	pop iy
+	IF DEBUG
+	PROFILE_END 0
+	ENDIF
+	ret
+
+; ix = this
+; iy = engine
+Scene_TickSecondary:
+	IF DEBUG
+	PROFILE_BEGIN 0
+	ENDIF
+	push iy
+	call Engine_GetInputIY
+
+	push ix
+	call Scene_GetPlayer
+	call Input_GetDirectionIY
+	call Player_Move
+	pop ix
+
+	push ix
+	call Scene_GetWeather
+	call Weather_TickSecondary
 	pop ix
 
 	pop iy

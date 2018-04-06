@@ -63,7 +63,7 @@ Weather_Lightning:
 	ret
 
 ; ix = this
-Weather_Tick: PROC
+Weather_TickPrimary: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,TickRain
@@ -73,7 +73,19 @@ TickSunny:
 	ret
 TickLightning:
 	call Weather_GetLightning
-	jp Lightning_Tick
+	jp Lightning_TickPrimary
+TickRain:
+	call Weather_GetRain
+	jp Rain_Tick
+	ENDP
+
+; ix = this
+Weather_TickSecondary: PROC
+	ld a,(ix + Weather.type)
+	cp Weather_RAIN
+	jr z,TickRain
+TickSunny:
+	ret
 TickRain:
 	call Weather_GetRain
 	jp Rain_Tick
