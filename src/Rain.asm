@@ -1,7 +1,6 @@
 ;
 ; Rain effect
 ;
-Rain_PATTERN: equ 8
 Rain_SPRITES: equ 8
 
 Rain: MACRO
@@ -11,6 +10,8 @@ Rain: MACRO
 		db 0
 	dropOffset:
 		dw 2B20H
+	patternBase:
+		db 0
 	palette:
 		Palette
 	ENDM
@@ -51,7 +52,7 @@ Rain_DrawSpriteAttributes:
 	ld a,(ix + Rain.y)
 	add a,(iy + SpriteAttributeTable.cameraOffsetY)
 	ld l,a
-	ld a,Rain_PATTERN << 2
+	ld a,(ix + Rain.patternBase)
 	ld e,(ix + Rain.dropOffset)
 	ld d,(ix + Rain.dropOffset + 1)
 	SpriteAttributeTable_WriteAttribute_M h, l, a
@@ -76,11 +77,18 @@ Rain_DrawSpriteColors:
 	ENDM
 	ret
 
+; b = patterns remaining
+; c = write port
 ; ix = this
 ; iy = sprite pattern table
+; b <- patterns remaining
+; c <- write port
 Rain_InitializeSpritePatterns:
-	ld a,Rain_PATTERN
-	call SpritePatternTable_SetPatternWriteIY
+	ld a,SpritePatternTable_COUNT
+	sub b
+	add a,a
+	add a,a
+	ld (ix + Rain.patternBase),a
 	ld hl,Rain_pattern
 	call SpritePatternTable_WritePatternIY
 	ret

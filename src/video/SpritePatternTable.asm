@@ -1,7 +1,8 @@
 ;
 ; Sprite pattern table in VRAM
 ;
-SpritePatternTable_SIZE: equ 64 * SpritePattern._size
+SpritePatternTable_COUNT: equ 64
+SpritePatternTable_SIZE: equ SpritePatternTable_COUNT * SpritePattern._size
 
 SpritePatternTable: MACRO ?address
 	super: VRAMTable ?address
@@ -36,8 +37,10 @@ SpritePatternTable_Select: MACRO ?this, ?displaySettings
 
 ; a = sprite pattern number
 ; iy = this
+; b <- patterns remaining
 ; c <- write port
 SpritePatternTable_SetPatternWriteIY:
+	ld b,a
 	add a,a
 	call c,System_ThrowException
 	add a,a
@@ -47,13 +50,40 @@ SpritePatternTable_SetPatternWriteIY:
 	add hl,hl
 	add hl,hl
 	add hl,hl
-	jp VRAMTable_SetWriteIY
+	call VRAMTable_SetWriteIY
+	ld a,SpritePatternTable_COUNT
+	sub b
+	ld b,a
+	ret
 
+; b = patterns remaining
 ; c = write port
 ; hl = sprite pattern
 ; iy = this
+; b <- patterns remaining
+; c <- write port
+; f <- z: no patterns remaining
 SpritePatternTable_WritePatternIY:
+	ld a,b
 	REPT 32
 	outi
 	ENDM
+	sub 1
+	ld b,a
+	ret nc
+	call System_ThrowException
+
+; b = patterns remaining
+; c = write port
+; iy = this
+SpritePatternTable_FinishWriteIY: PROC
+	ld a,b
+	and a
+	ret z
+	call m,System_ThrowException
+Loop:
+	ld hl,SpritePattern_blank
+	call SpritePatternTable_WritePatternIY
+	jr nz,Loop
 	ret
+	ENDP

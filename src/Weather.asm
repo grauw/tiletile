@@ -113,8 +113,12 @@ DrawRain:
 	jp Rain_DrawSpriteColors
 	ENDP
 
+; b = patterns remaining
+; c = write port
 ; ix = this
 ; iy = sprite pattern table
+; b <- patterns remaining
+; c <- write port
 Weather_InitializeSpritePatterns:
 	push ix
 	call Weather_GetRain

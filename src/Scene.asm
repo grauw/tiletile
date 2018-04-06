@@ -152,10 +152,17 @@ Scene_Start:
 ; ix = this
 ; iy = sprite pattern table
 Scene_InitializeSpritePatterns:
+	ld a,0
+	call SpritePatternTable_SetPatternWriteIY
+	push ix
+	call Scene_GetPlayer
+	call Player_InitializeSpritePatterns
+	pop ix
 	push ix
 	call Scene_GetWeather
 	call Weather_InitializeSpritePatterns
 	pop ix
+	call SpritePatternTable_FinishWriteIY
 	ret
 
 ; ix = this

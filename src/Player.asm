@@ -1,7 +1,7 @@
 ;
 ;
 ;
-Player_PATTERN: equ 0
+Player_PATTERNS: equ 8
 
 Player: MACRO
 	x:
@@ -16,6 +16,8 @@ Player: MACRO
 		db 0
 	tileMap:
 		dw 0
+	patternBase:
+		db 0
 	sourcePatterns:
 		SpritePatternTable 18000H
 	patternCopy:
@@ -33,6 +35,7 @@ Player_Construct:
 	add iy,de
 	ld a,0
 	call SpritePatternTable_SetPatternWriteIY
+	ld b,255  ; override max patterns
 	push ix
 	ld ix,FieldSet_may0_standDown
 	call Tile_LoadToSpritePatternTable
@@ -269,22 +272,22 @@ Player_DrawSpriteAttributes:
 	ld a,(ix + Player.y)
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
 	add a,-30
-	ld l,Player_PATTERN + 0 << 2
+	ld l,(ix + Player.patternBase)
+	REPT 4
 	SpriteAttributeTable_WriteAttribute_M h, a, l
-	ld l,Player_PATTERN + 1 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, l
-	ld l,Player_PATTERN + 2 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, l
-	ld l,Player_PATTERN + 3 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, l
+	inc l
+	inc l
+	inc l
+	inc l
+	ENDM
 	add a,16
-	ld l,Player_PATTERN + 4 << 2
+	REPT 3
 	SpriteAttributeTable_WriteAttribute_M h, a, l
-	ld l,Player_PATTERN + 5 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, l
-	ld l,Player_PATTERN + 6 << 2
-	SpriteAttributeTable_WriteAttribute_M h, a, l
-	ld l,Player_PATTERN + 7 << 2
+	inc l
+	inc l
+	inc l
+	inc l
+	ENDM
 	SpriteAttributeTable_WriteAttribute_M h, a, l
 	ret
 
@@ -315,6 +318,27 @@ Player_DrawSpriteColors:
 	ld hl,SpriteColor_solid8CC
 	jp SpriteColorTable_WriteColorIY
 
+; b = patterns remaining
+; c = write port
+; ix = this
+; iy = sprite pattern table
+; b <- patterns remaining
+; c <- write port
+Player_InitializeSpritePatterns:
+	ld a,b
+	and 3
+	call nz,System_ThrowException
+	ld a,SpritePatternTable_COUNT
+	sub b
+	add a,a
+	add a,a
+	ld (ix + Player.patternBase),a
+	REPT Player_PATTERNS
+	ld hl,SpritePattern_blank
+	call SpritePatternTable_WritePatternIY
+	ENDM
+	ret
+
 ; ix = this
 ; iy = sprite pattern table
 Player_DrawSpritePatterns:
@@ -329,8 +353,12 @@ Player_DrawSpritePatterns:
 	call VRAMTableCopy_SetSourceIY
 	ld de,-Player.sourcePatterns
 	add ix,de
+	ld l,(ix + Player.patternBase)
+	ld h,0
+	add hl,hl
+	add hl,hl
+	add hl,hl
 	ex (sp),ix
-	ld hl,Player_PATTERN * SpritePattern._size
 	call VRAMTableCopy_SetDestinationIY
 	ex (sp),ix
 	call VRAMTableCopy_ExecuteIY

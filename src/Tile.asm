@@ -90,9 +90,12 @@ Tile_LoadToSpritePatterns:
 	ld (hl),l
 	ret
 
+; b = patterns remaining
 ; c = write port
 ; ix = tile
 ; iy = sprite pattern table
+; b <- patterns remaining
+; c <- write port
 Tile_LoadToSpritePatternTable:
 	push bc
 	push iy
