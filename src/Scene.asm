@@ -188,23 +188,23 @@ Scene_Update:
 	ENDIF
 
 	call Scene_UpdateInput
-	call Scene_UpdatePlayerPosition
-	call Scene_UpdateMapViewPosition
-	call Scene_UpdateSpritePatterns
-	call Scene_UpdateSpriteColors
-	call Scene_UpdateSpriteAttributes
+	call Scene_Tick
+	call Scene_UpdateDisplayOffset
+	call Scene_DrawSpritePatterns
+	call Scene_DrawSpriteColors
+	call Scene_DrawSpriteAttributes
 	call Scene_UpdatePalette
 	call Engine_SubmitPrimaryIY
 
-	call Scene_UpdatePlayerPosition
-	call Scene_UpdateMapViewPosition
-	call Scene_UpdateMapViewPixels
+	call Scene_Tick
+	call Scene_UpdateDisplayOffset
+	call Scene_DrawBitmap
 	push iy
 	call Engine_GetVideoIY
 	call Video_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
 	pop iy
 	call Engine_CopySpriteColorToSecondary
-	call Scene_UpdateSpriteAttributes
+	call Scene_DrawSpriteAttributes
 	call Scene_UpdateTriggers
 
 	IF DEBUG
@@ -258,7 +258,7 @@ Scene_UpdateDisplayFrequency:
 
 ; ix = this
 ; iy = engine
-Scene_UpdatePlayerPosition:
+Scene_Tick:
 	IF DEBUG
 	PROFILE_BEGIN 0
 	ENDIF
@@ -333,7 +333,7 @@ Exiting:
 
 ; ix = this
 ; iy = engine
-Scene_UpdateMapViewPosition:
+Scene_UpdateDisplayOffset:
 	IF DEBUG
 	PROFILE_BEGIN 1
 	ENDIF
@@ -349,7 +349,7 @@ Scene_UpdateMapViewPosition:
 	call Scene_GetMapView
 	pop de
 	call MapView_SetTargetPosition
-	call MapView_Update
+	call MapView_UpdateDisplayOffset
 	pop ix
 
 	pop iy
@@ -360,7 +360,7 @@ Scene_UpdateMapViewPosition:
 
 ; ix = this
 ; iy = engine
-Scene_UpdateSpriteAttributes:
+Scene_DrawSpriteAttributes:
 	IF DEBUG
 	PROFILE_BEGIN 2
 	ENDIF
@@ -387,7 +387,7 @@ Scene_UpdateSpriteAttributes:
 
 ; ix = this
 ; iy = engine
-Scene_UpdateSpriteColors:
+Scene_DrawSpriteColors:
 	IF DEBUG
 	PROFILE_BEGIN 3
 	ENDIF
@@ -414,7 +414,7 @@ Scene_UpdateSpriteColors:
 
 ; ix = this
 ; iy = engine
-Scene_UpdateSpritePatterns:
+Scene_DrawSpritePatterns:
 	IF DEBUG
 	PROFILE_BEGIN 7
 	ENDIF
@@ -434,7 +434,7 @@ Scene_UpdateSpritePatterns:
 
 ; ix = this
 ; iy = engine
-Scene_UpdateMapViewPixels:
+Scene_DrawBitmap:
 	IF DEBUG
 	PROFILE_BEGIN 4
 	ENDIF
@@ -442,7 +442,7 @@ Scene_UpdateMapViewPixels:
 	push iy
 	push ix
 	call Scene_GetMapView
-	call MapView_Move
+	call MapView_DrawBitmap
 	pop ix
 	pop iy
 

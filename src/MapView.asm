@@ -168,7 +168,7 @@ MapView_GetTileDataPointer:
 	ret
 
 ; ix = this
-MapView_Move:
+MapView_DrawBitmap:
 	call MapView_MoveHorizontal
 	jp MapView_MoveVertical
 
@@ -260,7 +260,7 @@ MapView_Start:
 
 ; ix = this
 ; iy = display offset
-MapView_Update:
+MapView_UpdateDisplayOffset:
 	ld a,(ix + MapView.targetY)
 	call DisplayOffset_SetVerticalOffsetIY
 	ld a,(ix + MapView.targetX)
