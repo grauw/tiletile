@@ -9,6 +9,10 @@ Weather_LIGHTNING: equ 3
 Weather: MACRO
 	type:
 		db 0
+	newType:
+		db 0
+	fadeStep:
+		db 0
 	sunny:
 		Sunny
 	rain:
@@ -17,6 +21,8 @@ Weather: MACRO
 		ManaShroud
 	lightning:
 		Lightning
+	palette:
+		Palette
 	ENDM
 
 ; ix = this
@@ -68,6 +74,7 @@ UpdateRain:
 ; ix = this
 ; iy = engine
 Weather_TickPrimary: PROC
+	call Weather_TickFadePrimary
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,TickRain
@@ -117,16 +124,16 @@ Weather_UpdateTriggers:
 	jr z,TriggerLightning
 	ret
 TriggerSunny:
-	ld (ix + Weather.type),Weather_SUNNY
+	ld (ix + Weather.newType),Weather_SUNNY
 	ret
 TriggerRain:
-	ld (ix + Weather.type),Weather_RAIN
+	ld (ix + Weather.newType),Weather_RAIN
 	ret
 TriggerManaShroud:
-	ld (ix + Weather.type),Weather_MANASHROUD
+	ld (ix + Weather.newType),Weather_MANASHROUD
 	ret
 TriggerLightning:
-	ld (ix + Weather.type),Weather_LIGHTNING
+	ld (ix + Weather.newType),Weather_LIGHTNING
 	ret
 
 ; b = sprites remaining
@@ -192,6 +199,11 @@ Weather_InitializeSpritePatterns:
 ; ix = this
 ; de <- palette
 Weather_UpdatePalette: PROC
+	push ix
+	call UpdateType
+	pop ix
+	jp Weather_UpdatePaletteFade
+UpdateType:
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,UpdateRain
@@ -219,4 +231,48 @@ UpdateLightning:
 	call Weather_GetLightning
 	pop de
 	jp Lightning_UpdatePalette
+	ENDP
+
+; ix = this
+Weather_TickFadePrimary: PROC
+	ld a,(ix + Weather.newType)
+	cp (ix + Weather.type)
+	jr z,FadeIn
+FadeOut:
+	ld a,(ix + Weather.fadeStep)
+	add a,11H
+	cp 0DDH
+	jp nc,FadeOutDone
+	ld (ix + Weather.fadeStep),a
+	ret
+FadeOutDone:
+	ld a,(ix + Weather.newType)
+	ld (ix + Weather.type),a
+FadeIn:
+	ld a,(ix + Weather.fadeStep)
+	sub 11H
+	ret c
+	ld (ix + Weather.fadeStep),a
+	ret
+	ENDP
+
+; de = palette
+; ix = this
+; de <- palette
+Weather_UpdatePaletteFade: PROC
+	ld a,(ix + Weather.fadeStep)
+	cp 77H
+	jr c,NoClamp
+	ld a,77H
+NoClamp:
+	ld c,a
+	ld b,a
+	push de
+	ld de,Weather.palette
+	add ix,de
+	pop de
+	push ix
+	call Palette_AddConstant
+	pop de
+	ret
 	ENDP
