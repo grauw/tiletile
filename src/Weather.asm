@@ -9,6 +9,8 @@ Weather_LIGHTNING: equ 3
 Weather: MACRO
 	type:
 		db 0
+	sunny:
+		Sunny
 	rain:
 		Rain
 	manaShroud:
@@ -19,6 +21,13 @@ Weather: MACRO
 
 ; ix = this
 Weather_Construct:
+	ret
+
+; ix = this
+; ix <- sunny
+Weather_GetSunny:
+	ld de,Weather.sunny
+	add ix,de
 	ret
 
 ; ix = this
@@ -48,7 +57,9 @@ Weather_UpdateInput: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,UpdateRain
-	ret
+UpdateSunny:
+	call Weather_GetSunny
+	jp Sunny_UpdateInput
 UpdateRain:
 	call Weather_GetRain
 	jp Rain_UpdateInput
@@ -188,7 +199,11 @@ Weather_UpdatePalette: PROC
 	jr z,UpdateManaShroud
 	cp Weather_LIGHTNING
 	jr z,UpdateLightning
-	ret
+UpdateSunny:
+	push de
+	call Weather_GetSunny
+	pop de
+	jp Sunny_UpdatePalette
 UpdateRain:
 	push de
 	call Weather_GetRain

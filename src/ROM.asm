@@ -68,6 +68,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Player.asm"
 	INCLUDE "Scene.asm"
 	INCLUDE "Weather.asm"
+	INCLUDE "Sunny.asm"
 	INCLUDE "Rain.asm"
 	INCLUDE "ManaShroud.asm"
 	INCLUDE "Lightning.asm"
