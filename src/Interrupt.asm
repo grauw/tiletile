@@ -94,9 +94,12 @@ Interrupt_Unhook:
 	dec hl
 	dec hl
 	ex de,hl
-	di
 	ld bc,Interrupt_HOOK_SIZE
+	call System_CheckEIState
+	push af
+	di
 	ldir
+	pop af
 	ret po
 	ei
 	ret
