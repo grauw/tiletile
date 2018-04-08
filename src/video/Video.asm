@@ -24,19 +24,17 @@ Video: MACRO
 	lineInterrupt:
 		LineInterrupt 228, InterruptEntry
 	InterruptEntry:
-		ld a,(submitted)
-		and a
-		ret z
 		IF DEBUG
 		PROFILE_BEGIN 10
 		ENDIF
-		call System_ThrowException
+		call Return
 	displayFrame: equ $ - 2
 		xor a
 		ld (submitted),a
 		IF DEBUG
 		PROFILE_END 10
 		ENDIF
+	Return:
 		ret
 	initialDisplayFrame:
 		DisplayFrame
@@ -153,6 +151,7 @@ Loop:
 
 ; iy = this
 Video_StopIY:
+	call Video_ReleaseDisplayFrameIY
 	call VDP_InitText
 	ret
 
@@ -207,6 +206,21 @@ Video_SubmitDisplayFrameIY:
 	di
 	ld (iy + Video.displayFrame),e
 	ld (iy + Video.displayFrame + 1),d
+	ei
+	ld (iy + Video.submitted),1
+	ret
+
+; Waits until previous display frame is displayed
+; iy = this
+Video_ReleaseDisplayFrameIY:
+	call Video_WaitDisplayedIY
+	ld e,iyl
+	ld d,iyh
+	ld hl,Video.Return
+	add hl,de
+	di
+	ld (iy + Video.displayFrame),l
+	ld (iy + Video.displayFrame + 1),h
 	ei
 	ld (iy + Video.submitted),1
 	ret
