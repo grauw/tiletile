@@ -7,7 +7,7 @@ LineInterrupt: MACRO ?handler
 	Entry:
 		push af
 		ld a,1
-		out (VDP_PORT_1),a  ; select s#2
+		out (VDP_PORT_1),a  ; select s#1
 		ld a,15 | VDP_REGISTER
 		out (VDP_PORT_1),a
 		in a,(VDP_PORT_1)
@@ -15,8 +15,9 @@ LineInterrupt: MACRO ?handler
 		jr nc,NotLine
 		call ?handler
 	handler: equ $ - 2
-		xor a
-		out (VDP_PORT_1),a  ; select s#0
+	Return:
+		ld a,2
+		out (VDP_PORT_1),a  ; select s#2
 		ld a,15 | VDP_REGISTER
 		out (VDP_PORT_1),a
 		pop af
@@ -27,7 +28,9 @@ LineInterrupt: MACRO ?handler
 		out (VDP_PORT_1),a  ; select s#0
 		ld a,15 | VDP_REGISTER
 		out (VDP_PORT_1),a
-		pop af
+		call OldHook
+		di  ; small window for reentrant interrupt to occur
+		jr Return
 	OldHook:
 		ds Interrupt_HOOK_SIZE
 	ENDM
@@ -47,6 +50,9 @@ LineInterrupt_InstallIY:
 	ld hl,LineInterrupt.Entry - LineInterrupt.OldHook
 	add hl,de
 	call Interrupt_Hook
+	ld a,2
+	ld b,15
+	call VDP_SetRegister  ; select s#2
 	pop af
 	ld b,19
 	call VDP_SetRegister
@@ -75,6 +81,11 @@ LineInterrupt_UninstallIY:
 	ex de,hl
 	ld hl,LineInterrupt.Entry - LineInterrupt.OldHook
 	add hl,de
+	di
 	call Interrupt_Unhook
+	ld a,0
+	ld b,15
+	call VDP_SetRegister  ; select s#0
+	ei
 	ld (iy + LineInterrupt.installed),0
 	ret

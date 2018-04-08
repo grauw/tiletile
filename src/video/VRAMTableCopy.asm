@@ -56,10 +56,10 @@ VRAMTableCopy_SetSizeIY:
 	ret
 
 ; ix = this
-VRAMTableCopy_Execute: equ VDPCommand_Execute
+VRAMTableCopy_Execute: equ VDPCommand_ExecuteS2
 
 ; iy = this
-VRAMTableCopy_ExecuteIY: equ VDPCommand_Execute_IY
+VRAMTableCopy_ExecuteIY: equ VDPCommand_ExecuteS2IY
 
 ; hl = this
-VRAMTableCopy_ExecuteHL: equ VDPCommand_Execute_HL
+VRAMTableCopy_ExecuteHL: equ VDPCommand_ExecuteS2HL

@@ -33,7 +33,7 @@ Tile_Load:
 	ld h,(ix + Tile.image + 1)
 	ld de,16
 	ld a,4
-	call VDPCommand_PrepareCommand
+	call VDPCommand_PrepareCommandS2
 	ld a,(ix + Tile.x)
 	out (c),a
 	out (c),d

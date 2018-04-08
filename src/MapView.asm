@@ -342,7 +342,7 @@ Loop:
 	ld (iy + VDPCommand.sx),a
 	ld a,(ix + Tile.y)
 	ld (iy + VDPCommand.sy),a
-	call VDPCommand_Execute_IY
+	call VDPCommand_ExecuteS2IY
 	ld a,(iy + VDPCommand.dy)
 	add a,16
 	ld (iy + VDPCommand.dy),a
@@ -405,7 +405,7 @@ Loop:
 	ld (iy + VDPCommand.sx),a
 	ld a,(ix + Tile.y)
 	ld (iy + VDPCommand.sy),a
-	call VDPCommand_Execute_IY
+	call VDPCommand_ExecuteS2IY
 	ld a,(iy + VDPCommand.dx)
 	add a,16
 	ld (iy + VDPCommand.dx),a
