@@ -58,16 +58,16 @@ DisplaySettings_ApplyHL:
 	outi
 	ENDM
 	ld a,(hl)
-	ld (VDP_MIRROR_8 + 23),a
 	REPT 12
 	outi
 	ENDM
 	inc c
-	ld a,(hl)
+	ld b,(hl)
 	inc hl
 	ld h,(hl)
-	ld l,a
+	ld l,b
 	REPT 32
 	outi
 	ENDM
+	ld (VDP_MIRROR_8 + 23),a
 	ret
