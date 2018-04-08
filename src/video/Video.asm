@@ -22,7 +22,7 @@ Video: MACRO
 	submitted:
 		db 0
 	lineInterrupt:
-		LineInterrupt 228, InterruptEntry
+		LineInterrupt InterruptEntry
 	InterruptEntry:
 		IF DEBUG
 		PROFILE_BEGIN 10
@@ -50,6 +50,7 @@ Video_Construct:
 	pop ix
 	ld de,Video.lineInterrupt
 	add iy,de
+	ld a,DisplayFrame_FRAME_LINE
 	call LineInterrupt_InstallIY
 	ld de,-Video.lineInterrupt
 	add iy,de

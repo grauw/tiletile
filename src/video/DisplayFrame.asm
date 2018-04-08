@@ -1,6 +1,8 @@
 ;
 ; VDP registers to set on VBlank
 ;
+DisplayFrame_FRAME_LINE: equ 228
+
 DisplayFrame: MACRO
 	Entry:
 		jp Apply
@@ -13,6 +15,9 @@ DisplayFrame: MACRO
 	verticalOffset:
 		db 0
 		db 23 | VDP_REGISTER
+	interruptLine:
+		db 0
+		db 19 | VDP_REGISTER
 	patternName:
 		db 0
 		db 2 | VDP_REGISTER
@@ -36,11 +41,7 @@ DisplayFrame: MACRO
 		push hl
 		ld hl,horizontalOffsetCharacters
 		ld c,VDP_PORT_1
-		REPT 4
-		outi
-		ENDM
-		ld a,(hl)
-		REPT 12
+		REPT 9 * 2
 		outi
 		ENDM
 		inc c
@@ -51,7 +52,6 @@ DisplayFrame: MACRO
 		REPT 32
 		outi
 		ENDM
-		ld (VDP_MIRROR_8 + 23),a
 		pop hl
 		pop bc
 		ret
@@ -66,6 +66,8 @@ DisplayFrame_InitializeFromSystemVariablesIY:
 	ld (iy + DisplayFrame.horizontalOffsetDots),a
 	ld a,(VDP_MIRROR_8 + 23)
 	ld (iy + DisplayFrame.verticalOffset),a
+	add a,DisplayFrame_FRAME_LINE
+	ld (iy + DisplayFrame.interruptLine),a
 	ld a,(VDP_MIRROR_0 + 2)
 	ld (iy + DisplayFrame.patternName),a
 	ld a,(VDP_MIRROR_0 + 5)
@@ -85,6 +87,8 @@ DisplayFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
 	ld (?this + DisplayFrame.horizontalOffsetDots),a
 	ld a,(?displayOffset + DisplayOffset.verticalOffset)
 	ld (?this + DisplayFrame.verticalOffset),a
+	add a,DisplayFrame_FRAME_LINE
+	ld (?this + DisplayFrame.interruptLine),a
 	ENDM
 
 DisplayFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable

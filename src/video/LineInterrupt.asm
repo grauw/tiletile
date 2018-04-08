@@ -1,7 +1,7 @@
 ;
 ; Line interrupt
 ;
-LineInterrupt: MACRO ?line, ?handler
+LineInterrupt: MACRO ?handler
 	installed:
 		db 0
 	Entry:
@@ -19,12 +19,6 @@ LineInterrupt: MACRO ?line, ?handler
 		jr nc,NotLine
 		call ?handler
 	handler: equ $ - 2
-		ld a,(VDP_MIRROR_8 + 23)
-		add a,?line
-	line: equ $ - 1
-		out (VDP_PORT_1),a
-		ld a,19 | VDP_REGISTER
-		out (VDP_PORT_1),a
 		pop af
 		ei
 		ret
@@ -34,11 +28,13 @@ LineInterrupt: MACRO ?line, ?handler
 		ds Interrupt_HOOK_SIZE
 	ENDM
 
+; a = line
 ; ix = interrupt
 ; iy = this
 LineInterrupt_InstallIY:
 	bit 0,(iy + LineInterrupt.installed)
 	call nz,System_ThrowException
+	push af
 	ld e,iyl
 	ld d,iyh
 	ld hl,LineInterrupt.OldHook
@@ -47,8 +43,7 @@ LineInterrupt_InstallIY:
 	ld hl,LineInterrupt.Entry - LineInterrupt.OldHook
 	add hl,de
 	call Interrupt_Hook
-	ld a,(VDP_MIRROR_8 + 23)
-	add a,(iy + LineInterrupt.line)
+	pop af
 	ld b,19
 	call VDP_SetRegister
 	ld a,(VDP_MIRROR_0 + 0)
