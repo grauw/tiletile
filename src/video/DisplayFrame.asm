@@ -52,6 +52,7 @@ DisplayFrame: MACRO
 		REPT 32
 		outi
 		ENDM
+		in a,(VDP_PORT_1)  ; reset FH again
 		pop hl
 		pop bc
 		ret
