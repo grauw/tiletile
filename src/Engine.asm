@@ -309,7 +309,6 @@ Engine_SubmitPrimaryIY: PROC
 	ld d,iyh
 	ld ix,Engine.displayFrameEven
 	add ix,de
-	inc (iy + Engine.frame)
 	bit 1,(iy + Engine.frame)
 	jr nz,Odd
 Even:
@@ -334,6 +333,7 @@ Continue:
 	call Video_SubmitDisplayFrameIY
 	ld de,-Engine.video
 	add iy,de
+	inc (iy + Engine.frame)
 	pop ix
 	ret
 	ENDP
@@ -347,9 +347,8 @@ Engine_SubmitSecondaryIY: PROC
 	ld d,iyh
 	ld ix,Engine.displayFrameOdd
 	add ix,de
-	inc (iy + Engine.frame)
 	bit 1,(iy + Engine.frame)
-	jr z,Odd
+	jr nz,Odd
 Even:
 	DisplayFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
 	DisplayFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
@@ -373,6 +372,7 @@ Continue:
 	call Video_WaitDisplayedIY
 	ld de,-Engine.video
 	add iy,de
+	inc (iy + Engine.frame)
 	pop ix
 	ret
 	ENDP
