@@ -21,12 +21,6 @@ Video: MACRO
 	this:
 	submitted:
 		db 0
-	displayFrame:
-		dw 0
-	initialDisplayFrame:
-		DisplayFrame
-	initialPalette:
-		Palette
 	lineInterrupt:
 		LineInterrupt 228, InterruptEntry
 	InterruptEntry:
@@ -36,18 +30,18 @@ Video: MACRO
 		IF DEBUG
 		PROFILE_BEGIN 10
 		ENDIF
-		push bc
-		push hl
-		ld hl,(displayFrame)
-		call DisplayFrame_ApplyHL
+		call System_ThrowException
+	displayFrame: equ $ - 2
 		xor a
 		ld (submitted),a
-		pop hl
-		pop bc
 		IF DEBUG
 		PROFILE_END 10
 		ENDIF
 		ret
+	initialDisplayFrame:
+		DisplayFrame
+	initialPalette:
+		Palette
 	ENDM
 
 ; ix = this

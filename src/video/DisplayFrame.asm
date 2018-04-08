@@ -2,6 +2,8 @@
 ; VDP registers to set on VBlank
 ;
 DisplayFrame: MACRO
+	Entry:
+		jp Apply
 	horizontalOffsetCharacters:
 		db 0
 		db 26 | VDP_REGISTER
@@ -28,6 +30,31 @@ DisplayFrame: MACRO
 		db 16 | VDP_REGISTER
 	palette:
 		dw Palette_system
+
+	Apply:
+		push bc
+		push hl
+		ld hl,horizontalOffsetCharacters
+		ld c,VDP_PORT_1
+		REPT 4
+		outi
+		ENDM
+		ld a,(hl)
+		REPT 12
+		outi
+		ENDM
+		inc c
+		ld b,(hl)
+		inc hl
+		ld h,(hl)
+		ld l,b
+		REPT 32
+		outi
+		ENDM
+		ld (VDP_MIRROR_8 + 23),a
+		pop hl
+		pop bc
+		ret
 	_size:
 	ENDM
 
@@ -49,27 +76,6 @@ DisplayFrame_InitializeFromSystemVariablesIY:
 	ld (iy + DisplayFrame.spritePattern),a
 	ld (iy + DisplayFrame.palette),Palette_system
 	ld (iy + DisplayFrame.palette + 1),Palette_system >> 8
-	ret
-
-; hl = this
-DisplayFrame_ApplyHL:
-	ld c,VDP_PORT_1
-	REPT 4
-	outi
-	ENDM
-	ld a,(hl)
-	REPT 12
-	outi
-	ENDM
-	inc c
-	ld b,(hl)
-	inc hl
-	ld h,(hl)
-	ld l,b
-	REPT 32
-	outi
-	ENDM
-	ld (VDP_MIRROR_8 + 23),a
 	ret
 
 DisplayFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
