@@ -12,17 +12,21 @@ LineInterrupt: MACRO ?handler
 		out (VDP_PORT_1),a
 		in a,(VDP_PORT_1)
 		rra
-		ld a,0
-		out (VDP_PORT_1),a  ; select s#0
-		ld a,15 | VDP_REGISTER
-		out (VDP_PORT_1),a
 		jr nc,NotLine
 		call ?handler
 	handler: equ $ - 2
+		xor a
+		out (VDP_PORT_1),a  ; select s#0
+		ld a,15 | VDP_REGISTER
+		out (VDP_PORT_1),a
 		pop af
 		ei
 		ret
 	NotLine:
+		xor a
+		out (VDP_PORT_1),a  ; select s#0
+		ld a,15 | VDP_REGISTER
+		out (VDP_PORT_1),a
 		pop af
 	OldHook:
 		ds Interrupt_HOOK_SIZE
