@@ -55,11 +55,11 @@ SpriteAttributeTable_SetDisplayPositionIY:
 	ld (iy + SpriteAttributeTable.cameraOffsetY),a
 	ret
 
-SpriteAttributeTable_Select: MACRO ?this, ?displaySettings
+SpriteAttributeTable_Select: MACRO ?this, ?displayFrame
 	ld a,(?this + SpriteAttributeTable.baseRegister5)
-	ld (?displaySettings + DisplaySettings.spriteAttributeLSB),a
+	ld (?displayFrame + DisplayFrame.spriteAttributeLSB),a
 	ld a,(?this + SpriteAttributeTable.baseRegister11)
-	ld (?displaySettings + DisplaySettings.spriteAttributeMSB),a
+	ld (?displayFrame + DisplayFrame.spriteAttributeMSB),a
 	ENDM
 
 ; a = sprite number

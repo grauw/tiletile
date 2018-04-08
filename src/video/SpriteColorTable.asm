@@ -34,11 +34,11 @@ SpriteColorTable_Construct:
 	ld (ix + SpriteColorTable.baseRegister11),a
 	ret
 
-SpriteColorTable_Select: MACRO ?this, ?displaySettings
+SpriteColorTable_Select: MACRO ?this, ?displayFrame
 	ld a,(?this + SpriteColorTable.baseRegister5)
-	ld (?displaySettings + SpriteColorTable.spriteAttributeLSB),a
+	ld (?displayFrame + SpriteColorTable.spriteAttributeLSB),a
 	ld a,(?this + SpriteColorTable.baseRegister11)
-	ld (?displaySettings + SpriteColorTable.spriteAttributeMSB),a
+	ld (?displayFrame + SpriteColorTable.spriteAttributeMSB),a
 	ENDM
 
 ; a = sprite number

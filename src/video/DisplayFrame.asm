@@ -1,7 +1,7 @@
 ;
 ; VDP registers to set on VBlank
 ;
-DisplaySettings: MACRO
+DisplayFrame: MACRO
 	horizontalOffsetCharacters:
 		db 0
 		db 26 | VDP_REGISTER
@@ -32,27 +32,27 @@ DisplaySettings: MACRO
 	ENDM
 
 ; iy = this
-DisplaySettings_InitializeFromSystemVariablesIY:
+DisplayFrame_InitializeFromSystemVariablesIY:
 	ld a,(VDP_MIRROR_25 + 26)
-	ld (iy + DisplaySettings.horizontalOffsetCharacters),a
+	ld (iy + DisplayFrame.horizontalOffsetCharacters),a
 	ld a,(VDP_MIRROR_25 + 27)
-	ld (iy + DisplaySettings.horizontalOffsetDots),a
+	ld (iy + DisplayFrame.horizontalOffsetDots),a
 	ld a,(VDP_MIRROR_8 + 23)
-	ld (iy + DisplaySettings.verticalOffset),a
+	ld (iy + DisplayFrame.verticalOffset),a
 	ld a,(VDP_MIRROR_0 + 2)
-	ld (iy + DisplaySettings.patternName),a
+	ld (iy + DisplayFrame.patternName),a
 	ld a,(VDP_MIRROR_0 + 5)
-	ld (iy + DisplaySettings.spriteAttributeLSB),a
+	ld (iy + DisplayFrame.spriteAttributeLSB),a
 	ld a,(VDP_MIRROR_8 + 11)
-	ld (iy + DisplaySettings.spriteAttributeMSB),a
+	ld (iy + DisplayFrame.spriteAttributeMSB),a
 	ld a,(VDP_MIRROR_0 + 6)
-	ld (iy + DisplaySettings.spritePattern),a
-	ld (iy + DisplaySettings.palette),Palette_system
-	ld (iy + DisplaySettings.palette + 1),Palette_system >> 8
+	ld (iy + DisplayFrame.spritePattern),a
+	ld (iy + DisplayFrame.palette),Palette_system
+	ld (iy + DisplayFrame.palette + 1),Palette_system >> 8
 	ret
 
 ; hl = this
-DisplaySettings_ApplyHL:
+DisplayFrame_ApplyHL:
 	ld c,VDP_PORT_1
 	REPT 4
 	outi

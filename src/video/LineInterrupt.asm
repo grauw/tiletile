@@ -18,6 +18,7 @@ LineInterrupt: MACRO ?line, ?handler
 		out (VDP_PORT_1),a
 		jr nc,NotLine
 		call ?handler
+	handler: equ $ - 2
 		ld a,(VDP_MIRROR_8 + 23)
 		add a,?line
 	line: equ $ - 1

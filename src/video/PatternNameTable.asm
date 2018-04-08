@@ -30,9 +30,9 @@ PatternNameTable_Construct:
 	ld (ix + PatternNameTable.baseRegister2),a
 	ret
 
-PatternNameTable_Select: MACRO ?this, ?displaySettings
+PatternNameTable_Select: MACRO ?this, ?displayFrame
 	ld a,(?this + PatternNameTable.baseRegister2)
-	ld (?displaySettings + DisplaySettings.patternName),a
+	ld (?displayFrame + DisplayFrame.patternName),a
 	ENDM
 
 ; hl = offset

@@ -30,10 +30,10 @@ Engine: MACRO
 		dw Palette_system
 	paletteOdd:
 		dw Palette_system
-	displaySettingsEven:
-		DisplaySettings
-	displaySettingsOdd:
-		DisplaySettings
+	displayFrameEven:
+		DisplayFrame
+	displayFrameOdd:
+		DisplayFrame
 	video:
 		Video
 	interrupt:
@@ -308,29 +308,29 @@ Engine_SubmitPrimaryIY: PROC
 	bit 1,(iy + Engine.frame)
 	jr nz,Odd
 Even:
-	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsEven)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsEven)
+	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displayFrameEven)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displayFrameEven)
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsEven)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsEven)
+	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displayFrameEven)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displayFrameEven)
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	DisplayOffset_Select (iy + Engine.displayOffsetEven), (iy + Engine.displaySettingsEven)
-	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displaySettingsEven)
-	ld (iy + Engine.displaySettingsEven + DisplaySettings.palette),e
-	ld (iy + Engine.displaySettingsEven + DisplaySettings.palette + 1),d
+	DisplayOffset_Select (iy + Engine.displayOffsetEven), (iy + Engine.displayFrameEven)
+	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displayFrameEven)
+	ld (iy + Engine.displayFrameEven + DisplayFrame.palette),e
+	ld (iy + Engine.displayFrameEven + DisplayFrame.palette + 1),d
 	ld e,iyl
 	ld d,iyh
-	ld hl,Engine.displaySettingsEven
+	ld hl,Engine.displayFrameEven
 	add hl,de
 	ld de,Engine.video
 	add iy,de
 	ex de,hl
-	call Video_SubmitDisplaySettingsIY
+	call Video_SubmitDisplayFrameIY
 	ld de,-Engine.video
 	add iy,de
 	ret
@@ -344,29 +344,29 @@ Engine_SubmitSecondaryIY: PROC
 	bit 1,(iy + Engine.frame)
 	jr z,Odd
 Even:
-	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displaySettingsOdd)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displaySettingsOdd)
+	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displayFrameOdd)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displayFrameOdd)
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displaySettingsOdd)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displaySettingsOdd)
+	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displayFrameOdd)
+	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displayFrameOdd)
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	DisplayOffset_Select (iy + Engine.displayOffsetOdd), (iy + Engine.displaySettingsOdd)
-	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displaySettingsOdd)
-	ld (iy + Engine.displaySettingsOdd + DisplaySettings.palette),e
-	ld (iy + Engine.displaySettingsOdd + DisplaySettings.palette + 1),d
+	DisplayOffset_Select (iy + Engine.displayOffsetOdd), (iy + Engine.displayFrameOdd)
+	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displayFrameOdd)
+	ld (iy + Engine.displayFrameOdd + DisplayFrame.palette),e
+	ld (iy + Engine.displayFrameOdd + DisplayFrame.palette + 1),d
 	ld e,iyl
 	ld d,iyh
-	ld hl,Engine.displaySettingsOdd
+	ld hl,Engine.displayFrameOdd
 	add hl,de
 	ld de,Engine.video
 	add iy,de
 	ex de,hl
-	call Video_SubmitDisplaySettingsIY
+	call Video_SubmitDisplayFrameIY
 	call Video_WaitDisplayedIY
 	ld de,-Engine.video
 	add iy,de

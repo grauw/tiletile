@@ -30,9 +30,9 @@ SpritePatternTable_Construct:
 	ld (ix + SpritePatternTable.baseRegister6),a
 	ret
 
-SpritePatternTable_Select: MACRO ?this, ?displaySettings
+SpritePatternTable_Select: MACRO ?this, ?displayFrame
 	ld a,(?this + SpritePatternTable.baseRegister6)
-	ld (?displaySettings + DisplaySettings.spritePattern),a
+	ld (?displayFrame + DisplayFrame.spritePattern),a
 	ENDM
 
 ; a = sprite pattern number (x4)

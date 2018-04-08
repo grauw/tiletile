@@ -1,7 +1,7 @@
 ;
 ; Video subsystem
 ;
-	INCLUDE "DisplaySettings.asm"
+	INCLUDE "DisplayFrame.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "VRAMTableCopy.asm"
@@ -21,10 +21,10 @@ Video: MACRO
 	this:
 	submitted:
 		db 0
-	displaySettings:
+	displayFrame:
 		dw 0
-	initialDisplaySettings:
-		DisplaySettings
+	initialDisplayFrame:
+		DisplayFrame
 	initialPalette:
 		Palette
 	lineInterrupt:
@@ -38,8 +38,8 @@ Video: MACRO
 		ENDIF
 		push bc
 		push hl
-		ld hl,(displaySettings)
-		call DisplaySettings_ApplyHL
+		ld hl,(displayFrame)
+		call DisplayFrame_ApplyHL
 		xor a
 		ld (submitted),a
 		pop hl
@@ -124,9 +124,9 @@ Video_StartFadeOutIY: PROC
 	ld ix,Video.initialPalette
 	add ix,de
 	push iy
-	ld de,Video.initialDisplaySettings
+	ld de,Video.initialDisplayFrame
 	add iy,de
-	call DisplaySettings_InitializeFromSystemVariablesIY
+	call DisplayFrame_InitializeFromSystemVariablesIY
 	ld e,iyl
 	ld d,iyh
 	pop iy
@@ -143,12 +143,12 @@ Loop:
 	pop ix
 	ld e,ixl
 	ld d,ixh
-	ld (iy + Video.initialDisplaySettings + DisplaySettings.palette),e
-	ld (iy + Video.initialDisplaySettings + DisplaySettings.palette + 1),d
+	ld (iy + Video.initialDisplayFrame + DisplayFrame.palette),e
+	ld (iy + Video.initialDisplayFrame + DisplayFrame.palette + 1),d
 	pop de
-	call Video_SubmitDisplaySettingsIY
+	call Video_SubmitDisplayFrameIY
 	call Video_WaitDisplayedIY
-	call Video_SubmitDisplaySettingsIY
+	call Video_SubmitDisplayFrameIY
 	call Video_WaitDisplayedIY
 	pop af
 	sub 11H
@@ -205,14 +205,14 @@ Video_WaitDisplayedIY:
 	ENDIF
 	jr Video_WaitDisplayedIY
 
-; Waits until previous display settings is displayed
+; Waits until previous display frame is displayed
 ; iy = this
-; de = display settings
-Video_SubmitDisplaySettingsIY:
+; de = display frame
+Video_SubmitDisplayFrameIY:
 	call Video_WaitDisplayedIY
 	di
-	ld (iy + Video.displaySettings),e
-	ld (iy + Video.displaySettings + 1),d
+	ld (iy + Video.displayFrame),e
+	ld (iy + Video.displayFrame + 1),d
 	ei
 	ld (iy + Video.submitted),1
 	ret

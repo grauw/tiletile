@@ -16,13 +16,13 @@ DisplayOffset: MACRO
 DisplayOffset_Construct:
 	ret
 
-DisplayOffset_Select: MACRO ?this, ?displaySettings
+DisplayOffset_Select: MACRO ?this, ?displayFrame
 	ld a,(?this + DisplayOffset.horizontalOffsetCharacters)
-	ld (?displaySettings + DisplaySettings.horizontalOffsetCharacters),a
+	ld (?displayFrame + DisplayFrame.horizontalOffsetCharacters),a
 	ld a,(?this + DisplayOffset.horizontalOffsetDots)
-	ld (?displaySettings + DisplaySettings.horizontalOffsetDots),a
+	ld (?displayFrame + DisplayFrame.horizontalOffsetDots),a
 	ld a,(?this + DisplayOffset.verticalOffset)
-	ld (?displaySettings + DisplaySettings.verticalOffset),a
+	ld (?displayFrame + DisplayFrame.verticalOffset),a
 	ENDM
 
 ; a = offset
