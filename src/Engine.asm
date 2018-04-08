@@ -308,21 +308,20 @@ Engine_SubmitPrimaryIY: PROC
 	bit 1,(iy + Engine.frame)
 	jr nz,Odd
 Even:
-	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displayFrameEven)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displayFrameEven)
+	DisplayFrame_SetPatternNameTable_M (iy + Engine.displayFrameEven), (iy + Engine.patternNameTableEven)
+	DisplayFrame_SetSpritePatternTable_M (iy + Engine.displayFrameEven), (iy + Engine.spritePatternTableEven)
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displayFrameEven)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displayFrameEven)
+	DisplayFrame_SetPatternNameTable_M (iy + Engine.displayFrameEven), (iy + Engine.patternNameTableOdd)
+	DisplayFrame_SetSpritePatternTable_M (iy + Engine.displayFrameEven), (iy + Engine.spritePatternTableOdd)
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	DisplayOffset_Select (iy + Engine.displayOffsetEven), (iy + Engine.displayFrameEven)
-	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableEven), (iy + Engine.displayFrameEven)
-	ld (iy + Engine.displayFrameEven + DisplayFrame.palette),e
-	ld (iy + Engine.displayFrameEven + DisplayFrame.palette + 1),d
+	DisplayFrame_SetDisplayOffset_M (iy + Engine.displayFrameEven), (iy + Engine.displayOffsetEven)
+	DisplayFrame_SetSpriteAttributeTable_M (iy + Engine.displayFrameEven), (iy + Engine.spriteAttributeTableEven)
+	DisplayFrame_SetPalette_M (iy + Engine.displayFrameEven), e, d
 	ld e,iyl
 	ld d,iyh
 	ld hl,Engine.displayFrameEven
@@ -344,21 +343,20 @@ Engine_SubmitSecondaryIY: PROC
 	bit 1,(iy + Engine.frame)
 	jr z,Odd
 Even:
-	PatternNameTable_Select (iy + Engine.patternNameTableEven), (iy + Engine.displayFrameOdd)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableEven), (iy + Engine.displayFrameOdd)
+	DisplayFrame_SetPatternNameTable_M (iy + Engine.displayFrameOdd), (iy + Engine.patternNameTableEven)
+	DisplayFrame_SetSpritePatternTable_M (iy + Engine.displayFrameOdd), (iy + Engine.spritePatternTableEven)
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	PatternNameTable_Select (iy + Engine.patternNameTableOdd), (iy + Engine.displayFrameOdd)
-	SpritePatternTable_Select (iy + Engine.spritePatternTableOdd), (iy + Engine.displayFrameOdd)
+	DisplayFrame_SetPatternNameTable_M (iy + Engine.displayFrameOdd), (iy + Engine.patternNameTableOdd)
+	DisplayFrame_SetSpritePatternTable_M (iy + Engine.displayFrameOdd), (iy + Engine.spritePatternTableOdd)
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	DisplayOffset_Select (iy + Engine.displayOffsetOdd), (iy + Engine.displayFrameOdd)
-	SpriteAttributeTable_Select (iy + Engine.spriteAttributeTableOdd), (iy + Engine.displayFrameOdd)
-	ld (iy + Engine.displayFrameOdd + DisplayFrame.palette),e
-	ld (iy + Engine.displayFrameOdd + DisplayFrame.palette + 1),d
+	DisplayFrame_SetDisplayOffset_M (iy + Engine.displayFrameOdd), (iy + Engine.displayOffsetOdd)
+	DisplayFrame_SetSpriteAttributeTable_M (iy + Engine.displayFrameOdd), (iy + Engine.spriteAttributeTableOdd)
+	DisplayFrame_SetPalette_M (iy + Engine.displayFrameOdd), e, d
 	ld e,iyl
 	ld d,iyh
 	ld hl,Engine.displayFrameOdd

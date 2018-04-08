@@ -16,15 +16,6 @@ DisplayOffset: MACRO
 DisplayOffset_Construct:
 	ret
 
-DisplayOffset_Select: MACRO ?this, ?displayFrame
-	ld a,(?this + DisplayOffset.horizontalOffsetCharacters)
-	ld (?displayFrame + DisplayFrame.horizontalOffsetCharacters),a
-	ld a,(?this + DisplayOffset.horizontalOffsetDots)
-	ld (?displayFrame + DisplayFrame.horizontalOffsetDots),a
-	ld a,(?this + DisplayOffset.verticalOffset)
-	ld (?displayFrame + DisplayFrame.verticalOffset),a
-	ENDM
-
 ; a = offset
 ; iy = this
 DisplayOffset_SetHorizontalOffsetIY:

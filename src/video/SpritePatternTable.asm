@@ -30,11 +30,6 @@ SpritePatternTable_Construct:
 	ld (ix + SpritePatternTable.baseRegister6),a
 	ret
 
-SpritePatternTable_Select: MACRO ?this, ?displayFrame
-	ld a,(?this + SpritePatternTable.baseRegister6)
-	ld (?displayFrame + DisplayFrame.spritePattern),a
-	ENDM
-
 ; a = sprite pattern number (x4)
 ; iy = this
 ; b <- patterns remaining (x4)

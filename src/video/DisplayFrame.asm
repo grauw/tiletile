@@ -71,3 +71,41 @@ DisplayFrame_ApplyHL:
 	ENDM
 	ld (VDP_MIRROR_8 + 23),a
 	ret
+
+DisplayFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
+	ld a,(?displayOffset + DisplayOffset.horizontalOffsetCharacters)
+	ld (?this + DisplayFrame.horizontalOffsetCharacters),a
+	ld a,(?displayOffset + DisplayOffset.horizontalOffsetDots)
+	ld (?this + DisplayFrame.horizontalOffsetDots),a
+	ld a,(?displayOffset + DisplayOffset.verticalOffset)
+	ld (?this + DisplayFrame.verticalOffset),a
+	ENDM
+
+DisplayFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
+	ld a,(?patternNameTable + PatternNameTable.baseRegister2)
+	ld (?this + DisplayFrame.patternName),a
+	ENDM
+
+DisplayFrame_SetSpriteAttributeTable_M: MACRO ?this, ?spriteAttributeTable
+	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister5)
+	ld (?this + DisplayFrame.spriteAttributeLSB),a
+	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister11)
+	ld (?this + DisplayFrame.spriteAttributeMSB),a
+	ENDM
+
+DisplayFrame_SetSpriteColorTable_M: MACRO ?this, ?spriteColorTable
+	ld a,(?spriteColorTable + SpriteColorTable.baseRegister5)
+	ld (?this + SpriteColorTable.spriteAttributeLSB),a
+	ld a,(?spriteColorTable + SpriteColorTable.baseRegister11)
+	ld (?this + SpriteColorTable.spriteAttributeMSB),a
+	ENDM
+
+DisplayFrame_SetSpritePatternTable_M: MACRO ?this, ?spritePatternTable
+	ld a,(?spritePatternTable + SpritePatternTable.baseRegister6)
+	ld (?this + DisplayFrame.spritePattern),a
+	ENDM
+
+DisplayFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
+	ld (?this + DisplayFrame.palette),?palettelow
+	ld (?this + DisplayFrame.palette + 1),?palettehigh
+	ENDM

@@ -30,11 +30,6 @@ PatternNameTable_Construct:
 	ld (ix + PatternNameTable.baseRegister2),a
 	ret
 
-PatternNameTable_Select: MACRO ?this, ?displayFrame
-	ld a,(?this + PatternNameTable.baseRegister2)
-	ld (?displayFrame + DisplayFrame.patternName),a
-	ENDM
-
 ; hl = offset
 ; iy = this
 ; c <- write port
