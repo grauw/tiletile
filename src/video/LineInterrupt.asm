@@ -4,34 +4,39 @@
 LineInterrupt: MACRO ?handler
 	Entry:
 		push af
-		ld a,1
-		out (VDP_PORT_1),a  ; select s#1
-		ld a,15 | VDP_REGISTER
-		out (VDP_PORT_1),a
-		in a,(VDP_PORT_1)
-		rra
-		jr nc,NotLine
-		call ?handler
+		push bc
+		push hl
+		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
+		ld hl,2 << 8 | 1
+		out (c),l
+		out (c),b  ; select s#1
+		in (c)
+		out (c),h
+		out (c),b  ; select s#2
+		jp pe,?handler  ; V9958 has no light pen bits, and VDP ID is 2
 	handler: equ $ - 2
-	Return:
-		ld a,2
-		out (VDP_PORT_1),a  ; select s#2
-		ld a,15 | VDP_REGISTER
-		out (VDP_PORT_1),a
-		pop af
-		ei
-		ret
-	NotLine:
 		xor a
-		out (VDP_PORT_1),a  ; select s#0
-		ld a,15 | VDP_REGISTER
-		out (VDP_PORT_1),a
+		out (c),a
+		out (c),b  ; select s#0
 		call OldHook
 		di  ; small window for reentrant interrupt to occur
-		jr Return
+		out (c),h
+		out (c),b  ; select s#2
+		jp LineInterrupt_Return
 	OldHook:
 		ds Interrupt_HOOK_SIZE
 	ENDM
+
+	SECTION RAM
+
+LineInterrupt_Return:
+		pop hl
+		pop bc
+		pop af
+		ei
+		ret
+
+	ENDS
 
 ; ix = interrupt
 ; iy = this

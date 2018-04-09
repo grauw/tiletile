@@ -34,6 +34,7 @@ Video: MACRO
 		IF DEBUG
 		PROFILE_END 10
 		ENDIF
+		jp LineInterrupt_Return
 	Return:
 		ret
 	initialDisplayFrame:

@@ -36,11 +36,10 @@ DisplayFrame: MACRO
 	palette:
 		dw Palette_system
 
+	; c = VDP port 1
+	; Modifies: af, bc, hl
 	Apply:
-		push bc
-		push hl
 		ld hl,horizontalOffsetCharacters
-		ld c,VDP_PORT_1
 		REPT 9 * 2
 		outi
 		ENDM
@@ -52,9 +51,6 @@ DisplayFrame: MACRO
 		REPT 32
 		outi
 		ENDM
-		in a,(VDP_PORT_1)  ; reset FH again
-		pop hl
-		pop bc
 		ret
 	_size:
 	ENDM
