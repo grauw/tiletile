@@ -51,23 +51,25 @@ Video_Construct:
 	ld de,Video.lineInterrupt
 	add iy,de
 	ld a,DisplayFrame_FRAME_LINE
-	call LineInterrupt_InstallIY
+	call LineInterrupt_ConstructIY
 	ld de,-Video.lineInterrupt
 	add iy,de
 	push ix
 	ex (sp),iy
 	pop ix
+	call LineInterrupt_Enable
 	ret
 
 ; ix = this
 ; iy = interrupt
 Video_Destruct:
+	call LineInterrupt_Disable
 	push ix
 	ex (sp),iy
 	pop ix
 	ld de,Video.lineInterrupt
 	add iy,de
-	call LineInterrupt_UninstallIY
+	call LineInterrupt_DestructIY
 	ld de,-Video.lineInterrupt
 	add iy,de
 	push ix

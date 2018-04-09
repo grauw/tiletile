@@ -2,8 +2,6 @@
 ; Line interrupt
 ;
 LineInterrupt: MACRO ?handler
-	installed:
-		db 0
 	Entry:
 		push af
 		ld a,1
@@ -35,13 +33,9 @@ LineInterrupt: MACRO ?handler
 		ds Interrupt_HOOK_SIZE
 	ENDM
 
-; a = line
 ; ix = interrupt
 ; iy = this
-LineInterrupt_InstallIY:
-	bit 0,(iy + LineInterrupt.installed)
-	call nz,System_ThrowException
-	push af
+LineInterrupt_ConstructIY:
 	ld e,iyl
 	ld d,iyh
 	ld hl,LineInterrupt.OldHook
@@ -53,27 +47,11 @@ LineInterrupt_InstallIY:
 	ld a,2
 	ld b,15
 	call VDP_SetRegister  ; select s#2
-	pop af
-	ld b,19
-	call VDP_SetRegister
-	ld a,(VDP_MIRROR_0 + 0)
-	set 4,a
-	ld (VDP_MIRROR_0 + 0),a
-	ld b,0
-	call VDP_SetRegister
-	ld (iy + LineInterrupt.installed),1
 	ret
 
 ; ix = interrupt
 ; iy = this
-LineInterrupt_UninstallIY:
-	bit 0,(iy + LineInterrupt.installed)
-	call z,System_ThrowException
-	ld a,(VDP_MIRROR_0 + 0)
-	res 4,a
-	ld (VDP_MIRROR_0 + 0),a
-	ld b,0
-	call VDP_SetRegister
+LineInterrupt_DestructIY:
 	ld e,iyl
 	ld d,iyh
 	ld hl,LineInterrupt.OldHook
@@ -87,5 +65,25 @@ LineInterrupt_UninstallIY:
 	ld b,15
 	call VDP_SetRegister  ; select s#0
 	ei
-	ld (iy + LineInterrupt.installed),0
+	ret
+
+; a = line
+LineInterrupt_Enable:
+	ld b,19
+	call VDP_SetRegister
+	ld a,(VDP_MIRROR_0 + 0)
+	set 4,a
+	ld (VDP_MIRROR_0 + 0),a
+	ld b,0
+	call VDP_SetRegister
+	ret
+
+; ix = interrupt
+; iy = this
+LineInterrupt_Disable:
+	ld a,(VDP_MIRROR_0 + 0)
+	res 4,a
+	ld (VDP_MIRROR_0 + 0),a
+	ld b,0
+	call VDP_SetRegister
 	ret
