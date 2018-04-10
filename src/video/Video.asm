@@ -15,14 +15,11 @@
 	INCLUDE "Palette.asm"
 	INCLUDE "PaletteColor.asm"
 	INCLUDE "PaletteFader.asm"
-	INCLUDE "LineInterrupt.asm"
 
 Video: MACRO
 	this:
 	submitted:
 		db 0
-	lineInterrupt:
-		LineInterrupt InterruptEntry
 	InterruptEntry:
 		IF DEBUG
 		PROFILE_BEGIN 10
@@ -34,7 +31,7 @@ Video: MACRO
 		IF DEBUG
 		PROFILE_END 10
 		ENDIF
-		jp LineInterrupt_Return
+		jp Interrupt_Return
 	Return:
 		ret
 	initialDisplayFrame:
@@ -44,38 +41,33 @@ Video: MACRO
 	ENDM
 
 ; ix = this
-; iy = interrupt
 Video_Construct:
-	push ix
-	ex (sp),iy
-	pop ix
-	ld de,Video.lineInterrupt
-	add iy,de
 	ld a,DisplayFrame_FRAME_LINE
-	call LineInterrupt_ConstructIY
-	ld de,-Video.lineInterrupt
-	add iy,de
-	push ix
-	ex (sp),iy
-	pop ix
-	call LineInterrupt_Enable
+	call Video_EnableLineInterrupt
 	ret
 
 ; ix = this
-; iy = interrupt
 Video_Destruct:
-	call LineInterrupt_Disable
-	push ix
-	ex (sp),iy
-	pop ix
-	ld de,Video.lineInterrupt
-	add iy,de
-	call LineInterrupt_DestructIY
-	ld de,-Video.lineInterrupt
-	add iy,de
-	push ix
-	ex (sp),iy
-	pop ix
+	call Video_DisableLineInterrupt
+	ret
+
+; a = line
+Video_EnableLineInterrupt:
+	ld b,19
+	call VDP_SetRegister
+	ld a,(VDP_MIRROR_0 + 0)
+	set 4,a
+	ld (VDP_MIRROR_0 + 0),a
+	ld b,0
+	call VDP_SetRegister
+	ret
+
+Video_DisableLineInterrupt:
+	ld a,(VDP_MIRROR_0 + 0)
+	res 4,a
+	ld (VDP_MIRROR_0 + 0),a
+	ld b,0
+	call VDP_SetRegister
 	ret
 
 ; iy = this

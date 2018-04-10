@@ -37,7 +37,7 @@ Engine: MACRO
 	video:
 		Video
 	interrupt:
-		Interrupt
+		Interrupt video + Video.InterruptEntry
 	timiHook:
 		TIMIHook
 	spriteColorCopy:

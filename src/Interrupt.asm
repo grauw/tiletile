@@ -4,12 +4,44 @@
 Interrupt_HEAPBLOCK_SIZE: equ 200H
 Interrupt_HOOK_SIZE: equ 5
 
-Interrupt: MACRO
+Interrupt: MACRO ?handler
 	table:
 		dw 0
 	entry:
 		dw 0
+	Handler:
+		push af
+		push bc
+		push hl
+		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
+		ld hl,2 << 8 | 1
+		out (c),l
+		out (c),b  ; select s#1
+		in (c)
+		out (c),h
+		out (c),b  ; select s#2
+		jp pe,?handler  ; V9958 has no light pen bits, and VDP ID is 2
+	handler: equ $ - 2
+		xor a
+		out (c),a
+		out (c),b  ; select s#0
+		rst 38H
+		di  ; small window for reentrant interrupt to occur
+		out (c),h
+		out (c),b  ; select s#2
+		jp Interrupt_Return
 	ENDM
+
+	SECTION RAM
+
+Interrupt_Return:
+		pop hl
+		pop bc
+		pop af
+		ei
+		ret
+
+	ENDS
 
 ; ix = this
 Interrupt_Construct:
@@ -31,76 +63,33 @@ Interrupt_Construct:
 	inc de
 	ld bc,100H
 	ldir
+	ld e,ixl
+	ld d,ixh
+	ld hl,Interrupt.Handler
+	add hl,de
+	ex de,hl
 	ld l,a
 	ld h,a
-	ld (hl),0C3H  ; jp
-	inc hl
-	ld (hl),38H
-	inc hl
-	ld (hl),00H
-	call System_CheckEIState
-	ld a,(ix + Interrupt.table + 1)
-	di
-	ld i,a
-	im 2
-	ret po
-	ei
-	ret
-
-; ix = this
-Interrupt_Destruct:
-	im 1
-	ret
-
-; hl = handler address
-; de = old hook
-; ix = this
-Interrupt_Hook:
-	push hl
-	ld l,(ix + Interrupt.entry)
-	ld h,(ix + Interrupt.entry + 1)
-	ld bc,Interrupt_HOOK_SIZE
-	ldir
-	pop de
-	ld l,(ix + Interrupt.entry)
-	ld h,(ix + Interrupt.entry + 1)
-	call System_CheckEIState
-	di
 	ld (hl),0C3H  ; jp
 	inc hl
 	ld (hl),e
 	inc hl
 	ld (hl),d
-	ret po
-	ei
+	ld a,(ix + Interrupt.table + 1)
+	ld i,a
+	im 2
+	ld a,2
+	ld b,15
+	call VDP_SetRegister  ; select s#2
 	ret
 
-; hl = handler address
-; de = old hook
 ; ix = this
-Interrupt_Unhook:
-	ld c,l
-	ld b,h
-	ld l,(ix + Interrupt.entry)
-	ld h,(ix + Interrupt.entry + 1)
-	inc hl
-	ld a,c
-	cp (hl)
-	call nz,System_ThrowException
-	inc hl
-	ld a,b
-	cp (hl)
-	call nz,System_ThrowException
-	dec hl
-	dec hl
-	ex de,hl
-	ld bc,Interrupt_HOOK_SIZE
-	call System_CheckEIState
-	push af
+Interrupt_Destruct:
 	di
-	ldir
-	pop af
-	ret po
+	im 1
+	ld a,0
+	ld b,15
+	call VDP_SetRegister  ; select s#0
 	ei
 	ret
 
