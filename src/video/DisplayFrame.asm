@@ -6,6 +6,7 @@ DisplayFrame_FRAME_LINE: equ 228
 DisplayFrame: MACRO
 	Entry:
 		jp Apply
+	registers:
 	horizontalOffsetCharacters:
 		db 0
 		db 26 | VDP_REGISTER
@@ -39,7 +40,7 @@ DisplayFrame: MACRO
 	; c = VDP port 1
 	; Modifies: af, bc, hl
 	Apply:
-		ld hl,horizontalOffsetCharacters
+		ld hl,registers
 		REPT 9 * 2
 		outi
 		ENDM
