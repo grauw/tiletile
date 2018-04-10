@@ -4,7 +4,7 @@
 Interrupt_HEAPBLOCK_SIZE: equ 200H
 Interrupt_HOOK_SIZE: equ 5
 
-Interrupt: MACRO ?handler
+Interrupt: MACRO
 	table:
 		dw 0
 	entry:
@@ -20,7 +20,7 @@ Interrupt: MACRO ?handler
 		in (c)
 		out (c),h
 		out (c),b  ; select s#2
-		jp pe,?handler  ; V9958 has no light pen bits, and VDP ID is 2
+		jp pe,Interrupt_Return  ; V9958 has no light pen bits, and VDP ID is 2
 	handler: equ $ - 2
 		xor a
 		out (c),a
@@ -92,6 +92,20 @@ Interrupt_Destruct:
 	call VDP_SetRegister  ; select s#0
 	ei
 	ret
+
+; de = handler
+; iy = this
+Interrupt_SetLineInterruptHandlerIY:
+	di
+	ld (iy + Interrupt.handler),e
+	ei
+	ld (iy + Interrupt.handler + 1),d
+	ret
+
+; iy = this
+Interrupt_ResetLineInterruptHandlerIY:
+	ld de,Interrupt_Return
+	jp Interrupt_SetLineInterruptHandlerIY
 
 ;
 	SECTION RAM

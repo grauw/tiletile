@@ -41,7 +41,14 @@ Video: MACRO
 	ENDM
 
 ; ix = this
+; iy = interrupt
 Video_Construct:
+	ld e,ixl
+	ld d,ixh
+	ld hl,Video.InterruptEntry
+	add hl,de
+	ex de,hl
+	call Interrupt_SetLineInterruptHandlerIY
 	ld a,DisplayFrame_FRAME_LINE
 	call Video_EnableLineInterrupt
 	ret
