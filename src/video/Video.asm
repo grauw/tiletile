@@ -2,6 +2,8 @@
 ; Video subsystem
 ;
 	INCLUDE "DisplayFrame.asm"
+	INCLUDE "BootFrame.asm"
+	INCLUDE "GameFrame.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "VRAMTableCopy.asm"
@@ -34,9 +36,9 @@ Video: MACRO
 		jp Interrupt_Return
 	Return:
 		ret
-	initialDisplayFrame:
-		DisplayFrame
-	initialPalette:
+	bootFrame:
+		BootFrame
+	bootPalette:
 		Palette
 	ENDM
 
@@ -116,15 +118,11 @@ Video_StartFadeOutIY: PROC
 	push ix
 	ld e,iyl
 	ld d,iyh
-	ld ix,Video.initialPalette
+	ld ix,Video.bootPalette
 	add ix,de
-	push iy
-	ld de,Video.initialDisplayFrame
-	add iy,de
-	call DisplayFrame_InitializeFromSystemVariablesIY
-	ld e,iyl
-	ld d,iyh
-	pop iy
+	ld hl,Video.bootFrame
+	add hl,de
+	ex de,hl
 	ld a,77H
 Loop:
 	push af
@@ -138,8 +136,7 @@ Loop:
 	pop ix
 	ld e,ixl
 	ld d,ixh
-	ld (iy + Video.initialDisplayFrame + DisplayFrame.palette),e
-	ld (iy + Video.initialDisplayFrame + DisplayFrame.palette + 1),d
+	BootFrame_SetPalette_M (iy + Video.bootFrame), e, d
 	pop de
 	call Video_SubmitDisplayFrameIY
 	call Video_WaitDisplayedIY

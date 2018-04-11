@@ -30,10 +30,10 @@ Engine: MACRO
 		dw Palette_system
 	paletteOdd:
 		dw Palette_system
-	displayFrameEven:
-		DisplayFrame
-	displayFrameOdd:
-		DisplayFrame
+	gameFrameEven:
+		GameFrame
+	gameFrameOdd:
+		GameFrame
 	video:
 		Video
 	interrupt:
@@ -307,25 +307,25 @@ Engine_SubmitPrimaryIY: PROC
 	push ix
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.displayFrameEven
+	ld ix,Engine.gameFrameEven
 	add ix,de
 	bit 1,(iy + Engine.frame)
 	jr nz,Odd
 Even:
-	DisplayFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
-	DisplayFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	DisplayFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
-	DisplayFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	DisplayFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetEven
-	DisplayFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
-	DisplayFrame_SetPalette_M ix, e, d
+	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetEven
+	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
+	GameFrame_SetPalette_M ix, e, d
 	ld de,Engine.video
 	add iy,de
 	ld e,ixl
@@ -345,25 +345,25 @@ Engine_SubmitSecondaryIY: PROC
 	push ix
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.displayFrameOdd
+	ld ix,Engine.gameFrameOdd
 	add ix,de
 	bit 1,(iy + Engine.frame)
 	jr nz,Odd
 Even:
-	DisplayFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
-	DisplayFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	DisplayFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
-	DisplayFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	DisplayFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetOdd
-	DisplayFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
-	DisplayFrame_SetPalette_M ix, e, d
+	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetOdd
+	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
+	GameFrame_SetPalette_M ix, e, d
 	ld de,Engine.video
 	add iy,de
 	ld e,ixl
