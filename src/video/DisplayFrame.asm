@@ -45,10 +45,7 @@ DisplayFrame: MACRO
 		outi
 		ENDM
 		inc c
-		ld b,(hl)
-		inc hl
-		ld h,(hl)
-		ld l,b
+		ld hl,(palette)
 		REPT 32
 		outi
 		ENDM
