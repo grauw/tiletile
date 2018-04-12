@@ -1,6 +1,7 @@
 ;
 ; Video subsystem
 ;
+	INCLUDE "VDPRegister.asm"
 	INCLUDE "DisplayFrame.asm"
 	INCLUDE "BootFrame.asm"
 	INCLUDE "GameFrame.asm"

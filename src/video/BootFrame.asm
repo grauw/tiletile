@@ -6,8 +6,7 @@ BootFrame: MACRO
 
 	registers:
 	paletteNumber:
-		db 0
-		db 16 | VDP_REGISTER
+		VDPRegister 16, 0
 	palette:
 		dw Palette_system
 
@@ -15,8 +14,7 @@ BootFrame: MACRO
 	; Modifies: af, bc, hl
 	Apply:
 		ld hl,registers
-		outi
-		outi
+		VDPRegister_OUTI_DI_M  ; palette number
 		inc c
 		ld hl,(palette)
 		REPT 32

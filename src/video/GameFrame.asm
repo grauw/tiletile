@@ -8,32 +8,23 @@ GameFrame: MACRO
 
 	registers:
 	horizontalOffsetCharacters:
-		db 0
-		db 26 | VDP_REGISTER
+		VDPRegister 26
 	horizontalOffsetDots:
-		db 0
-		db 27 | VDP_REGISTER
+		VDPRegister 27
 	verticalOffset:
-		db 0
-		db 23 | VDP_REGISTER
+		VDPRegister 23
 	interruptLine:
-		db 0
-		db 19 | VDP_REGISTER
+		VDPRegister 19
 	patternName:
-		db 0
-		db 2 | VDP_REGISTER
+		VDPRegister 2
 	spriteAttributeLSB:
-		db 0
-		db 5 | VDP_REGISTER
+		VDPRegister 5
 	spriteAttributeMSB:
-		db 0
-		db 11 | VDP_REGISTER
+		VDPRegister 11
 	spritePattern:
-		db 0
-		db 6 | VDP_REGISTER
+		VDPRegister 6
 	paletteNumber:
-		db 0
-		db 16 | VDP_REGISTER
+		VDPRegister 16, 0
 	palette:
 		dw Palette_system
 
@@ -41,9 +32,15 @@ GameFrame: MACRO
 	; Modifies: af, bc, hl
 	Apply:
 		ld hl,registers
-		REPT 9 * 2
-		outi
-		ENDM
+		VDPRegister_OUTI_DI_M  ; horizontal offset (characters)
+		VDPRegister_OUTI_DI_M  ; horizontal offset (dots)
+		VDPRegister_OUTI_DI_M  ; vertical offset
+		VDPRegister_OUTI_DI_M  ; interrupt line
+		VDPRegister_OUTI_DI_M  ; pattern name base
+		VDPRegister_OUTI_DI_M  ; sprite attribute base LSB
+		VDPRegister_OUTI_DI_M  ; sprite attribute base MSB
+		VDPRegister_OUTI_DI_M  ; sprite pattern base
+		VDPRegister_OUTI_DI_M  ; palette number
 		inc c
 		ld hl,(palette)
 		REPT 32
@@ -55,37 +52,37 @@ GameFrame: MACRO
 
 GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
 	ld a,(?displayOffset + DisplayOffset.horizontalOffsetCharacters)
-	ld (?this + GameFrame.horizontalOffsetCharacters),a
+	ld (?this + GameFrame.horizontalOffsetCharacters + VDPRegister.value),a
 	ld a,(?displayOffset + DisplayOffset.horizontalOffsetDots)
-	ld (?this + GameFrame.horizontalOffsetDots),a
+	ld (?this + GameFrame.horizontalOffsetDots + VDPRegister.value),a
 	ld a,(?displayOffset + DisplayOffset.verticalOffset)
-	ld (?this + GameFrame.verticalOffset),a
+	ld (?this + GameFrame.verticalOffset + VDPRegister.value),a
 	add a,GameFrame_FRAME_LINE
-	ld (?this + GameFrame.interruptLine),a
+	ld (?this + GameFrame.interruptLine + VDPRegister.value),a
 	ENDM
 
 GameFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
 	ld a,(?patternNameTable + PatternNameTable.baseRegister2)
-	ld (?this + GameFrame.patternName),a
+	ld (?this + GameFrame.patternName + VDPRegister.value),a
 	ENDM
 
 GameFrame_SetSpriteAttributeTable_M: MACRO ?this, ?spriteAttributeTable
 	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister5)
-	ld (?this + GameFrame.spriteAttributeLSB),a
+	ld (?this + GameFrame.spriteAttributeLSB + VDPRegister.value),a
 	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister11)
-	ld (?this + GameFrame.spriteAttributeMSB),a
+	ld (?this + GameFrame.spriteAttributeMSB + VDPRegister.value),a
 	ENDM
 
 GameFrame_SetSpriteColorTable_M: MACRO ?this, ?spriteColorTable
 	ld a,(?spriteColorTable + SpriteColorTable.baseRegister5)
-	ld (?this + SpriteColorTable.spriteAttributeLSB),a
+	ld (?this + SpriteColorTable.spriteAttributeLSB + VDPRegister.value),a
 	ld a,(?spriteColorTable + SpriteColorTable.baseRegister11)
-	ld (?this + SpriteColorTable.spriteAttributeMSB),a
+	ld (?this + SpriteColorTable.spriteAttributeMSB + VDPRegister.value),a
 	ENDM
 
 GameFrame_SetSpritePatternTable_M: MACRO ?this, ?spritePatternTable
 	ld a,(?spritePatternTable + SpritePatternTable.baseRegister6)
-	ld (?this + GameFrame.spritePattern),a
+	ld (?this + GameFrame.spritePattern + VDPRegister.value),a
 	ENDM
 
 GameFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
