@@ -13,8 +13,6 @@ GameFrame: MACRO
 		VDPRegister 27
 	verticalOffset:
 		VDPRegister 23
-	interruptLine:
-		VDPRegister 19
 	patternName:
 		VDPRegister 2
 	spriteAttributeLSB:
@@ -23,6 +21,10 @@ GameFrame: MACRO
 		VDPRegister 11
 	spritePattern:
 		VDPRegister 6
+	interruptLine:
+		VDPRegister 19
+		VDPRegister 15, 1
+		VDPRegister 15, 2
 	paletteNumber:
 		VDPRegister 16, 0
 	palette:
@@ -35,11 +37,14 @@ GameFrame: MACRO
 		VDPRegister_OUTI_DI_M  ; horizontal offset (characters)
 		VDPRegister_OUTI_DI_M  ; horizontal offset (dots)
 		VDPRegister_OUTI_DI_M  ; vertical offset
-		VDPRegister_OUTI_DI_M  ; interrupt line
 		VDPRegister_OUTI_DI_M  ; pattern name base
 		VDPRegister_OUTI_DI_M  ; sprite attribute base LSB
 		VDPRegister_OUTI_DI_M  ; sprite attribute base MSB
 		VDPRegister_OUTI_DI_M  ; sprite pattern base
+		VDPRegister_OUTI_DI_M  ; interrupt line
+		VDPRegister_OUTI_DI_M  ; status register 1
+		in a,(c)               ; clear FH
+		VDPRegister_OUTI_DI_M  ; status register 2
 		VDPRegister_OUTI_DI_M  ; palette number
 		inc c
 		ld hl,(palette)
