@@ -376,3 +376,11 @@ Continue:
 	pop ix
 	ret
 	ENDP
+
+; iy = this
+Engine_WaitDisplayedIY:
+	push iy
+	call Engine_GetVideoIY
+	call Video_WaitDisplayedIY
+	pop iy
+	ret

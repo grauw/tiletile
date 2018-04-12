@@ -176,7 +176,7 @@ Loop:
 	call Scene_Update
 	bit 0,(ix + Scene.exit)
 	jr z,Loop
-	call Video_WaitDisplayedIY
+	call Engine_WaitDisplayedIY
 	ret
 	ENDP
 
@@ -199,10 +199,7 @@ Scene_Update:
 	call Scene_TickSecondary
 	call Scene_UpdateDisplayOffset
 	call Scene_DrawBitmap
-	push iy
-	call Engine_GetVideoIY
-	call Video_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
-	pop iy
+	call Engine_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
 	call Engine_CopySpriteColorToSecondary
 	call Scene_DrawSpriteAttributes
 	call Scene_UpdateTriggers
