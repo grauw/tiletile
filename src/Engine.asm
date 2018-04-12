@@ -2,7 +2,7 @@
 ; Engine
 ;
 Engine: MACRO
-	frame:
+	frameCount:
 		db 0
 	input:
 		Input
@@ -145,7 +145,7 @@ Engine_GetSpritePatternTableOddIY:
 ; iy = this
 ; iy <- current display offset
 Engine_GetDisplayOffsetIY: PROC
-	bit 0,(iy + Engine.frame)
+	bit 0,(iy + Engine.frameCount)
 	jr nz,Odd
 	ld de,Engine.displayOffsetEven
 	add iy,de
@@ -159,7 +159,7 @@ Odd:
 ; iy = this
 ; iy <- current sprite attribute table
 Engine_GetSpriteAttributeTableIY: PROC
-	bit 0,(iy + Engine.frame)
+	bit 0,(iy + Engine.frameCount)
 	jr nz,Odd
 	ld h,(iy + Engine.displayOffsetEven + DisplayOffset.horizontalOffset)
 	ld l,(iy + Engine.displayOffsetEven + DisplayOffset.verticalOffset)
@@ -177,7 +177,7 @@ Odd:
 ; iy = this
 ; iy <- current sprite color table
 Engine_GetSpriteColorTableIY: PROC
-	bit 0,(iy + Engine.frame)
+	bit 0,(iy + Engine.frameCount)
 	jr nz,Odd
 	ld de,Engine.spriteColorTableEven
 	add iy,de
@@ -191,7 +191,7 @@ Odd:
 ; iy = this
 ; iy <- current sprite pattern table
 Engine_GetSpritePatternTableIY: PROC
-	bit 1,(iy + Engine.frame)
+	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 	ld de,Engine.spritePatternTableEven
 	add iy,de
@@ -205,7 +205,7 @@ Odd:
 ; de = palette
 ; iy = this
 Engine_SetPaletteIY: PROC
-	bit 1,(iy + Engine.frame)
+	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 	ld (iy + Engine.paletteEven),e
 	ld (iy + Engine.paletteEven + 1),d
@@ -302,14 +302,14 @@ Engine_CopySpriteColorToSecondary:
 
 ; iy = this
 Engine_SubmitPrimaryIY: PROC
-	bit 0,(iy + Engine.frame)
+	bit 0,(iy + Engine.frameCount)
 	call nz,System_ThrowException
 	push ix
 	ld e,iyl
 	ld d,iyh
 	ld ix,Engine.gameFrameEven
 	add ix,de
-	bit 1,(iy + Engine.frame)
+	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 Even:
 	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
@@ -333,21 +333,21 @@ Continue:
 	call Video_SubmitDisplayFrameIY
 	ld de,-Engine.video
 	add iy,de
-	inc (iy + Engine.frame)
+	inc (iy + Engine.frameCount)
 	pop ix
 	ret
 	ENDP
 
 ; iy = this
 Engine_SubmitSecondaryIY: PROC
-	bit 0,(iy + Engine.frame)
+	bit 0,(iy + Engine.frameCount)
 	call z,System_ThrowException
 	push ix
 	ld e,iyl
 	ld d,iyh
 	ld ix,Engine.gameFrameOdd
 	add ix,de
-	bit 1,(iy + Engine.frame)
+	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 Even:
 	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
@@ -372,7 +372,7 @@ Continue:
 	call Video_WaitDisplayedIY
 	ld de,-Engine.video
 	add iy,de
-	inc (iy + Engine.frame)
+	inc (iy + Engine.frameCount)
 	pop ix
 	ret
 	ENDP
