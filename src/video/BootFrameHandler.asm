@@ -1,8 +1,8 @@
 ;
 ; Frame for boot
 ;
-BootFrame: MACRO
-	super: DisplayFrame Apply
+BootFrameHandler: MACRO
+	super: DisplayFrameHandler Apply
 
 	frameCount:
 		db 0
@@ -24,24 +24,24 @@ BootFrame: MACRO
 		ld a,(frameCount)
 		inc a
 		ld (frameCount),a
-		ret
+		jp Interrupt_Return
 	ENDM
 
 ; de = palette
 ; iy = this
-BootFrame_SubmitIY:
+BootFrameHandler_SubmitIY:
 	di
-	ld (iy + BootFrame.palette),e
+	ld (iy + BootFrameHandler.palette),e
 	ei
-	ld (iy + BootFrame.palette + 1),d
-	call BootFrame_WaitIY
+	ld (iy + BootFrameHandler.palette + 1),d
+	call BootFrameHandler_WaitIY
 	ret
 
 ; iy = this
-BootFrame_WaitIY: PROC
-	ld b,(iy + BootFrame.frameCount)
+BootFrameHandler_WaitIY: PROC
+	ld b,(iy + BootFrameHandler.frameCount)
 Wait:
-	ld a,(iy + BootFrame.frameCount)
+	ld a,(iy + BootFrameHandler.frameCount)
 	sub b
 	jr z,Wait
 	ret

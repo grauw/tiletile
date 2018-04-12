@@ -34,6 +34,8 @@ Engine: MACRO
 		GameFrame
 	gameFrameOdd:
 		GameFrame
+	gameFrameHandler:
+		GameFrameHandler
 	video:
 		Video
 	interrupt:
@@ -326,11 +328,16 @@ Continue:
 	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetEven
 	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
 	GameFrame_SetPalette_M ix, e, d
-	ld de,Engine.video
+	ld de,Engine.gameFrameHandler
 	add iy,de
 	ld e,ixl
 	ld d,ixh
-	call Video_SubmitDisplayFrameIY
+	call GameFrameHandler_SubmitIY
+	ld e,iyl
+	ld d,iyh
+	ld bc,Engine.video - Engine.gameFrameHandler
+	add iy,bc
+	call Video_SetDisplayFrameHandlerIY
 	ld de,-Engine.video
 	add iy,de
 	inc (iy + Engine.frameCount)
@@ -364,12 +371,16 @@ Continue:
 	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetOdd
 	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
 	GameFrame_SetPalette_M ix, e, d
-	ld de,Engine.video
+	ld de,Engine.gameFrameHandler
 	add iy,de
 	ld e,ixl
 	ld d,ixh
-	call Video_SubmitDisplayFrameIY
-	call Video_WaitDisplayedIY
+	call GameFrameHandler_SubmitIY
+	ld e,iyl
+	ld d,iyh
+	ld bc,Engine.video - Engine.gameFrameHandler
+	add iy,bc
+	call Video_SetDisplayFrameHandlerIY
 	ld de,-Engine.video
 	add iy,de
 	inc (iy + Engine.frameCount)
@@ -379,8 +390,9 @@ Continue:
 
 ; iy = this
 Engine_WaitDisplayedIY:
-	push iy
-	call Engine_GetVideoIY
-	call Video_WaitDisplayedIY
-	pop iy
+	ld de,Engine.gameFrameHandler
+	add iy,de
+	call GameFrameHandler_WaitIY
+	ld de,-Engine.gameFrameHandler
+	add iy,de
 	ret

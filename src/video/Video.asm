@@ -2,9 +2,10 @@
 ; Video subsystem
 ;
 	INCLUDE "VDPRegister.asm"
-	INCLUDE "DisplayFrame.asm"
-	INCLUDE "BootFrame.asm"
+	INCLUDE "DisplayFrameHandler.asm"
+	INCLUDE "BootFrameHandler.asm"
 	INCLUDE "GameFrame.asm"
+	INCLUDE "GameFrameHandler.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "VRAMTableCopy.asm"
@@ -21,24 +22,11 @@
 
 Video: MACRO
 	this:
-	submitted:
-		db 0
 	InterruptEntry:
-		IF DEBUG
-		PROFILE_BEGIN 10
-		ENDIF
-		call Return
-	displayFrame: equ $ - 2
-		xor a
-		ld (submitted),a
-		IF DEBUG
-		PROFILE_END 10
-		ENDIF
 		jp Interrupt_Return
-	Return:
-		ret
-	bootFrame:
-		BootFrame
+	displayFrameHandler: equ $ - 2
+	bootFrameHandler:
+		BootFrameHandler
 	bootPalette:
 		Palette
 	ENDM
@@ -52,7 +40,7 @@ Video_Construct:
 	add hl,de
 	ex de,hl
 	call Interrupt_SetLineInterruptHandlerIY
-	ld a,DisplayFrame_FRAME_LINE
+	ld a,DisplayFrameHandler_FRAME_LINE
 	call Video_EnableLineInterrupt
 	ret
 
@@ -121,10 +109,10 @@ Video_StartFadeOutIY: PROC
 	ld d,iyh
 	ld ix,Video.bootPalette
 	add ix,de
-	ld hl,Video.bootFrame
+	ld hl,Video.bootFrameHandler
 	add hl,de
 	ex de,hl
-	call Video_SetDisplayFrameIY
+	call Video_SetDisplayFrameHandlerIY
 	push iy
 	ld iyl,e
 	ld iyh,d
@@ -140,8 +128,8 @@ Loop:
 	pop ix
 	ld e,ixl
 	ld d,ixh
-	call BootFrame_SubmitIY
-	call BootFrame_WaitIY
+	call BootFrameHandler_SubmitIY
+	call BootFrameHandler_WaitIY
 	pop af
 	sub 11H
 	jr nc,Loop
@@ -152,7 +140,7 @@ Loop:
 
 ; iy = this
 Video_StopIY:
-	call Video_ReleaseDisplayFrameIY
+	call Video_ReleaseDisplayFrameHandlerIY
 	call VDP_InitText
 	ret
 
@@ -187,50 +175,23 @@ Video_ToggleFrequencyIY:
 	ret
 
 ; iy = this
-Video_WaitDisplayedIY:
-	bit 0,(iy + Video.submitted)
-	ret z
-	IF DEBUG
-	PROFILE_BEGIN 29
-	ENDIF
-	halt
-	IF DEBUG
-	PROFILE_END 29
-	ENDIF
-	jr Video_WaitDisplayedIY
-
-; iy = this
-; de = display frame
-Video_SetDisplayFrameIY:
+; de = display frame handler
+Video_SetDisplayFrameHandlerIY:
 	di
-	ld (iy + Video.displayFrame),e
+	ld (iy + Video.displayFrameHandler),e
 	ei
-	ld (iy + Video.displayFrame + 1),d
+	ld (iy + Video.displayFrameHandler + 1),d
 	ret
 
 ; Waits until previous display frame is displayed
 ; iy = this
-; de = display frame
-Video_SubmitDisplayFrameIY:
-	call Video_WaitDisplayedIY
-	di
-	ld (iy + Video.displayFrame),e
-	ld (iy + Video.displayFrame + 1),d
-	ei
-	ld (iy + Video.submitted),1
-	ret
-
-; Waits until previous display frame is displayed
-; iy = this
-Video_ReleaseDisplayFrameIY:
-	call Video_WaitDisplayedIY
+Video_ReleaseDisplayFrameHandlerIY:
 	ld e,iyl
 	ld d,iyh
-	ld hl,Video.Return
+	ld hl,Interrupt_Return
 	add hl,de
 	di
-	ld (iy + Video.displayFrame),l
-	ld (iy + Video.displayFrame + 1),h
+	ld (iy + Video.displayFrameHandler),l
 	ei
-	ld (iy + Video.submitted),1
+	ld (iy + Video.displayFrameHandler + 1),h
 	ret

@@ -4,9 +4,6 @@
 GameFrame_FRAME_LINE: equ 228
 
 GameFrame: MACRO
-	super: DisplayFrame Apply
-
-	registers:
 	horizontalOffsetCharacters:
 		VDPRegister 26
 	horizontalOffsetDots:
@@ -28,29 +25,6 @@ GameFrame: MACRO
 		VDPRegister 16, 0
 	palette:
 		dw Palette_system
-
-	; c = VDP port 1
-	; Modifies: af, bc, hl
-	Apply:
-		ld hl,registers
-		VDPRegister_OUTI_DI_M  ; horizontal offset (characters)
-		VDPRegister_OUTI_DI_M  ; horizontal offset (dots)
-		VDPRegister_OUTI_DI_M  ; vertical offset
-		VDPRegister_OUTI_DI_M  ; pattern name base
-		VDPRegister_OUTI_DI_M  ; sprite attribute base LSB
-		VDPRegister_OUTI_DI_M  ; sprite attribute base MSB
-		VDPRegister_OUTI_DI_M  ; sprite pattern base
-		VDPRegister_OUTI_DI_M  ; interrupt line
-		VDPRegister_OUTI_DI_M  ; status register 1
-		in a,(c)               ; clear FH
-		VDPRegister_OUTI_DI_M  ; status register 2
-		VDPRegister_OUTI_DI_M  ; palette number
-		inc c
-		ld hl,(palette)
-		REPT 32
-		outi
-		ENDM
-		ret
 	_size:
 	ENDM
 
