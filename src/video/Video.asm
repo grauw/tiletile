@@ -124,10 +124,13 @@ Video_StartFadeOutIY: PROC
 	ld hl,Video.bootFrame
 	add hl,de
 	ex de,hl
+	call Video_SetDisplayFrameIY
+	push iy
+	ld iyl,e
+	ld iyh,d
 	ld a,77H
 Loop:
 	push af
-	push de
 	push ix
 	ld b,a
 	ld c,a
@@ -137,15 +140,12 @@ Loop:
 	pop ix
 	ld e,ixl
 	ld d,ixh
-	BootFrame_SetPalette_M (iy + Video.bootFrame), e, d
-	pop de
-	call Video_SubmitDisplayFrameIY
-	call Video_WaitDisplayedIY
-	call Video_SubmitDisplayFrameIY
-	call Video_WaitDisplayedIY
+	call BootFrame_SubmitIY
+	call BootFrame_WaitIY
 	pop af
 	sub 11H
 	jr nc,Loop
+	pop iy
 	pop ix
 	ret
 	ENDP
@@ -198,6 +198,15 @@ Video_WaitDisplayedIY:
 	PROFILE_END 29
 	ENDIF
 	jr Video_WaitDisplayedIY
+
+; iy = this
+; de = display frame
+Video_SetDisplayFrameIY:
+	di
+	ld (iy + Video.displayFrame),e
+	ei
+	ld (iy + Video.displayFrame + 1),d
+	ret
 
 ; Waits until previous display frame is displayed
 ; iy = this

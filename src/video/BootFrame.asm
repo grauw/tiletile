@@ -4,6 +4,8 @@
 BootFrame: MACRO
 	super: DisplayFrame Apply
 
+	frameCount:
+		db 0
 	registers:
 		VDPRegister 16, 0
 	palette:
@@ -19,12 +21,28 @@ BootFrame: MACRO
 		REPT 32
 		outi
 		ENDM
+		ld a,(frameCount)
+		inc a
+		ld (frameCount),a
 		ret
 	ENDM
 
-BootFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
+; de = palette
+; iy = this
+BootFrame_SubmitIY:
 	di
-	ld (?this + BootFrame.palette),?palettelow
+	ld (iy + BootFrame.palette),e
 	ei
-	ld (?this + BootFrame.palette + 1),?palettehigh
-	ENDM
+	ld (iy + BootFrame.palette + 1),d
+	call BootFrame_WaitIY
+	ret
+
+; iy = this
+BootFrame_WaitIY: PROC
+	ld b,(iy + BootFrame.frameCount)
+Wait:
+	ld a,(iy + BootFrame.frameCount)
+	sub b
+	jr z,Wait
+	ret
+	ENDP
