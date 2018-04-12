@@ -25,7 +25,6 @@ GameFrame: MACRO
 		VDPRegister 19
 		VDPRegister 15, 1
 		VDPRegister 15, 2
-	paletteNumber:
 		VDPRegister 16, 0
 	palette:
 		dw Palette_system

@@ -5,7 +5,6 @@ BootFrame: MACRO
 	super: DisplayFrame Apply
 
 	registers:
-	paletteNumber:
 		VDPRegister 16, 0
 	palette:
 		dw Palette_system
