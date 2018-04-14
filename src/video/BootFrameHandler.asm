@@ -9,13 +9,13 @@ BootFrameHandler: MACRO
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; palette index
-		inc c
 		ld b,(hl)
 		inc hl
 		ld h,(hl)
 		ld l,b
-		REPT 32
-		outi
+		inc c
+		REPT Palette_COLORS
+		PaletteColor_SetDI_M
 		ENDM
 		jp super.Return
 	ENDM

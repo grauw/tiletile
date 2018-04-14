@@ -5,6 +5,15 @@ PaletteColor: MACRO ?r, ?g, ?b
 	dw ?g << 8 | ?r << 4 | ?b
 	ENDM
 
+; c = VDP port 2
+; hl = this
+; hl <- updated
+; Modifies: f, b
+PaletteColor_SetDI_M: MACRO
+	outi
+	outi
+	ENDM
+
 ; de = color reference
 ; hl = color reference
 ; ix = result color reference (this)
