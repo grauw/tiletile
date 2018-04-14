@@ -29,11 +29,11 @@ FrameHandler: MACRO ?line, ?settings, ?next
 	Return:
 		xor a
 		ld (pending),a
+		call ?next
+		pop hl
 		IF DEBUG
 		PROFILE_END 10
 		ENDIF
-		call ?next
-		pop hl
 		jp Interrupt_Return
 	; c = VDP port 1
 	; Modifies: af, bc
