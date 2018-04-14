@@ -339,7 +339,7 @@ Continue:
 	add iy,de
 	ld e,ixl
 	ld d,ixh
-	call GameFrameHandler_SubmitIY
+	call FrameHandler_SubmitIY
 	ld de,-Engine.gameFrameHandler
 	add iy,de
 	inc (iy + Engine.frameCount)
@@ -377,7 +377,7 @@ Continue:
 	add iy,de
 	ld e,ixl
 	ld d,ixh
-	call GameFrameHandler_SubmitIY
+	call FrameHandler_SubmitIY
 	ld de,-Engine.gameFrameHandler
 	add iy,de
 	inc (iy + Engine.frameCount)
@@ -389,7 +389,7 @@ Continue:
 Engine_WaitDisplayedIY:
 	ld de,Engine.gameFrameHandler
 	add iy,de
-	call GameFrameHandler_WaitIY
+	call FrameHandler_WaitIY
 	ld de,-Engine.gameFrameHandler
 	add iy,de
 	ret

@@ -25,10 +25,3 @@ BootFrameHandler: MACRO ?settings, ?next
 BootFrameHandler_Construct:
 	call FrameHandler_Construct
 	ret
-
-; de = boot frame
-; iy = this
-BootFrameHandler_SubmitIY: equ FrameHandler_SubmitIY
-
-; iy = this
-BootFrameHandler_WaitIY: equ FrameHandler_WaitIY

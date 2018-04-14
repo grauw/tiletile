@@ -36,10 +36,3 @@ GameFrameHandler: MACRO ?settings, ?next
 GameFrameHandler_Construct:
 	call FrameHandler_Construct
 	ret
-
-; de = game frame
-; iy = this
-GameFrameHandler_SubmitIY: equ FrameHandler_SubmitIY
-
-; iy = this
-GameFrameHandler_WaitIY: equ FrameHandler_WaitIY
