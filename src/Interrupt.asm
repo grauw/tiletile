@@ -27,14 +27,17 @@ Interrupt: MACRO
 		out (c),b  ; select s#0
 		rst 38H
 		di  ; small window for reentrant interrupt to occur
-		out (c),h
-		out (c),b  ; select s#2
 		jp Interrupt_Return
 	ENDM
 
 	SECTION RAM
 
+; c = VDP port 1
 Interrupt_Return:
+		ld a,(VDP_MIRROR_8 + 15)
+		out (c),a
+		ld a,15 | VDP_REGISTER
+		out (c),a
 		pop hl
 		pop bc
 		pop af
