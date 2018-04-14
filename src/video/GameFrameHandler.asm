@@ -15,6 +15,7 @@ GameFrameHandler: MACRO ?settings, ?next
 		VDPRegister_SetDI_M  ; sprite attribute base LSB
 		VDPRegister_SetDI_M  ; sprite attribute base MSB
 		VDPRegister_SetDI_M  ; sprite pattern base
+		VDPRegister_SetDI_M  ; mode 8 (enable sprites)
 		VDPRegister_SetDI_M  ; interrupt line
 		VDPRegister_SetDI_M  ; status register 1
 		in a,(c)             ; clear FH

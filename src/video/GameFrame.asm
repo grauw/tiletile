@@ -19,6 +19,8 @@ GameFrame: MACRO
 		VDPRegister 11
 	spritePattern:
 		VDPRegister 6
+	mode8:
+		VDPRegister 8
 	interruptLine:
 		VDPRegister 19, GameFrame_FRAME_LINE
 		VDPRegister 15, 1
@@ -39,6 +41,9 @@ GameFrame_Construct:
 	ld (ix + GameFrame.spriteAttributeMSB + VDPRegister.value),a
 	ld a,(VDP_MIRROR_0 + 6)
 	ld (ix + GameFrame.spritePattern + VDPRegister.value),a
+	ld a,(VDP_MIRROR_8 + 8)
+	and 11111101B
+	ld (ix + GameFrame.mode8 + VDPRegister.value),a
 	ret
 
 GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
@@ -48,7 +53,7 @@ GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
 	ld (?this + GameFrame.horizontalOffsetDots + VDPRegister.value),a
 	ld a,(?displayOffset + DisplayOffset.verticalOffset)
 	ld (?this + GameFrame.verticalOffset + VDPRegister.value),a
-	add a,GameFrame_FRAME_LINE
+	add a,DialogFrame_FRAME_LINE - 2
 	ld (?this + GameFrame.interruptLine + VDPRegister.value),a
 	ENDM
 

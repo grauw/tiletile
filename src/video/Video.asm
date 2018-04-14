@@ -8,6 +8,8 @@
 	INCLUDE "BootFrameHandler.asm"
 	INCLUDE "GameFrame.asm"
 	INCLUDE "GameFrameHandler.asm"
+	INCLUDE "DialogFrame.asm"
+	INCLUDE "DialogFrameHandler.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "VRAMTableCopy.asm"

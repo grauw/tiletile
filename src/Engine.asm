@@ -34,8 +34,12 @@ Engine: MACRO
 		GameFrame
 	gameFrameOdd:
 		GameFrame
+	dialogFrame:
+		DialogFrame
 	gameFrameHandler:
-		GameFrameHandler gameFrameOdd, $
+		GameFrameHandler gameFrameOdd, dialogFrameHandler
+	dialogFrameHandler:
+		DialogFrameHandler dialogFrame, gameFrameHandler
 	video:
 		Video
 	interrupt:
@@ -96,7 +100,10 @@ Engine_Construct:
 	ld de,Engine.gameFrameHandler
 	add ix,de
 	call GameFrameHandler_Construct
-	ld de,-Engine.gameFrameHandler
+	ld de,Engine.dialogFrameHandler - Engine.gameFrameHandler
+	add ix,de
+	call DialogFrameHandler_Construct
+	ld de,-Engine.dialogFrameHandler
 	add ix,de
 
 	push ix
@@ -291,6 +298,9 @@ Engine_StartIY:
 	ld de,Engine.gameFrameOdd - Engine.gameFrameEven
 	add ix,de
 	call GameFrame_Construct
+	ld de,Engine.dialogFrame - Engine.gameFrameOdd
+	add ix,de
+	call DialogFrame_Construct
 	ld de,Engine.gameFrameHandler
 	add iy,de
 	call FrameHandler_ActivateIY
