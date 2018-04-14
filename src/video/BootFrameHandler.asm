@@ -8,7 +8,7 @@ BootFrameHandler: MACRO
 	; hl = boot frame
 	; Modifies: af, bc, hl
 	Apply:
-		VDPRegister_OUTI_DI_M  ; palette number
+		VDPRegister_SetDI_M  ; palette index
 		inc c
 		ld b,(hl)
 		inc hl

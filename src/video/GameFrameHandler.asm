@@ -8,18 +8,18 @@ GameFrameHandler: MACRO
 	; hl = boot frame
 	; Modifies: af, bc, hl
 	Apply:
-		VDPRegister_OUTI_DI_M  ; horizontal offset (characters)
-		VDPRegister_OUTI_DI_M  ; horizontal offset (dots)
-		VDPRegister_OUTI_DI_M  ; vertical offset
-		VDPRegister_OUTI_DI_M  ; pattern name base
-		VDPRegister_OUTI_DI_M  ; sprite attribute base LSB
-		VDPRegister_OUTI_DI_M  ; sprite attribute base MSB
-		VDPRegister_OUTI_DI_M  ; sprite pattern base
-		VDPRegister_OUTI_DI_M  ; interrupt line
-		VDPRegister_OUTI_DI_M  ; status register 1
-		in a,(c)               ; clear FH
-		VDPRegister_OUTI_DI_M  ; status register 2
-		VDPRegister_OUTI_DI_M  ; palette number
+		VDPRegister_SetDI_M  ; horizontal offset (characters)
+		VDPRegister_SetDI_M  ; horizontal offset (dots)
+		VDPRegister_SetDI_M  ; vertical offset
+		VDPRegister_SetDI_M  ; pattern name base
+		VDPRegister_SetDI_M  ; sprite attribute base LSB
+		VDPRegister_SetDI_M  ; sprite attribute base MSB
+		VDPRegister_SetDI_M  ; sprite pattern base
+		VDPRegister_SetDI_M  ; interrupt line
+		VDPRegister_SetDI_M  ; status register 1
+		in a,(c)             ; clear FH
+		VDPRegister_SetDI_M  ; status register 2
+		VDPRegister_SetDI_M  ; palette index
 		inc c
 		ld b,(hl)
 		inc hl
