@@ -92,6 +92,13 @@ Engine_Construct:
 	call Interrupt_Construct
 	pop ix
 
+	call Engine_GetInterrupt_IY
+	ld de,Engine.gameFrameHandler
+	add ix,de
+	call GameFrameHandler_Construct
+	ld de,-Engine.gameFrameHandler
+	add ix,de
+
 	push ix
 	call Engine_GetInterrupt_IY
 	call Engine_GetVideo
@@ -333,12 +340,7 @@ Continue:
 	ld e,ixl
 	ld d,ixh
 	call GameFrameHandler_SubmitIY
-	ld e,iyl
-	ld d,iyh
-	ld bc,Engine.video - Engine.gameFrameHandler
-	add iy,bc
-	call Video_SetDisplayFrameHandlerIY
-	ld de,-Engine.video
+	ld de,-Engine.gameFrameHandler
 	add iy,de
 	inc (iy + Engine.frameCount)
 	pop ix
@@ -376,12 +378,7 @@ Continue:
 	ld e,ixl
 	ld d,ixh
 	call GameFrameHandler_SubmitIY
-	ld e,iyl
-	ld d,iyh
-	ld bc,Engine.video - Engine.gameFrameHandler
-	add iy,bc
-	call Video_SetDisplayFrameHandlerIY
-	ld de,-Engine.video
+	ld de,-Engine.gameFrameHandler
 	add iy,de
 	inc (iy + Engine.frameCount)
 	pop ix

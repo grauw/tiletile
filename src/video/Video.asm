@@ -21,10 +21,8 @@
 	INCLUDE "PaletteFader.asm"
 
 Video: MACRO
-	this:
-	InterruptEntry:
-		jp Interrupt_Return
-	displayFrameHandler: equ $ - 2
+	interrupt:
+		dw 0
 	bootFrameHandler:
 		BootFrameHandler
 	bootPalette:
@@ -34,19 +32,31 @@ Video: MACRO
 ; ix = this
 ; iy = interrupt
 Video_Construct:
-	ld e,ixl
-	ld d,ixh
-	ld hl,Video.InterruptEntry
-	add hl,de
-	ex de,hl
-	call Interrupt_SetLineInterruptHandlerIY
+	ld e,iyl
+	ld d,iyh
+	ld (ix + Video.interrupt),e
+	ld (ix + Video.interrupt + 1),d
 	ld a,DisplayFrameHandler_FRAME_LINE
 	call Video_EnableLineInterrupt
+	ld de,Video.bootFrameHandler
+	add ix,de
+	call BootFrameHandler_Construct
+	ld de,-Video.bootFrameHandler
+	add ix,de
 	ret
 
 ; ix = this
 Video_Destruct:
 	call Video_DisableLineInterrupt
+	ret
+
+; iy = this
+; iy = interrupt
+Video_GetInterruptIY:
+	ld e,(iy + Video.interrupt)
+	ld d,(iy + Video.interrupt + 1)
+	ld iyl,e
+	ld iyh,d
 	ret
 
 ; a = line
@@ -109,13 +119,8 @@ Video_StartFadeOutIY: PROC
 	ld d,iyh
 	ld ix,Video.bootPalette
 	add ix,de
-	ld hl,Video.bootFrameHandler
-	add hl,de
-	ex de,hl
-	call Video_SetDisplayFrameHandlerIY
-	push iy
-	ld iyl,e
-	ld iyh,d
+	ld de,Video.bootFrameHandler
+	add iy,de
 	ld a,77H
 Loop:
 	push af
@@ -133,14 +138,18 @@ Loop:
 	pop af
 	sub 11H
 	jr nc,Loop
-	pop iy
+	ld de,-Video.bootFrameHandler
+	add iy,de
 	pop ix
 	ret
 	ENDP
 
 ; iy = this
 Video_StopIY:
-	call Video_ReleaseDisplayFrameHandlerIY
+	push iy
+	call Video_GetInterruptIY
+	call Interrupt_ResetLineInterruptHandlerIY
+	pop iy
 	call VDP_InitText
 	ret
 
@@ -172,26 +181,4 @@ Video_ToggleFrequencyIY:
 	ld (VDP_MIRROR_8 + 9),a
 	ld b,9
 	call VDP_SetRegister
-	ret
-
-; iy = this
-; de = display frame handler
-Video_SetDisplayFrameHandlerIY:
-	di
-	ld (iy + Video.displayFrameHandler),e
-	ei
-	ld (iy + Video.displayFrameHandler + 1),d
-	ret
-
-; Waits until previous display frame is displayed
-; iy = this
-Video_ReleaseDisplayFrameHandlerIY:
-	ld e,iyl
-	ld d,iyh
-	ld hl,Interrupt_Return
-	add hl,de
-	di
-	ld (iy + Video.displayFrameHandler),l
-	ei
-	ld (iy + Video.displayFrameHandler + 1),h
 	ret

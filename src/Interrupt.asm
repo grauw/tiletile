@@ -93,6 +93,15 @@ Interrupt_Destruct:
 	ei
 	ret
 
+; iy = this
+; hl <- handler pointer address
+Interrupt_GetLineInterruptHandlerPointerIY:
+	ld e,iyl
+	ld d,iyh
+	ld hl,Interrupt.handler
+	add hl,de
+	ret
+
 ; de = handler
 ; iy = this
 Interrupt_SetLineInterruptHandlerIY:

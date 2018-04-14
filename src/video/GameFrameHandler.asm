@@ -7,6 +7,8 @@ GameFrameHandler: MACRO
 	super: DisplayFrameHandler Apply
 	pending:
 		db 0
+	handlerPointer:
+		dw 0
 
 	; c = VDP port 1
 	; Modifies: af, bc, hl
@@ -44,6 +46,14 @@ GameFrameHandler: MACRO
 		jp Interrupt_Return
 	ENDM
 
+; ix = this
+; iy = interrupt
+GameFrameHandler_Construct:
+	call Interrupt_GetLineInterruptHandlerPointerIY
+	ld (ix + GameFrameHandler.handlerPointer),l
+	ld (ix + GameFrameHandler.handlerPointer + 1),h
+	ret
+
 ; Waits until previous display frame is displayed
 ; de = game frame settings
 ; iy = this
@@ -51,9 +61,18 @@ GameFrameHandler_SubmitIY:
 	call GameFrameHandler_WaitIY
 	di
 	ld (iy + GameFrameHandler.settings),e
-	ld (iy + GameFrameHandler.settings + 1),d
 	ei
+	ld (iy + GameFrameHandler.settings + 1),d
 	ld (iy + GameFrameHandler.pending),1
+	push iy
+	pop de
+	ld l,(iy + GameFrameHandler.handlerPointer)
+	ld h,(iy + GameFrameHandler.handlerPointer + 1)
+	di
+	ld (hl),e
+	inc hl
+	ei
+	ld (hl),d
 	ret
 
 ; iy = this

@@ -3,9 +3,11 @@
 ;
 BootFrameHandler: MACRO
 	super: DisplayFrameHandler Apply
-
 	frameCount:
 		db 0
+	handlerPointer:
+		dw 0
+
 	registers:
 		VDPRegister 16, 0
 	palette:
@@ -27,6 +29,14 @@ BootFrameHandler: MACRO
 		jp Interrupt_Return
 	ENDM
 
+; ix = this
+; iy = interrupt
+BootFrameHandler_Construct:
+	call Interrupt_GetLineInterruptHandlerPointerIY
+	ld (ix + BootFrameHandler.handlerPointer),l
+	ld (ix + BootFrameHandler.handlerPointer + 1),h
+	ret
+
 ; de = palette
 ; iy = this
 BootFrameHandler_SubmitIY:
@@ -34,6 +44,15 @@ BootFrameHandler_SubmitIY:
 	ld (iy + BootFrameHandler.palette),e
 	ei
 	ld (iy + BootFrameHandler.palette + 1),d
+	push iy
+	pop de
+	ld l,(iy + BootFrameHandler.handlerPointer)
+	ld h,(iy + BootFrameHandler.handlerPointer + 1)
+	di
+	ld (hl),e
+	inc hl
+	ei
+	ld (hl),d
 	call BootFrameHandler_WaitIY
 	ret
 
