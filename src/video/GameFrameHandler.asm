@@ -1,8 +1,8 @@
 ;
 ; Game frame interrupt handler
 ;
-GameFrameHandler: MACRO ?settings
-	super: FrameHandler Apply, ?settings
+GameFrameHandler: MACRO ?settings, ?next
+	super: FrameHandler Apply, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot frame

@@ -2,7 +2,8 @@
 ; Interrupt handler to display a frame.
 ; Or, the framing of the display.
 ;
-FrameHandler: MACRO ?entry, ?settings
+FrameHandler: MACRO ?entry, ?settings, ?next
+	this:
 	; Modifies: hl
 	Set:
 		ld hl,Entry
@@ -24,6 +25,7 @@ FrameHandler: MACRO ?entry, ?settings
 		IF DEBUG
 		PROFILE_END 10
 		ENDIF
+		call ?next
 		jp Interrupt_Return
 	pending:
 		db 0

@@ -28,7 +28,7 @@ Video: MACRO
 	bootFrame:
 		BootFrame
 	bootFrameHandler:
-		BootFrameHandler bootFrame
+		BootFrameHandler bootFrame, $
 	bootPalette:
 		Palette
 	ENDM

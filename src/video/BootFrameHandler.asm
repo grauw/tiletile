@@ -1,8 +1,8 @@
 ;
 ; Frame for boot
 ;
-BootFrameHandler: MACRO ?settings
-	super: FrameHandler Apply, ?settings
+BootFrameHandler: MACRO ?settings, ?next
+	super: FrameHandler Apply, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot frame

@@ -35,7 +35,7 @@ Engine: MACRO
 	gameFrameOdd:
 		GameFrame
 	gameFrameHandler:
-		GameFrameHandler gameFrameOdd
+		GameFrameHandler gameFrameOdd, $
 	video:
 		Video
 	interrupt:
