@@ -15,10 +15,10 @@ DialogFrameHandler: MACRO ?settings, ?next
 		in a,(c)
 		and b
 		jr z,PollHR  ; z: display, nz: h-blank
+		VDPRegister_SetDI_M  ; enable display
 		VDPRegister_SetDI_M  ; pattern name base
 		ld a,(hl)
 		VDPRegister_SetDI_M  ; vertical offset
-		VDPRegister_SetDI_M  ; enable display
 		VDPRegister_SetDI_M  ; horizontal offset (characters)
 		VDPRegister_SetDI_M  ; horizontal offset (dots)
 		VDPRegister_SetDI_M  ; disable sprites
