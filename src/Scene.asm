@@ -183,6 +183,8 @@ Loop:
 ; ix = this
 ; iy = engine
 Scene_Update:
+	call Engine_WaitDisplayedIY
+
 	IF DEBUG
 	PROFILE_FRAME_BEGIN
 	ENDIF
@@ -203,12 +205,11 @@ Scene_Update:
 	call Engine_CopySpriteColorToSecondary
 	call Scene_DrawSpriteAttributes
 	call Scene_UpdateTriggers
+	call Engine_SubmitSecondaryIY
 
 	IF DEBUG
 	PROFILE_FRAME_END
 	ENDIF
-
-	call Engine_SubmitSecondaryIY
 	ret
 
 ; ix = this

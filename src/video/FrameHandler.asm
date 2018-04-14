@@ -31,11 +31,9 @@ FrameHandler_Construct:
 	ld (ix + FrameHandler.handlerPointer + 1),h
 	ret
 
-; Waits until previous frame is displayed
 ; de = frame
 ; iy = this
 FrameHandler_SubmitIY:
-	call FrameHandler_WaitIY
 	di
 	ld (iy + FrameHandler.settings),e
 	ei

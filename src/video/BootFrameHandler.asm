@@ -26,7 +26,6 @@ BootFrameHandler_Construct:
 	call FrameHandler_Construct
 	ret
 
-; Waits until previous frame is displayed
 ; de = boot frame
 ; iy = this
 BootFrameHandler_SubmitIY: equ FrameHandler_SubmitIY
