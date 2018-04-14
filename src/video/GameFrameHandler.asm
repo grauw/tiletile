@@ -4,7 +4,7 @@
 GameFrameHandler_FRAME_LINE: equ 228
 
 GameFrameHandler: MACRO
-	super: DisplayFrameHandler Apply
+	super: FrameHandler Apply
 
 	; c = VDP port 1
 	; hl = boot frame
@@ -36,13 +36,13 @@ GameFrameHandler: MACRO
 ; ix = this
 ; iy = interrupt
 GameFrameHandler_Construct:
-	call DisplayFrameHandler_Construct
+	call FrameHandler_Construct
 	ret
 
 ; Waits until previous frame is displayed
 ; de = game frame
 ; iy = this
-GameFrameHandler_SubmitIY: equ DisplayFrameHandler_SubmitIY
+GameFrameHandler_SubmitIY: equ FrameHandler_SubmitIY
 
 ; iy = this
-GameFrameHandler_WaitIY: equ DisplayFrameHandler_WaitIY
+GameFrameHandler_WaitIY: equ FrameHandler_WaitIY

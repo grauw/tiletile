@@ -2,7 +2,7 @@
 ; Frame for boot
 ;
 BootFrameHandler: MACRO
-	super: DisplayFrameHandler Apply
+	super: FrameHandler Apply
 
 	; c = VDP port 1
 	; hl = boot frame
@@ -23,13 +23,13 @@ BootFrameHandler: MACRO
 ; ix = this
 ; iy = interrupt
 BootFrameHandler_Construct:
-	call DisplayFrameHandler_Construct
+	call FrameHandler_Construct
 	ret
 
 ; Waits until previous frame is displayed
 ; de = boot frame
 ; iy = this
-BootFrameHandler_SubmitIY: equ DisplayFrameHandler_SubmitIY
+BootFrameHandler_SubmitIY: equ FrameHandler_SubmitIY
 
 ; iy = this
-BootFrameHandler_WaitIY: equ DisplayFrameHandler_WaitIY
+BootFrameHandler_WaitIY: equ FrameHandler_WaitIY
