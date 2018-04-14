@@ -6,8 +6,7 @@ FrameHandler: MACRO ?line, ?settings, ?next
 	this:
 	; Modifies: af, bc, hl
 	Activate:
-		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
-		ld hl,2 << 8 | 1
+		ld c,VDP_PORT_1
 		ld a,(VDP_MIRROR_8 + 23)
 		add a,?line
 	line: equ $ - 1
@@ -15,11 +14,10 @@ FrameHandler: MACRO ?line, ?settings, ?next
 		out (c),a
 		ld a,19 | VDP_REGISTER
 		out (c),a  ; interrupt line
+		ld hl,(15 | VDP_REGISTER) << 8 | 1
 		out (c),l
-		out (c),b  ; status register 1
+		out (c),h  ; status register 1
 		in a,(c)   ; clear FH
-		out (c),h
-		out (c),b  ; status register 2
 		ld hl,Entry
 		ld (0),hl
 	handlerPointer: equ $ - 2
@@ -58,6 +56,10 @@ FrameHandler_Construct:
 FrameHandler_ActivateIY:
 	di
 	call System_JumpIY
+	ld a,(VDP_MIRROR_8 + 15)
+	out (c),a
+	ld a,15 | VDP_REGISTER
+	out (c),a
 	ei
 	ret
 
