@@ -4,7 +4,7 @@
 BootFrame_FRAME_LINE: equ 228
 
 BootFrame: MACRO
-	registers:
+	super: DisplayFrame
 		VDPRegister 16, 0
 	palette:
 		dw Palette_system

@@ -5,19 +5,11 @@ GameFrameHandler_FRAME_LINE: equ 228
 
 GameFrameHandler: MACRO
 	super: DisplayFrameHandler Apply
-	pending:
-		db 0
-	handlerPointer:
-		dw 0
 
 	; c = VDP port 1
+	; hl = boot frame
 	; Modifies: af, bc, hl
 	Apply:
-		IF DEBUG
-		PROFILE_BEGIN 10
-		ENDIF
-		ld hl,0
-	settings: equ $ - 2
 		VDPRegister_OUTI_DI_M  ; horizontal offset (characters)
 		VDPRegister_OUTI_DI_M  ; horizontal offset (dots)
 		VDPRegister_OUTI_DI_M  ; vertical offset
@@ -38,52 +30,19 @@ GameFrameHandler: MACRO
 		REPT 32
 		outi
 		ENDM
-		xor a
-		ld (pending),a
-		IF DEBUG
-		PROFILE_END 10
-		ENDIF
-		jp Interrupt_Return
+		jp super.Return
 	ENDM
 
 ; ix = this
 ; iy = interrupt
 GameFrameHandler_Construct:
-	call Interrupt_GetLineInterruptHandlerPointerIY
-	ld (ix + GameFrameHandler.handlerPointer),l
-	ld (ix + GameFrameHandler.handlerPointer + 1),h
+	call DisplayFrameHandler_Construct
 	ret
 
-; Waits until previous display frame is displayed
-; de = game frame settings
+; Waits until previous frame is displayed
+; de = game frame
 ; iy = this
-GameFrameHandler_SubmitIY:
-	call GameFrameHandler_WaitIY
-	di
-	ld (iy + GameFrameHandler.settings),e
-	ei
-	ld (iy + GameFrameHandler.settings + 1),d
-	ld (iy + GameFrameHandler.pending),1
-	push iy
-	pop de
-	ld l,(iy + GameFrameHandler.handlerPointer)
-	ld h,(iy + GameFrameHandler.handlerPointer + 1)
-	di
-	ld (hl),e
-	inc hl
-	ei
-	ld (hl),d
-	ret
+GameFrameHandler_SubmitIY: equ DisplayFrameHandler_SubmitIY
 
 ; iy = this
-GameFrameHandler_WaitIY:
-	bit 0,(iy + GameFrameHandler.pending)
-	ret z
-	IF DEBUG
-	PROFILE_BEGIN 29
-	ENDIF
-	halt
-	IF DEBUG
-	PROFILE_END 29
-	ENDIF
-	jr GameFrameHandler_WaitIY
+GameFrameHandler_WaitIY: equ DisplayFrameHandler_WaitIY

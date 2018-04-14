@@ -4,6 +4,7 @@
 GameFrame_FRAME_LINE: equ 228
 
 GameFrame: MACRO
+	super: DisplayFrame
 	horizontalOffsetCharacters:
 		VDPRegister 26
 	horizontalOffsetDots:

@@ -3,16 +3,11 @@
 ;
 BootFrameHandler: MACRO
 	super: DisplayFrameHandler Apply
-	frameCount:
-		db 0
-	handlerPointer:
-		dw 0
 
 	; c = VDP port 1
+	; hl = boot frame
 	; Modifies: af, bc, hl
 	Apply:
-		ld hl,0
-	settings: equ $ - 2
 		VDPRegister_OUTI_DI_M  ; palette number
 		inc c
 		ld b,(hl)
@@ -22,45 +17,19 @@ BootFrameHandler: MACRO
 		REPT 32
 		outi
 		ENDM
-		ld a,(frameCount)
-		inc a
-		ld (frameCount),a
-		jp Interrupt_Return
+		jp super.Return
 	ENDM
 
 ; ix = this
 ; iy = interrupt
 BootFrameHandler_Construct:
-	call Interrupt_GetLineInterruptHandlerPointerIY
-	ld (ix + BootFrameHandler.handlerPointer),l
-	ld (ix + BootFrameHandler.handlerPointer + 1),h
+	call DisplayFrameHandler_Construct
 	ret
 
+; Waits until previous frame is displayed
 ; de = boot frame
 ; iy = this
-BootFrameHandler_SubmitIY:
-	di
-	ld (iy + BootFrameHandler.settings),e
-	ei
-	ld (iy + BootFrameHandler.settings + 1),d
-	push iy
-	pop de
-	ld l,(iy + BootFrameHandler.handlerPointer)
-	ld h,(iy + BootFrameHandler.handlerPointer + 1)
-	di
-	ld (hl),e
-	inc hl
-	ei
-	ld (hl),d
-	call BootFrameHandler_WaitIY
-	ret
+BootFrameHandler_SubmitIY: equ DisplayFrameHandler_SubmitIY
 
 ; iy = this
-BootFrameHandler_WaitIY: PROC
-	ld b,(iy + BootFrameHandler.frameCount)
-Wait:
-	ld a,(iy + BootFrameHandler.frameCount)
-	sub b
-	jr z,Wait
-	ret
-	ENDP
+BootFrameHandler_WaitIY: equ DisplayFrameHandler_WaitIY
