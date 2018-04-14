@@ -25,7 +25,7 @@ FrameHandler: MACRO ?line, ?settings, ?next
 	pending:
 		db 0
 	; c = VDP port 1
-	; Modifies: af, bc, hl
+	; Modifies: af, bc
 	Return:
 		xor a
 		ld (pending),a
@@ -33,13 +33,15 @@ FrameHandler: MACRO ?line, ?settings, ?next
 		PROFILE_END 10
 		ENDIF
 		call ?next
+		pop hl
 		jp Interrupt_Return
 	; c = VDP port 1
-	; Modifies: af, bc, hl
+	; Modifies: af, bc
 	Entry:
 		IF DEBUG
 		PROFILE_BEGIN 10
 		ENDIF
+		push hl
 		ld hl,?settings
 	settings: equ $ - 2
 	ENDM
