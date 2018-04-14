@@ -80,6 +80,7 @@ Interrupt_Construct:
 	im 2
 	ld a,2
 	ld b,15
+	ld (VDP_MIRROR_8 + 15),a
 	call VDP_SetRegister  ; select s#2
 	ret
 
@@ -89,6 +90,7 @@ Interrupt_Destruct:
 	im 1
 	ld a,0
 	ld b,15
+	ld (VDP_MIRROR_8 + 15),a
 	call VDP_SetRegister  ; select s#0
 	ei
 	ret
