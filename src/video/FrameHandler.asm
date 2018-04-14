@@ -3,6 +3,14 @@
 ; Or, the framing of the display.
 ;
 FrameHandler: MACRO ?entry
+	; Modifies: hl
+	Set:
+		ld hl,Entry
+		ld (0),hl
+	handlerPointer: equ $ - 2
+		ret
+	; c = VDP port 1
+	; Modifies: af, bc, hl
 	Entry:
 		IF DEBUG
 		PROFILE_BEGIN 10
@@ -19,8 +27,6 @@ FrameHandler: MACRO ?entry
 		jp Interrupt_Return
 	pending:
 		db 0
-	handlerPointer:
-		dw 0
 	ENDM
 
 ; ix = this
@@ -33,22 +39,14 @@ FrameHandler_Construct:
 
 ; de = frame
 ; iy = this
+; Modifies: hl
 FrameHandler_SubmitIY:
 	di
 	ld (iy + FrameHandler.settings),e
 	ei
 	ld (iy + FrameHandler.settings + 1),d
 	ld (iy + FrameHandler.pending),1
-	push iy
-	pop de
-	ld l,(iy + FrameHandler.handlerPointer)
-	ld h,(iy + FrameHandler.handlerPointer + 1)
-	di
-	ld (hl),e
-	inc hl
-	ei
-	ld (hl),d
-	ret
+	jp iy
 
 ; iy = this
 FrameHandler_WaitIY:

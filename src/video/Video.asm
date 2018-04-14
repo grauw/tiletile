@@ -145,10 +145,8 @@ Loop:
 	ld hl,Video.bootFrame - Video.bootFrameHandler
 	add hl,de
 	ex de,hl
-	push de
 	call BootFrameHandler_SubmitIY
 	call BootFrameHandler_WaitIY
-	pop de
 	call BootFrameHandler_SubmitIY
 	call BootFrameHandler_WaitIY
 	pop af
