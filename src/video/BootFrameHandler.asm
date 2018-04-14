@@ -8,18 +8,17 @@ BootFrameHandler: MACRO
 	handlerPointer:
 		dw 0
 
-	registers:
-		VDPRegister 16, 0
-	palette:
-		dw Palette_system
-
 	; c = VDP port 1
 	; Modifies: af, bc, hl
 	Apply:
-		ld hl,registers
+		ld hl,0
+	settings: equ $ - 2
 		VDPRegister_OUTI_DI_M  ; palette number
 		inc c
-		ld hl,(palette)
+		ld b,(hl)
+		inc hl
+		ld h,(hl)
+		ld l,b
 		REPT 32
 		outi
 		ENDM
@@ -37,13 +36,13 @@ BootFrameHandler_Construct:
 	ld (ix + BootFrameHandler.handlerPointer + 1),h
 	ret
 
-; de = palette
+; de = boot frame
 ; iy = this
 BootFrameHandler_SubmitIY:
 	di
-	ld (iy + BootFrameHandler.palette),e
+	ld (iy + BootFrameHandler.settings),e
 	ei
-	ld (iy + BootFrameHandler.palette + 1),d
+	ld (iy + BootFrameHandler.settings + 1),d
 	push iy
 	pop de
 	ld l,(iy + BootFrameHandler.handlerPointer)

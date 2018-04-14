@@ -3,6 +3,7 @@
 ;
 	INCLUDE "VDPRegister.asm"
 	INCLUDE "DisplayFrameHandler.asm"
+	INCLUDE "BootFrame.asm"
 	INCLUDE "BootFrameHandler.asm"
 	INCLUDE "GameFrame.asm"
 	INCLUDE "GameFrameHandler.asm"
@@ -23,6 +24,8 @@
 Video: MACRO
 	interrupt:
 		dw 0
+	bootFrame:
+		BootFrame
 	bootFrameHandler:
 		BootFrameHandler
 	bootPalette:
@@ -133,6 +136,14 @@ Loop:
 	pop ix
 	ld e,ixl
 	ld d,ixh
+	di
+	BootFrame_SetPalette_M (iy + Video.bootFrame - Video.bootFrameHandler), e, d
+	ei
+	ld e,iyl
+	ld d,iyh
+	ld hl,Video.bootFrame - Video.bootFrameHandler
+	add hl,de
+	ex de,hl
 	call BootFrameHandler_SubmitIY
 	call BootFrameHandler_WaitIY
 	pop af
