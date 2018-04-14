@@ -2,8 +2,6 @@
 ; Interrupt handler to display a frame.
 ; Or, the framing of the display.
 ;
-FrameHandler_FRAME_LINE: equ 228
-
 FrameHandler: MACRO ?entry
 	Entry:
 		IF DEBUG

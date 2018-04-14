@@ -40,7 +40,7 @@ Video_Construct:
 	ld d,iyh
 	ld (ix + Video.interrupt),e
 	ld (ix + Video.interrupt + 1),d
-	ld a,FrameHandler_FRAME_LINE
+	ld a,BootFrame_FRAME_LINE
 	call Video_EnableLineInterrupt
 	ld de,Video.bootFrameHandler
 	add ix,de

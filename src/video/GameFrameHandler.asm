@@ -1,8 +1,6 @@
 ;
 ; Game frame interrupt handler
 ;
-GameFrameHandler_FRAME_LINE: equ 228
-
 GameFrameHandler: MACRO
 	super: FrameHandler Apply
 
