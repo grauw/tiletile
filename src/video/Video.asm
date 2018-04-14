@@ -73,7 +73,7 @@ Video_EnableLineInterrupt:
 	ld b,19
 	call VDP_SetRegister
 	ld a,(VDP_MIRROR_0 + 0)
-	set 4,a
+	set 4,a  ; IE1
 	ld (VDP_MIRROR_0 + 0),a
 	ld b,0
 	call VDP_SetRegister
@@ -81,7 +81,7 @@ Video_EnableLineInterrupt:
 
 Video_DisableLineInterrupt:
 	ld a,(VDP_MIRROR_0 + 0)
-	res 4,a
+	res 4,a  ; IE1
 	ld (VDP_MIRROR_0 + 0),a
 	ld b,0
 	call VDP_SetRegister
