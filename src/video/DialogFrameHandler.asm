@@ -9,6 +9,7 @@ DialogFrameHandler: MACRO ?settings, ?next
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; disable display
+		VDPRegister_SetDI_M  ; status register 2
 		ld b,00100000B
 	PollHR:
 		in a,(c)

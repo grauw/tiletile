@@ -7,6 +7,7 @@ DialogFrame: MACRO
 	super: Frame
 	mode1Blank:
 		VDPRegister 1
+		VDPRegister 15, 2
 		VDPRegister 2, 3 << 5 | 00011111B
 	verticalOffset:
 		VDPRegister 23, -DialogFrame_FRAME_LINE

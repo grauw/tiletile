@@ -14,12 +14,10 @@ Interrupt: MACRO
 		push bc
 		push hl
 		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
-		ld hl,2 << 8 | 1
-		out (c),l
+		ld a,1
+		out (c),a
 		out (c),b  ; select s#1
 		in (c)
-		out (c),h
-		out (c),b  ; select s#2
 		jp pe,Interrupt_Return  ; V9958 has no light pen bits, and VDP ID is 2
 	handler: equ $ - 2
 		xor a
