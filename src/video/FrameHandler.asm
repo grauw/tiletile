@@ -51,6 +51,12 @@ FrameHandler_SubmitIY:
 	jp iy
 
 ; iy = this
+; Modifies: hl
+FrameHandler_SubmitSameFrameIY:
+	ld (iy + FrameHandler.pending),1
+	jp iy
+
+; iy = this
 FrameHandler_WaitIY:
 	bit 0,(iy + FrameHandler.pending)
 	ret z

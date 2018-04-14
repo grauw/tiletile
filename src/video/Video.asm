@@ -140,14 +140,9 @@ Loop:
 	di
 	BootFrame_SetPalette_M (iy + Video.bootFrame - Video.bootFrameHandler), e, d
 	ei
-	ld e,iyl
-	ld d,iyh
-	ld hl,Video.bootFrame - Video.bootFrameHandler
-	add hl,de
-	ex de,hl
-	call FrameHandler_SubmitIY
+	call FrameHandler_SubmitSameFrameIY
 	call FrameHandler_WaitIY
-	call FrameHandler_SubmitIY
+	call FrameHandler_SubmitSameFrameIY
 	call FrameHandler_WaitIY
 	pop af
 	sub 11H
