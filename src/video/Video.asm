@@ -42,7 +42,6 @@ Video_Construct:
 	ld d,iyh
 	ld (ix + Video.interrupt),e
 	ld (ix + Video.interrupt + 1),d
-	ld a,BootFrame_FRAME_LINE
 	call Video_EnableLineInterrupt
 	ld de,Video.bootFrame
 	add ix,de
@@ -68,10 +67,7 @@ Video_GetInterruptIY:
 	ld iyh,d
 	ret
 
-; a = line
 Video_EnableLineInterrupt:
-	ld b,19
-	call VDP_SetRegister
 	ld a,(VDP_MIRROR_0 + 0)
 	set 4,a  ; IE1
 	ld (VDP_MIRROR_0 + 0),a

@@ -2,7 +2,7 @@
 ; Dialog frame interrupt handler
 ;
 DialogFrameHandler: MACRO ?settings, ?next
-	super: FrameHandler Apply, ?settings, ?next
+	super: FrameHandler Apply, DialogFrame_FRAME_LINE - 2, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot frame
@@ -15,15 +15,13 @@ DialogFrameHandler: MACRO ?settings, ?next
 		and b
 		jr z,PollHR  ; z: display, nz: h-blank
 		VDPRegister_SetDI_M  ; pattern name base
+		ld a,(hl)
 		VDPRegister_SetDI_M  ; vertical offset
 		VDPRegister_SetDI_M  ; enable display
 		VDPRegister_SetDI_M  ; horizontal offset (characters)
 		VDPRegister_SetDI_M  ; horizontal offset (dots)
 		VDPRegister_SetDI_M  ; disable sprites
-		VDPRegister_SetDI_M  ; set interrupt line
-		VDPRegister_SetDI_M  ; status register 1
-		in a,(c)             ; clear FH
-		VDPRegister_SetDI_M  ; status register 2
+		ld (VDP_MIRROR_8 + 23),a
 		jp super.Return
 	ENDM
 

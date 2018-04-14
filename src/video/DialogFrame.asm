@@ -16,10 +16,6 @@ DialogFrame: MACRO
 		VDPRegister 27, 0
 	mode8:
 		VDPRegister 8
-	interruptLine:
-		VDPRegister 19, GameFrame_FRAME_LINE - DialogFrame_FRAME_LINE - 2
-		VDPRegister 15, 1
-		VDPRegister 15, 2
 	_size:
 	ENDM
 

@@ -2,10 +2,24 @@
 ; Interrupt handler to display a frame.
 ; Or, the framing of the display.
 ;
-FrameHandler: MACRO ?entry, ?settings, ?next
+FrameHandler: MACRO ?entry, ?line, ?settings, ?next
 	this:
-	; Modifies: hl
+	; Modifies: af, bc, hl
 	Activate:
+		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
+		ld hl,2 << 8 | 1
+		ld a,(VDP_MIRROR_8 + 23)
+		add a,?line
+	line: equ $ - 1
+		ld (VDP_MIRROR_8 + 19),a
+		out (c),a
+		ld a,19 | VDP_REGISTER
+		out (c),a  ; interrupt line
+		out (c),l
+		out (c),b  ; status register 1
+		in a,(c)   ; clear FH
+		out (c),h
+		out (c),b  ; status register 2
 		ld hl,Entry
 		ld (0),hl
 	handlerPointer: equ $ - 2
@@ -42,7 +56,10 @@ FrameHandler_Construct:
 ; iy = this
 ; Modifies: hl
 FrameHandler_ActivateIY:
-	jp iy
+	di
+	call System_JumpIY
+	ei
+	ret
 
 ; de = frame
 ; iy = this

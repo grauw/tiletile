@@ -2,7 +2,7 @@
 ; Game frame interrupt handler
 ;
 GameFrameHandler: MACRO ?settings, ?next
-	super: FrameHandler Apply, ?settings, ?next
+	super: FrameHandler Apply, GameFrame_FRAME_LINE, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot frame
@@ -10,16 +10,13 @@ GameFrameHandler: MACRO ?settings, ?next
 	Apply:
 		VDPRegister_SetDI_M  ; horizontal offset (characters)
 		VDPRegister_SetDI_M  ; horizontal offset (dots)
+		ld a,(hl)
 		VDPRegister_SetDI_M  ; vertical offset
 		VDPRegister_SetDI_M  ; pattern name base
 		VDPRegister_SetDI_M  ; sprite attribute base LSB
 		VDPRegister_SetDI_M  ; sprite attribute base MSB
 		VDPRegister_SetDI_M  ; sprite pattern base
 		VDPRegister_SetDI_M  ; mode 8 (enable sprites)
-		VDPRegister_SetDI_M  ; interrupt line
-		VDPRegister_SetDI_M  ; status register 1
-		in a,(c)             ; clear FH
-		VDPRegister_SetDI_M  ; status register 2
 		VDPRegister_SetDI_M  ; palette index
 		ld b,(hl)
 		inc hl
@@ -29,6 +26,7 @@ GameFrameHandler: MACRO ?settings, ?next
 		REPT Palette_COLORS
 		PaletteColor_SetDI_M
 		ENDM
+		ld (VDP_MIRROR_8 + 23),a
 		jp super.Return
 	ENDM
 

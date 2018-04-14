@@ -22,9 +22,6 @@ GameFrame: MACRO
 	mode8:
 		VDPRegister 8
 	interruptLine:
-		VDPRegister 19, GameFrame_FRAME_LINE
-		VDPRegister 15, 1
-		VDPRegister 15, 2
 		VDPRegister 16, 0
 	palette:
 		dw Palette_black
@@ -53,8 +50,6 @@ GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
 	ld (?this + GameFrame.horizontalOffsetDots + VDPRegister.value),a
 	ld a,(?displayOffset + DisplayOffset.verticalOffset)
 	ld (?this + GameFrame.verticalOffset + VDPRegister.value),a
-	add a,DialogFrame_FRAME_LINE - 2
-	ld (?this + GameFrame.interruptLine + VDPRegister.value),a
 	ENDM
 
 GameFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
