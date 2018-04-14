@@ -2,7 +2,7 @@
 ; Interrupt handler to display a frame.
 ; Or, the framing of the display.
 ;
-FrameHandler: MACRO ?entry, ?line, ?settings, ?next
+FrameHandler: MACRO ?line, ?settings, ?next
 	this:
 	; Modifies: af, bc, hl
 	Activate:
@@ -24,15 +24,9 @@ FrameHandler: MACRO ?entry, ?line, ?settings, ?next
 		ld (0),hl
 	handlerPointer: equ $ - 2
 		ret
-	; c = VDP port 1
+	pending:
+		db 0
 	; Modifies: af, bc, hl
-	Entry:
-		IF DEBUG
-		PROFILE_BEGIN 10
-		ENDIF
-		ld hl,?settings
-	settings: equ $ - 2
-		jp ?entry
 	Return:
 		xor a
 		ld (pending),a
@@ -41,8 +35,14 @@ FrameHandler: MACRO ?entry, ?line, ?settings, ?next
 		ENDIF
 		call ?next
 		jp Interrupt_Return
-	pending:
-		db 0
+	; c = VDP port 1
+	; Modifies: af, bc, hl
+	Entry:
+		IF DEBUG
+		PROFILE_BEGIN 10
+		ENDIF
+		ld hl,?settings
+	settings: equ $ - 2
 	ENDM
 
 ; ix = this

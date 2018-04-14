@@ -2,7 +2,7 @@
 ; Dialog frame interrupt handler
 ;
 DialogFrameHandler: MACRO ?settings, ?next
-	super: FrameHandler Apply, DialogFrame_FRAME_LINE - 2, ?settings, ?next
+	super: FrameHandler DialogFrame_FRAME_LINE - 2, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot frame
