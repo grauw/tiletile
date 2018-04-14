@@ -128,6 +128,7 @@ Video_StartFadeOutIY: PROC
 	add ix,de
 	ld de,Video.bootFrameHandler
 	add iy,de
+	call FrameHandler_ActivateIY
 	ld a,77H
 Loop:
 	push af

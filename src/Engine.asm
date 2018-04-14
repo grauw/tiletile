@@ -291,6 +291,11 @@ Engine_StartIY:
 	ld de,Engine.gameFrameOdd - Engine.gameFrameEven
 	add ix,de
 	call GameFrame_Construct
+	ld de,Engine.gameFrameHandler
+	add iy,de
+	call FrameHandler_ActivateIY
+	ld de,-Engine.gameFrameHandler
+	add iy,de
 	ret
 
 ; iy = this

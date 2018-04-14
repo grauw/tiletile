@@ -5,7 +5,7 @@
 FrameHandler: MACRO ?entry, ?settings, ?next
 	this:
 	; Modifies: hl
-	Set:
+	Activate:
 		ld hl,Entry
 		ld (0),hl
 	handlerPointer: equ $ - 2
@@ -39,22 +39,25 @@ FrameHandler_Construct:
 	ld (ix + FrameHandler.handlerPointer + 1),h
 	ret
 
-; de = frame
 ; iy = this
 ; Modifies: hl
+FrameHandler_ActivateIY:
+	jp iy
+
+; de = frame
+; iy = this
 FrameHandler_SubmitIY:
 	di
 	ld (iy + FrameHandler.settings),e
 	ei
 	ld (iy + FrameHandler.settings + 1),d
 	ld (iy + FrameHandler.pending),1
-	jp iy
+	ret
 
 ; iy = this
-; Modifies: hl
 FrameHandler_SubmitSameFrameIY:
 	ld (iy + FrameHandler.pending),1
-	jp iy
+	ret
 
 ; iy = this
 FrameHandler_WaitIY:
