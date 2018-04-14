@@ -4,9 +4,9 @@
 ;
 FrameHandler: MACRO ?line, ?settings, ?next
 	this:
+	; c = VDP port 1
 	; Modifies: af, bc, hl
 	Activate:
-		ld c,VDP_PORT_1
 		ld a,(VDP_MIRROR_8 + 23)
 		add a,?line
 	line: equ $ - 1
@@ -24,6 +24,7 @@ FrameHandler: MACRO ?line, ?settings, ?next
 		ret
 	pending:
 		db 0
+	; c = VDP port 1
 	; Modifies: af, bc, hl
 	Return:
 		xor a
@@ -54,12 +55,12 @@ FrameHandler_Construct:
 ; iy = this
 ; Modifies: hl
 FrameHandler_ActivateIY:
+	ld c,VDP_PORT_1
 	di
 	call System_JumpIY
 	ld a,(VDP_MIRROR_8 + 15)
-	out (c),a
-	ld a,15 | VDP_REGISTER
-	out (c),a
+	ld b,15
+	call VDP_SetRegister
 	ei
 	ret
 

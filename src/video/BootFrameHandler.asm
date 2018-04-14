@@ -17,6 +17,7 @@ BootFrameHandler: MACRO ?settings, ?next
 		REPT Palette_COLORS
 		PaletteColor_SetDI_M
 		ENDM
+		dec c
 		jp super.Return
 	ENDM
 

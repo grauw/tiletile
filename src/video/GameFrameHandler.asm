@@ -27,6 +27,7 @@ GameFrameHandler: MACRO ?settings, ?next
 		PaletteColor_SetDI_M
 		ENDM
 		ld (VDP_MIRROR_8 + 23),a
+		dec c
 		jp super.Return
 	ENDM
 
