@@ -6,11 +6,11 @@ GameFrame_FRAME_LINE: equ 228
 GameFrame: MACRO
 	super: Frame
 	horizontalOffsetCharacters:
-		VDPRegister 26
+		VDPRegister 26, 0
 	horizontalOffsetDots:
-		VDPRegister 27
+		VDPRegister 27, 0
 	verticalOffset:
-		VDPRegister 23
+		VDPRegister 23, 0
 	patternName:
 		VDPRegister 2
 	spriteAttributeLSB:
@@ -20,14 +20,26 @@ GameFrame: MACRO
 	spritePattern:
 		VDPRegister 6
 	interruptLine:
-		VDPRegister 19
+		VDPRegister 19, GameFrame_FRAME_LINE
 		VDPRegister 15, 1
 		VDPRegister 15, 2
 		VDPRegister 16, 0
 	palette:
-		dw Palette_system
+		dw Palette_black
 	_size:
 	ENDM
+
+; ix = this
+GameFrame_Construct:
+	ld a,(VDP_MIRROR_0 + 2)
+	ld (ix + GameFrame.patternName + VDPRegister.value),a
+	ld a,(VDP_MIRROR_0 + 5)
+	ld (ix + GameFrame.spriteAttributeLSB + VDPRegister.value),a
+	ld a,(VDP_MIRROR_8 + 11)
+	ld (ix + GameFrame.spriteAttributeMSB + VDPRegister.value),a
+	ld a,(VDP_MIRROR_0 + 6)
+	ld (ix + GameFrame.spritePattern + VDPRegister.value),a
+	ret
 
 GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
 	ld a,(?displayOffset + DisplayOffset.horizontalOffsetCharacters)

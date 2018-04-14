@@ -11,6 +11,10 @@ BootFrame: MACRO
 	_size:
 	ENDM
 
+; ix = this
+BootFrame_Construct:
+	ret
+
 BootFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
 	ld (?this + BootFrame.palette),?palettelow
 	ld (?this + BootFrame.palette + 1),?palettehigh

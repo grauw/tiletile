@@ -282,6 +282,15 @@ Engine_StartIY:
 	call Engine_GetVideoIY
 	call Video_StartIY
 	pop iy
+
+	ld e,iyl
+	ld d,iyh
+	ld ix,Engine.gameFrameEven
+	add ix,de
+	call GameFrame_Construct
+	ld de,Engine.gameFrameOdd - Engine.gameFrameEven
+	add ix,de
+	call GameFrame_Construct
 	ret
 
 ; iy = this
