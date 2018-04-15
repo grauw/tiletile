@@ -1,7 +1,7 @@
 ;
 ; A scene.
 ;
-Scene: MACRO ?tileset, ?tilemap
+Scene: MACRO ?tileset, ?tilemap, ?uiImage
 	engine:
 		dw 0
 	tileSet:
@@ -12,6 +12,8 @@ Scene: MACRO ?tileset, ?tilemap
 		db 0
 	exit:
 		db 0
+	dialog:
+		Dialog ?uiImage
 	mapView:
 		MapView
 	player:
@@ -27,6 +29,11 @@ Scene: MACRO ?tileset, ?tilemap
 Scene_Construct:
 	ld (ix + Scene.engine),e
 	ld (ix + Scene.engine + 1),d
+
+	push ix
+	call Scene_GetDialog
+	call Dialog_Construct
+	pop ix
 
 	push ix
 	call Scene_GetTileMap_DE
@@ -97,6 +104,13 @@ Scene_GetTileMap_DE:
 	ret
 
 ; ix = this
+; ix <- dialog
+Scene_GetDialog:
+	ld de,Scene.dialog
+	add ix,de
+	ret
+
+; ix = this
 ; ix <- map view
 Scene_GetMapView:
 	ld de,Scene.mapView
@@ -126,12 +140,17 @@ Scene_GetPaletteFader:
 
 ; ix = this
 Scene_Start:
-	call Scene_GetEngine_IY
-
 	push ix
 	call Scene_GetTileSet
 	call TileSet_Load
 	pop ix
+
+	push ix
+	call Scene_GetDialog
+	call Dialog_Load
+	pop ix
+
+	call Scene_GetEngine_IY
 
 	push iy
 	call Engine_GetSpritePatternTableEvenIY
