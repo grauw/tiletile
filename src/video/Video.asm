@@ -85,6 +85,10 @@ Video_DisableLineInterrupt:
 
 ; iy = this
 Video_StartIY:
+	ld a,0
+	ld (VDP_MIRROR_8 + 16),a
+	ld b,16
+	call VDP_SetRegister
 	call Video_StartFadeOutIY
 	ld a,5
 	call VDP_InitScreen

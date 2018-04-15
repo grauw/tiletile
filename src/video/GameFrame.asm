@@ -21,8 +21,6 @@ GameFrame: MACRO
 		VDPRegister 6
 	mode8:
 		VDPRegister 8
-	interruptLine:
-		VDPRegister 16, 0
 	palette:
 		dw Palette_black
 	_size:

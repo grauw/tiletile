@@ -5,7 +5,6 @@ BootFrame_FRAME_LINE: equ 228
 
 BootFrame: MACRO
 	super: Frame
-		VDPRegister 16, 0
 	palette:
 		dw Palette_system
 	_size:

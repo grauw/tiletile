@@ -17,7 +17,6 @@ GameFrameHandler: MACRO ?settings, ?next
 		VDPRegister_SetDI_M  ; sprite attribute base MSB
 		VDPRegister_SetDI_M  ; sprite pattern base
 		VDPRegister_SetDI_M  ; mode 8 (enable sprites)
-		VDPRegister_SetDI_M  ; palette index
 		ld b,(hl)
 		inc hl
 		ld h,(hl)
