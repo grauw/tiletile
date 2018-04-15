@@ -21,6 +21,8 @@ GameFrame: MACRO
 		VDPRegister 6
 	mode8:
 		VDPRegister 8
+	mode9:
+		VDPRegister 9
 	palette:
 		dw Palette_black
 	_size:
@@ -39,6 +41,9 @@ GameFrame_Construct:
 	ld a,(VDP_MIRROR_8 + 8)
 	and 11111101B
 	ld (ix + GameFrame.mode8 + VDPRegister.value),a
+	ld a,(VDP_MIRROR_8 + 9)
+	or 10000000B
+	ld (ix + GameFrame.mode9 + VDPRegister.value),a
 	ret
 
 GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset

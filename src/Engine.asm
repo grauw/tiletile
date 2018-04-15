@@ -36,10 +36,14 @@ Engine: MACRO
 		GameFrame
 	dialogFrame:
 		DialogFrame
+	overscanFrame:
+		OverscanFrame
 	gameFrameHandler:
 		GameFrameHandler gameFrameOdd, dialogFrameHandler
 	dialogFrameHandler:
 		DialogFrameHandler dialogFrame, gameFrameHandler
+	overscanFrameHandler:
+		OverscanFrameHandler overscanFrame, gameFrameHandler
 	video:
 		Video
 	interrupt:
@@ -103,7 +107,10 @@ Engine_Construct:
 	ld de,Engine.dialogFrameHandler - Engine.gameFrameHandler
 	add ix,de
 	call DialogFrameHandler_Construct
-	ld de,-Engine.dialogFrameHandler
+	ld de,Engine.overscanFrameHandler - Engine.dialogFrameHandler
+	add ix,de
+	call OverscanFrameHandler_Construct
+	ld de,-Engine.overscanFrameHandler
 	add ix,de
 
 	push ix
@@ -301,6 +308,9 @@ Engine_StartIY:
 	ld de,Engine.dialogFrame - Engine.gameFrameOdd
 	add ix,de
 	call DialogFrame_Construct
+	ld de,Engine.overscanFrame - Engine.dialogFrame
+	add ix,de
+	call OverscanFrame_Construct
 	ld de,Engine.gameFrameHandler
 	add iy,de
 	call FrameHandler_ActivateIY

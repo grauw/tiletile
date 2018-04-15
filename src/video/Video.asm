@@ -10,6 +10,8 @@
 	INCLUDE "GameFrameHandler.asm"
 	INCLUDE "DialogFrame.asm"
 	INCLUDE "DialogFrameHandler.asm"
+	INCLUDE "OverscanFrame.asm"
+	INCLUDE "OverscanFrameHandler.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "VRAMTableCopy.asm"
