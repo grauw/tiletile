@@ -1,0 +1,8 @@
+{
+	"tilemaps": [
+		{
+			"name": "FieldMap",
+			"path": "field/tilemap.tmx"
+		}
+	]
+}

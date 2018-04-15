@@ -3,7 +3,7 @@ COPY_TARGET = /Volumes/MSXDOS2
 all:
 	mkdir -p gen bin
 	[ -d node_modules ] || npm install
-	node tools/tmxtomap.js res/field/tilemap.tmx > gen/FieldMap.asm FieldMap
+	node tools/buildres.js res/manifest.json > gen/Resources.asm
 	java -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/tiletile.rom bin/tiletile.sym
 
 copy: all

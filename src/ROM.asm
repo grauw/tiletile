@@ -73,7 +73,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Rain.asm"
 	INCLUDE "ManaShroud.asm"
 	INCLUDE "Lightning.asm"
-	INCLUDE "FieldMap.asm"
+	INCLUDE "Resources.asm"
 
 	ENDS
 

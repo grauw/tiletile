@@ -5,18 +5,38 @@ let xml2js = require('xml2js');
 let PNG = require('png-js');
 
 function main() {
-	if (process.argv.length < 4) {
-		console.log("Usage: node " + process.argv[1] + " TILEMAP.TMX NAME");
+	if (process.argv.length < 3) {
+		console.log("Usage: node " + process.argv[1] + " manifest.json");
 		process.exit(1);
 	}
 
 	let path = process.argv[2];
-	let name = process.argv[3];
 
-	new Tmx(name, path).parse((tileMap) => {
-		tileMap.optimize();
-		console.log(tileMap.toAsm());
+	new ManifestLoader(path).parse(manifest => {
+		manifest.optimize();
+		console.log(manifest.toAsm());
 	});
+}
+
+class Manifest {
+	constructor(tileMaps) {
+		checkTypes(arguments, Array);
+		this.tileMaps = tileMaps;
+	}
+
+	optimize() {
+		for (let tileMap of this.tileMaps) {
+			tileMap.optimize();
+		}
+	}
+
+	toAsm() {
+		var lines = [];
+		for (let tileMap of this.tileMaps) {
+			lines.push(tileMap.toAsm());
+		}
+		return lines.join("\n\n");
+	}
 }
 
 class TileMap {
@@ -218,6 +238,41 @@ class PaletteColor {
 
 	getWord() {
 		return this.r << 8 | this.g << 4 | this.b;
+	}
+}
+
+class ManifestLoader {
+	constructor(path) {
+		checkTypes(arguments, "string");
+		this.path = path;
+	}
+
+	parse(callback) {
+		checkTypes(arguments, Function);
+		fs.readFile(this.path, (err, data) => {
+			let json = JSON.parse(data.toString());
+			this.parseTileMaps(json.tilemaps, tileMaps => {
+				callback(new Manifest(tileMaps));
+			});
+		});
+	}
+
+	parseTileMaps(jsonTileMaps, callback) {
+		checkTypes(arguments, Array, Function);
+		let tileMaps = [];
+		let parseMap = index => {
+			if (index < jsonTileMaps.length) {
+				let jsonTileMap = jsonTileMaps[index];
+				let tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
+				new Tmx(jsonTileMap.name, tileMapPath).parse(tileMap => {
+					tileMaps.push(tileMap);
+					parseMap(index + 1);
+				});
+			} else {
+				callback(tileMaps);
+			}
+		};
+		parseMap(0);
 	}
 }
 
