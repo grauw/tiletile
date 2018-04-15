@@ -15,6 +15,7 @@
 	INCLUDE "Palette.asm"
 	INCLUDE "PaletteColor.asm"
 	INCLUDE "PaletteFader.asm"
+	INCLUDE "VDPCommandEx.asm"
 
 Video: MACRO
 	interrupt:
