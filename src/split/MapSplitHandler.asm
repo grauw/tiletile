@@ -1,11 +1,11 @@
 ;
-; Map frame interrupt handler
+; Map split interrupt handler
 ;
-MapFrameHandler: MACRO ?settings, ?next
-	super: FrameHandler MapFrame_FRAME_LINE, ?settings, ?next
+MapSplitHandler: MACRO ?settings, ?next
+	super: SplitHandler MapSplit_FRAME_LINE, ?settings, ?next
 
 	; c = VDP port 1
-	; hl = boot frame
+	; hl = boot split
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; horizontal offset (characters)
@@ -33,6 +33,6 @@ MapFrameHandler: MACRO ?settings, ?next
 
 ; ix = this
 ; iy = interrupt
-MapFrameHandler_Construct:
-	call FrameHandler_Construct
+MapSplitHandler_Construct:
+	call SplitHandler_Construct
 	ret

@@ -2,16 +2,6 @@
 ; Video subsystem
 ;
 	INCLUDE "VDPRegister.asm"
-	INCLUDE "Frame.asm"
-	INCLUDE "FrameHandler.asm"
-	INCLUDE "BootFrame.asm"
-	INCLUDE "BootFrameHandler.asm"
-	INCLUDE "MapFrame.asm"
-	INCLUDE "MapFrameHandler.asm"
-	INCLUDE "DialogFrame.asm"
-	INCLUDE "DialogFrameHandler.asm"
-	INCLUDE "OverscanFrame.asm"
-	INCLUDE "OverscanFrameHandler.asm"
 	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "VRAMTableCopy.asm"
@@ -29,10 +19,10 @@
 Video: MACRO
 	interrupt:
 		dw 0
-	bootFrame:
-		BootFrame
-	bootFrameHandler:
-		BootFrameHandler bootFrame, $
+	bootSplit:
+		BootSplit
+	bootSplitHandler:
+		BootSplitHandler bootSplit, $
 	bootPalette:
 		Palette
 	ENDM
@@ -45,13 +35,13 @@ Video_Construct:
 	ld (ix + Video.interrupt),e
 	ld (ix + Video.interrupt + 1),d
 	call Video_EnableLineInterrupt
-	ld de,Video.bootFrame
+	ld de,Video.bootSplit
 	add ix,de
-	call BootFrame_Construct
-	ld de,Video.bootFrameHandler - Video.bootFrame
+	call BootSplit_Construct
+	ld de,Video.bootSplitHandler - Video.bootSplit
 	add ix,de
-	call BootFrameHandler_Construct
-	ld de,-Video.bootFrameHandler
+	call BootSplitHandler_Construct
+	ld de,-Video.bootSplitHandler
 	add ix,de
 	ret
 
@@ -130,9 +120,9 @@ Video_StartFadeOutIY: PROC
 	ld d,iyh
 	ld ix,Video.bootPalette
 	add ix,de
-	ld de,Video.bootFrameHandler
+	ld de,Video.bootSplitHandler
 	add iy,de
-	call FrameHandler_ActivateIY
+	call SplitHandler_ActivateIY
 	ld a,77H
 Loop:
 	push af
@@ -146,16 +136,16 @@ Loop:
 	ld e,ixl
 	ld d,ixh
 	di
-	BootFrame_SetPalette_M (iy + Video.bootFrame - Video.bootFrameHandler), e, d
+	BootSplit_SetPalette_M (iy + Video.bootSplit - Video.bootSplitHandler), e, d
 	ei
-	call FrameHandler_SubmitSameFrameIY
-	call FrameHandler_WaitIY
-	call FrameHandler_SubmitSameFrameIY
-	call FrameHandler_WaitIY
+	call SplitHandler_SubmitSameSplitIY
+	call SplitHandler_WaitIY
+	call SplitHandler_SubmitSameSplitIY
+	call SplitHandler_WaitIY
 	pop af
 	sub 11H
 	jr nc,Loop
-	ld de,-Video.bootFrameHandler
+	ld de,-Video.bootSplitHandler
 	add iy,de
 	pop ix
 	ret

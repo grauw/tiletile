@@ -1,8 +1,7 @@
 ;
-; Interrupt handler to display a frame.
-; Or, the framing of the display.
+; Line interrupt handler for a split.
 ;
-FrameHandler: MACRO ?line, ?settings, ?next
+SplitHandler: MACRO ?line, ?settings, ?next
 	this:
 	; c = VDP port 1
 	; Modifies: af, bc, hl
@@ -48,15 +47,15 @@ FrameHandler: MACRO ?line, ?settings, ?next
 
 ; ix = this
 ; iy = interrupt
-FrameHandler_Construct:
+SplitHandler_Construct:
 	call Interrupt_GetLineInterruptHandlerPointerIY
-	ld (ix + FrameHandler.handlerPointer),l
-	ld (ix + FrameHandler.handlerPointer + 1),h
+	ld (ix + SplitHandler.handlerPointer),l
+	ld (ix + SplitHandler.handlerPointer + 1),h
 	ret
 
 ; iy = this
 ; Modifies: hl
-FrameHandler_ActivateIY:
+SplitHandler_ActivateIY:
 	ld c,VDP_PORT_1
 	di
 	call System_JumpIY
@@ -66,24 +65,24 @@ FrameHandler_ActivateIY:
 	ei
 	ret
 
-; de = frame
+; de = split
 ; iy = this
-FrameHandler_SubmitIY:
+SplitHandler_SubmitIY:
 	di
-	ld (iy + FrameHandler.settings),e
+	ld (iy + SplitHandler.settings),e
 	ei
-	ld (iy + FrameHandler.settings + 1),d
-	ld (iy + FrameHandler.pending),1
+	ld (iy + SplitHandler.settings + 1),d
+	ld (iy + SplitHandler.pending),1
 	ret
 
 ; iy = this
-FrameHandler_SubmitSameFrameIY:
-	ld (iy + FrameHandler.pending),1
+SplitHandler_SubmitSameSplitIY:
+	ld (iy + SplitHandler.pending),1
 	ret
 
 ; iy = this
-FrameHandler_WaitIY:
-	bit 0,(iy + FrameHandler.pending)
+SplitHandler_WaitIY:
+	bit 0,(iy + SplitHandler.pending)
 	ret z
 	IF DEBUG
 	PROFILE_BEGIN 29
@@ -92,4 +91,4 @@ FrameHandler_WaitIY:
 	IF DEBUG
 	PROFILE_END 29
 	ENDIF
-	jr FrameHandler_WaitIY
+	jr SplitHandler_WaitIY

@@ -1,11 +1,11 @@
 ;
-; Dialog frame interrupt handler
+; Dialog split interrupt handler
 ;
-DialogFrameHandler: MACRO ?settings, ?next
-	super: FrameHandler DialogFrame_FRAME_LINE - 2, ?settings, ?next
+DialogSplitHandler: MACRO ?settings, ?next
+	super: SplitHandler DialogSplit_FRAME_LINE - 2, ?settings, ?next
 
 	; c = VDP port 1
-	; hl = boot frame
+	; hl = boot split
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; disable display
@@ -28,6 +28,6 @@ DialogFrameHandler: MACRO ?settings, ?next
 
 ; ix = this
 ; iy = interrupt
-DialogFrameHandler_Construct:
-	call FrameHandler_Construct
+DialogSplitHandler_Construct:
+	call SplitHandler_Construct
 	ret

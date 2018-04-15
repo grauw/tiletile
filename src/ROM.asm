@@ -59,6 +59,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Math.asm"
 	INCLUDE "Engine.asm"
 	INCLUDE "video/Video.asm"
+	INCLUDE "split/Split.asm"
 	INCLUDE "Interrupt.asm"
 	INCLUDE "Hook.asm"
 	INCLUDE "TIMIHook.asm"

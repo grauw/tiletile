@@ -1,11 +1,11 @@
 ;
-; Frame for boot
+; Split for boot
 ;
-BootFrameHandler: MACRO ?settings, ?next
-	super: FrameHandler BootFrame_FRAME_LINE, ?settings, ?next
+BootSplitHandler: MACRO ?settings, ?next
+	super: SplitHandler BootSplit_FRAME_LINE, ?settings, ?next
 
 	; c = VDP port 1
-	; hl = boot frame
+	; hl = boot split
 	; Modifies: af, bc, hl
 	Apply:
 		ld b,(hl)
@@ -22,6 +22,6 @@ BootFrameHandler: MACRO ?settings, ?next
 
 ; ix = this
 ; iy = interrupt
-BootFrameHandler_Construct:
-	call FrameHandler_Construct
+BootSplitHandler_Construct:
+	call SplitHandler_Construct
 	ret
