@@ -23,7 +23,7 @@ Player: MACRO
 	patternBase:
 		db 0
 	sourcePatterns:
-		SpritePatternTable 18000H
+		SpritePatternTable 1C000H
 	patternCopy:
 		VRAMTableCopy 0, 0, 8 * SpritePattern._size
 	ENDM
