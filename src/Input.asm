@@ -49,15 +49,16 @@ Input_UpdateKeyboardIY: PROC
 	ENDM
 	pop hl
 	ld bc,Input_KEY_MATRIX_ROWS << 8 | Input_PPI_PORT_B
-	di
 	in a,(Input_PPI_PORT_C)
 	and 0F0H
+	dec a
 Loop:
-	out (Input_PPI_PORT_C),a
 	inc a
+	di
+	out (Input_PPI_PORT_C),a
+	ei
 	ini
 	jr nz,Loop
-	ei
 	ret
 	ENDP
 
@@ -65,8 +66,8 @@ Loop:
 Input_UpdateJoystickIY:
 	ld a,(iy + Input.newStick)
 	ld (iy + Input.oldStick),a
-	di
 	ld a,Input_PSG_GPIO_B
+	di
 	out (Input_PSG_ADDRESS),a
 	in a,(Input_PSG_READ)
 	and ~(1 << 6)
