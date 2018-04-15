@@ -4,5 +4,11 @@
 			"name": "FieldMap",
 			"path": "field/tilemap.tmx"
 		}
+	],
+	"images": [
+		{
+			"name": "UIImage",
+			"path": "ui/ui.png"
+		}
 	]
 }

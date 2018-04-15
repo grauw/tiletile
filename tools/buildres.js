@@ -19,9 +19,10 @@ function main() {
 }
 
 class Manifest {
-	constructor(tileMaps) {
-		checkTypes(arguments, Array);
+	constructor(tileMaps, images) {
+		checkTypes(arguments, Array, Array);
 		this.tileMaps = tileMaps;
+		this.images = images;
 	}
 
 	optimize() {
@@ -34,6 +35,9 @@ class Manifest {
 		var lines = [];
 		for (let tileMap of this.tileMaps) {
 			lines.push(tileMap.toAsm());
+		}
+		for (let image of this.images) {
+			lines.push(image.toAsm());
 		}
 		return lines.join("\n\n");
 	}
@@ -135,8 +139,7 @@ class TileSet {
 		}
 		lines.push("\tENDS");
 		lines.push("");
-		lines.push(`${this.name}_palette: Palette ` + this.palette.getWords()
-			.slice(0, 16).map(word => `00${word.toString(16)}H`.substr(-4)).join(", "));
+		lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
 		return lines.join("\n");
 	}
 }
@@ -166,6 +169,7 @@ class Image {
 		this.height = height;
 		this.palette = palette;
 		this.pixels = [];
+		this.name = null;
 	}
 
 	addPixel(index) {
@@ -205,6 +209,21 @@ class Image {
 				tiles.push(this.getSlice(x, y, width, height));
 		return tiles;
 	}
+
+	toAsm() {
+		let lines = [];
+		if (this.name) {
+			lines.push(`${this.name}_instance: Image ${this.width}, ${this.height}, ${this.name}_palette, ${this.name}_pixelData, ROM_${this.name}_BANK`);
+			lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
+			lines.push(`\tSECTION ROM_${this.name}`);
+			lines.push(`${this.name}_pixelData:`);
+			let pixelData = this.to4Bpp();
+			for (let i = 0; i < pixelData.length; i += 16)
+				lines.push("\tdb " + pixelData.slice(i, i + 16).join(", "));
+			lines.push("\tENDS");
+		}
+		return lines.join("\n");
+	}
 }
 
 class Palette {
@@ -224,6 +243,10 @@ class Palette {
 
 	getWords() {
 		return this.colors.map(color => color.getWord());
+	}
+
+	toAsm() {
+		return "Palette " + this.getWords().slice(0, 16).map(word => `00${word.toString(16)}H`.substr(-4)).join(", ");
 	}
 }
 
@@ -252,7 +275,9 @@ class ManifestLoader {
 		fs.readFile(this.path, (err, data) => {
 			let json = JSON.parse(data.toString());
 			this.parseTileMaps(json.tilemaps, tileMaps => {
-				callback(new Manifest(tileMaps));
+				this.parseImages(json.images, images => {
+					callback(new Manifest(tileMaps, images));
+				});
 			});
 		});
 	}
@@ -273,6 +298,25 @@ class ManifestLoader {
 			}
 		};
 		parseMap(0);
+	}
+
+	parseImages(jsonImages, callback) {
+		checkTypes(arguments, Array, Function);
+		let images = [];
+		let parseImage = index => {
+			if (index < jsonImages.length) {
+				let jsonImage = jsonImages[index];
+				let imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
+				new PNGLoader(imagePath).loadImage(image => {
+					image.name = jsonImage.name;
+					images.push(image);
+					parseImage(index + 1);
+				});
+			} else {
+				callback(images);
+			}
+		};
+		parseImage(0);
 	}
 }
 

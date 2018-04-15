@@ -25,11 +25,17 @@ ROM_BANK3: ds 2000H
 
 ROM_BANK4567: ds 8000H
 
+	org 8000H
+
+ROM_BANK89: ds 4000H
+
 TPA_PAGE1: equ ROM_BANK1
 RAM_RESIDENT: equ RAM
 ROM_FieldMap: equ ROM_BANK2
 ROM_FieldSet: equ ROM_BANK4567
 ROM_FieldSet_BANK: equ 4
+ROM_UIImage: equ ROM_BANK89
+ROM_UIImage_BANK: equ 8
 
 ROM_BANK_4000_CHANGE: equ 5000H
 ROM_BANK_6000_CHANGE: equ 7000H
@@ -65,6 +71,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Tile.asm"
 	INCLUDE "TileSet.asm"
 	INCLUDE "TileMap.asm"
+	INCLUDE "Image.asm"
 	INCLUDE "MapView.asm"
 	INCLUDE "Player.asm"
 	INCLUDE "Scene.asm"
