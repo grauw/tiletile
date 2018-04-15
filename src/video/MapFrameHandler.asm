@@ -1,8 +1,8 @@
 ;
-; Game frame interrupt handler
+; Map frame interrupt handler
 ;
-GameFrameHandler: MACRO ?settings, ?next
-	super: FrameHandler GameFrame_FRAME_LINE, ?settings, ?next
+MapFrameHandler: MACRO ?settings, ?next
+	super: FrameHandler MapFrame_FRAME_LINE, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot frame
@@ -33,6 +33,6 @@ GameFrameHandler: MACRO ?settings, ?next
 
 ; ix = this
 ; iy = interrupt
-GameFrameHandler_Construct:
+MapFrameHandler_Construct:
 	call FrameHandler_Construct
 	ret

@@ -1,9 +1,9 @@
 ;
 ; Frame for gameplay
 ;
-GameFrame_FRAME_LINE: equ 228
+MapFrame_FRAME_LINE: equ 228
 
-GameFrame: MACRO
+MapFrame: MACRO
 	super: Frame
 	horizontalOffsetCharacters:
 		VDPRegister 26, 0
@@ -29,57 +29,57 @@ GameFrame: MACRO
 	ENDM
 
 ; ix = this
-GameFrame_Construct:
+MapFrame_Construct:
 	ld a,(VDP_MIRROR_0 + 2)
-	ld (ix + GameFrame.patternName + VDPRegister.value),a
+	ld (ix + MapFrame.patternName + VDPRegister.value),a
 	ld a,(VDP_MIRROR_0 + 5)
-	ld (ix + GameFrame.spriteAttributeLSB + VDPRegister.value),a
+	ld (ix + MapFrame.spriteAttributeLSB + VDPRegister.value),a
 	ld a,(VDP_MIRROR_8 + 11)
-	ld (ix + GameFrame.spriteAttributeMSB + VDPRegister.value),a
+	ld (ix + MapFrame.spriteAttributeMSB + VDPRegister.value),a
 	ld a,(VDP_MIRROR_0 + 6)
-	ld (ix + GameFrame.spritePattern + VDPRegister.value),a
+	ld (ix + MapFrame.spritePattern + VDPRegister.value),a
 	ld a,(VDP_MIRROR_8 + 8)
 	and 11111101B
-	ld (ix + GameFrame.mode8 + VDPRegister.value),a
+	ld (ix + MapFrame.mode8 + VDPRegister.value),a
 	ld a,(VDP_MIRROR_8 + 9)
 	or 10000000B
-	ld (ix + GameFrame.mode9 + VDPRegister.value),a
+	ld (ix + MapFrame.mode9 + VDPRegister.value),a
 	ret
 
-GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
+MapFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
 	ld a,(?displayOffset + DisplayOffset.horizontalOffsetCharacters)
-	ld (?this + GameFrame.horizontalOffsetCharacters + VDPRegister.value),a
+	ld (?this + MapFrame.horizontalOffsetCharacters + VDPRegister.value),a
 	ld a,(?displayOffset + DisplayOffset.horizontalOffsetDots)
-	ld (?this + GameFrame.horizontalOffsetDots + VDPRegister.value),a
+	ld (?this + MapFrame.horizontalOffsetDots + VDPRegister.value),a
 	ld a,(?displayOffset + DisplayOffset.verticalOffset)
-	ld (?this + GameFrame.verticalOffset + VDPRegister.value),a
+	ld (?this + MapFrame.verticalOffset + VDPRegister.value),a
 	ENDM
 
-GameFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
+MapFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
 	ld a,(?patternNameTable + PatternNameTable.baseRegister2)
-	ld (?this + GameFrame.patternName + VDPRegister.value),a
+	ld (?this + MapFrame.patternName + VDPRegister.value),a
 	ENDM
 
-GameFrame_SetSpriteAttributeTable_M: MACRO ?this, ?spriteAttributeTable
+MapFrame_SetSpriteAttributeTable_M: MACRO ?this, ?spriteAttributeTable
 	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister5)
-	ld (?this + GameFrame.spriteAttributeLSB + VDPRegister.value),a
+	ld (?this + MapFrame.spriteAttributeLSB + VDPRegister.value),a
 	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister11)
-	ld (?this + GameFrame.spriteAttributeMSB + VDPRegister.value),a
+	ld (?this + MapFrame.spriteAttributeMSB + VDPRegister.value),a
 	ENDM
 
-GameFrame_SetSpriteColorTable_M: MACRO ?this, ?spriteColorTable
+MapFrame_SetSpriteColorTable_M: MACRO ?this, ?spriteColorTable
 	ld a,(?spriteColorTable + SpriteColorTable.baseRegister5)
 	ld (?this + SpriteColorTable.spriteAttributeLSB + VDPRegister.value),a
 	ld a,(?spriteColorTable + SpriteColorTable.baseRegister11)
 	ld (?this + SpriteColorTable.spriteAttributeMSB + VDPRegister.value),a
 	ENDM
 
-GameFrame_SetSpritePatternTable_M: MACRO ?this, ?spritePatternTable
+MapFrame_SetSpritePatternTable_M: MACRO ?this, ?spritePatternTable
 	ld a,(?spritePatternTable + SpritePatternTable.baseRegister6)
-	ld (?this + GameFrame.spritePattern + VDPRegister.value),a
+	ld (?this + MapFrame.spritePattern + VDPRegister.value),a
 	ENDM
 
-GameFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
-	ld (?this + GameFrame.palette),?palettelow
-	ld (?this + GameFrame.palette + 1),?palettehigh
+MapFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
+	ld (?this + MapFrame.palette),?palettelow
+	ld (?this + MapFrame.palette + 1),?palettehigh
 	ENDM
