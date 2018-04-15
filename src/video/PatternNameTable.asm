@@ -33,9 +33,4 @@ PatternNameTable_Construct:
 ; hl = offset
 ; iy = this
 ; c <- write port
-PatternNameTable_SetPatternNameWriteIY:
-	add a,a
-	add a,a
-	ld l,a
-	ld h,0
-	jp VRAMTable_SetWriteIY
+PatternNameTable_SetPatternNameWriteIY: equ VRAMTable_SetWriteIY
