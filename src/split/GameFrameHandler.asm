@@ -5,11 +5,11 @@ GameFrameHandler: MACRO ?settings
 	mapSplitHandler:
 		MapSplitHandler ?settings + GameFrame.mapSplit, dialogSplitHandler
 	dialogSplitHandler:
-		DialogSplitHandler ?settings + GameFrame.dialogSplit, overscanSplitHandler
+		DialogSplitHandler ?settings + GameFrame.dialogSplit, dialogEndSplitHandler
 	dialogEndSplitHandler:
-		DialogEndSplitHandler ?settings + GameFrame.dialogEndSplit, mapSplitHandler
+		DialogEndSplitHandler ?settings + GameFrame.dialogEndSplit, overscanSplitHandler
 	overscanSplitHandler:
-		OverscanSplitHandler ?settings + GameFrame.overscanSplit, dialogEndSplitHandler
+		OverscanSplitHandler ?settings + GameFrame.overscanSplit, mapSplitHandler
 	ENDM
 
 ; ix = this

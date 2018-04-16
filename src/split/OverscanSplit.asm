@@ -1,11 +1,14 @@
 ;
 ; Split for overscan
 ;
-OverscanSplit_FRAME_LINE: equ 192
+OverscanSplit_FRAME_LINE: equ 212
 
 OverscanSplit: MACRO
 	super: Split
-	mode9:
+	mode9_192:
+		VDPRegister 9
+		VDPRegister 15, 2
+	mode9_212:
 		VDPRegister 9
 	_size:
 	ENDM
@@ -14,5 +17,8 @@ OverscanSplit: MACRO
 OverscanSplit_Construct:
 	ld a,(VDP_MIRROR_8 + 9)
 	and 01111111B
-	ld (ix + OverscanSplit.mode9 + VDPRegister.value),a
+	ld (ix + OverscanSplit.mode9_192 + VDPRegister.value),a
+	ld a,(VDP_MIRROR_8 + 9)
+	or 10000000B
+	ld (ix + OverscanSplit.mode9_212 + VDPRegister.value),a
 	ret

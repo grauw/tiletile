@@ -19,8 +19,6 @@ MapSplit: MACRO
 		VDPRegister 11
 	spritePattern:
 		VDPRegister 6
-	mode9:
-		VDPRegister 9
 	palette:
 		dw Palette_black
 	_size:
@@ -36,9 +34,6 @@ MapSplit_Construct:
 	ld (ix + MapSplit.spriteAttributeMSB + VDPRegister.value),a
 	ld a,(VDP_MIRROR_0 + 6)
 	ld (ix + MapSplit.spritePattern + VDPRegister.value),a
-	ld a,(VDP_MIRROR_8 + 9)
-	or 10000000B
-	ld (ix + MapSplit.mode9 + VDPRegister.value),a
 	ret
 
 MapSplit_SetDisplayOffset_M: MACRO ?this, ?displayOffset
