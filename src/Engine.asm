@@ -30,20 +30,12 @@ Engine: MACRO
 		dw Palette_system
 	paletteOdd:
 		dw Palette_system
-	mapSplitEven:
-		MapSplit
-	mapSplitOdd:
-		MapSplit
-	dialogSplit:
-		DialogSplit
-	overscanSplit:
-		OverscanSplit
-	mapSplitHandler:
-		MapSplitHandler mapSplitOdd, dialogSplitHandler
-	dialogSplitHandler:
-		DialogSplitHandler dialogSplit, mapSplitHandler
-	overscanSplitHandler:
-		OverscanSplitHandler overscanSplit, mapSplitHandler
+	gameFrameEven:
+		GameFrame
+	gameFrameOdd:
+		GameFrame
+	gameFrameHandler:
+		GameFrameHandler gameFrameOdd
 	video:
 		Video
 	interrupt:
@@ -101,16 +93,10 @@ Engine_Construct:
 	pop ix
 
 	call Engine_GetInterrupt_IY
-	ld de,Engine.mapSplitHandler
+	ld de,Engine.gameFrameHandler
 	add ix,de
-	call MapSplitHandler_Construct
-	ld de,Engine.dialogSplitHandler - Engine.mapSplitHandler
-	add ix,de
-	call DialogSplitHandler_Construct
-	ld de,Engine.overscanSplitHandler - Engine.dialogSplitHandler
-	add ix,de
-	call OverscanSplitHandler_Construct
-	ld de,-Engine.overscanSplitHandler
+	call GameFrameHandler_Construct
+	ld de,-Engine.gameFrameHandler
 	add ix,de
 
 	push ix
@@ -299,22 +285,16 @@ Engine_StartIY:
 
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.mapSplitEven
+	ld ix,Engine.gameFrameEven
 	add ix,de
-	call MapSplit_Construct
-	ld de,Engine.mapSplitOdd - Engine.mapSplitEven
+	call GameFrame_Construct
+	ld de,Engine.gameFrameOdd - Engine.gameFrameEven
 	add ix,de
-	call MapSplit_Construct
-	ld de,Engine.dialogSplit - Engine.mapSplitOdd
-	add ix,de
-	call DialogSplit_Construct
-	ld de,Engine.overscanSplit - Engine.dialogSplit
-	add ix,de
-	call OverscanSplit_Construct
-	ld de,Engine.mapSplitHandler
+	call GameFrame_Construct
+	ld de,Engine.gameFrameHandler
 	add iy,de
-	call SplitHandler_ActivateIY
-	ld de,-Engine.mapSplitHandler
+	call GameFrameHandler_ActivateIY
+	ld de,-Engine.gameFrameHandler
 	add iy,de
 	ret
 
@@ -350,31 +330,31 @@ Engine_SubmitPrimaryIY: PROC
 	push ix
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.mapSplitEven
+	ld ix,Engine.gameFrameEven
 	add ix,de
 	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 Even:
-	MapSplit_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
-	MapSplit_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	MapSplit_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
-	MapSplit_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	MapSplit_SetDisplayOffset_M ix, iy + Engine.displayOffsetEven
-	MapSplit_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
-	MapSplit_SetPalette_M ix, e, d
-	ld de,Engine.mapSplitHandler
+	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetEven
+	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
+	GameFrame_SetPalette_M ix, e, d
+	ld de,Engine.gameFrameHandler
 	add iy,de
 	ld e,ixl
 	ld d,ixh
-	call SplitHandler_SubmitIY
-	ld de,-Engine.mapSplitHandler
+	call GameFrameHandler_SubmitIY
+	ld de,-Engine.gameFrameHandler
 	add iy,de
 	inc (iy + Engine.frameCount)
 	pop ix
@@ -388,31 +368,31 @@ Engine_SubmitSecondaryIY: PROC
 	push ix
 	ld e,iyl
 	ld d,iyh
-	ld ix,Engine.mapSplitOdd
+	ld ix,Engine.gameFrameOdd
 	add ix,de
 	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 Even:
-	MapSplit_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
-	MapSplit_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
 	ld e,(iy + Engine.paletteEven)
 	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	MapSplit_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
-	MapSplit_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
+	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 	ld e,(iy + Engine.paletteOdd)
 	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	MapSplit_SetDisplayOffset_M ix, iy + Engine.displayOffsetOdd
-	MapSplit_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
-	MapSplit_SetPalette_M ix, e, d
-	ld de,Engine.mapSplitHandler
+	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetOdd
+	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
+	GameFrame_SetPalette_M ix, e, d
+	ld de,Engine.gameFrameHandler
 	add iy,de
 	ld e,ixl
 	ld d,ixh
-	call SplitHandler_SubmitIY
-	ld de,-Engine.mapSplitHandler
+	call GameFrameHandler_SubmitIY
+	ld de,-Engine.gameFrameHandler
 	add iy,de
 	inc (iy + Engine.frameCount)
 	pop ix
@@ -421,9 +401,9 @@ Continue:
 
 ; iy = this
 Engine_WaitDisplayedIY:
-	ld de,Engine.mapSplitHandler
+	ld de,Engine.gameFrameHandler
 	add iy,de
-	call SplitHandler_WaitIY
-	ld de,-Engine.mapSplitHandler
+	call GameFrameHandler_WaitIY
+	ld de,-Engine.gameFrameHandler
 	add iy,de
 	ret

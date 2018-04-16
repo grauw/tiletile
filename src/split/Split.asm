@@ -10,6 +10,8 @@
 	INCLUDE "DialogSplitHandler.asm"
 	INCLUDE "OverscanSplit.asm"
 	INCLUDE "OverscanSplitHandler.asm"
+	INCLUDE "GameFrame.asm"
+	INCLUDE "GameFrameHandler.asm"
 
 Split: MACRO
 	ENDM
