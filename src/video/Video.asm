@@ -17,7 +17,7 @@
 	INCLUDE "PaletteFader.asm"
 	INCLUDE "VDPCommandEx.asm"
 
-Video_VERTICAL_ADJUST: equ 0
+Video_VERTICAL_ADJUST: equ -2
 
 Video: MACRO
 	interrupt:
