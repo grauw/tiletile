@@ -10,11 +10,7 @@ DialogSplitHandler: MACRO ?settings, ?next
 	Apply:
 		VDPRegister_SetDI_M  ; disable display
 		VDPRegister_SetDI_M  ; status register 2
-		ld b,00100000B
-	PollHR:
-		in a,(c)
-		and b
-		jr z,PollHR  ; z: display, nz: h-blank
+		Split_PollHR_M
 		VDPRegister_SetDI_M  ; enable display
 		VDPRegister_SetDI_M  ; pattern name base
 		ld a,(hl)

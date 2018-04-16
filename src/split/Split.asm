@@ -13,3 +13,14 @@
 
 Split: MACRO
 	ENDM
+
+; Have status register 2 selected.
+; c = VDP port 1
+; Modifies: af, b
+Split_PollHR_M: MACRO
+	ld b,00100000B
+Loop:
+	in a,(c)
+	and b
+	jr z,Loop  ; z: display, nz: h-blank
+	ENDM
