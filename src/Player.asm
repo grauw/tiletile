@@ -3,7 +3,7 @@
 ;
 Player_PATTERNS: equ 8
 Player_COLLIDER_WIDTH: equ 16
-Player_COLLIDER_HEIGHT: equ 16
+Player_COLLIDER_HEIGHT: equ 8
 
 Player: MACRO
 	x:
