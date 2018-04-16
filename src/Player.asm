@@ -2,6 +2,8 @@
 ;
 ;
 Player_PATTERNS: equ 8
+Player_COLLIDER_WIDTH: equ 16
+Player_COLLIDER_HEIGHT: equ 16
 
 Player: MACRO
 	x:
@@ -245,36 +247,36 @@ Player_TickSecondary:
 ; ix = this
 ; f <- c: can
 Player_CanMove16x16:
-	ld hl,-8
+	ld hl,-Player_COLLIDER_WIDTH / 2
 	add hl,bc
 	ld c,l
 	ld b,h
-	ld hl,-8
+	ld hl,-Player_COLLIDER_HEIGHT / 2
 	add hl,de
 	ex de,hl
 	call Player_CanMove
 	ret nc
-	ld hl,15
+	ld hl,Player_COLLIDER_HEIGHT - 1
 	add hl,de
 	ex de,hl
 	call Player_CanMove
 	ret nc
-	ld hl,15
+	ld hl,Player_COLLIDER_WIDTH - 1
 	add hl,bc
 	ld c,l
 	ld b,h
 	call Player_CanMove
 	ret nc
-	ld hl,-15
+	ld hl,-(Player_COLLIDER_HEIGHT - 1)
 	add hl,de
 	ex de,hl
 	call Player_CanMove
 	ret nc
-	ld hl,-7
+	ld hl,-(Player_COLLIDER_WIDTH / 2 - 1)
 	add hl,bc
 	ld c,l
 	ld b,h
-	ld hl,8
+	ld hl,Player_COLLIDER_HEIGHT / 2
 	add hl,de
 	ex de,hl
 	scf
