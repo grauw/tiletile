@@ -5,9 +5,11 @@ GameFrameHandler: MACRO ?settings
 	mapSplitHandler:
 		MapSplitHandler ?settings + GameFrame.mapSplit, dialogSplitHandler
 	dialogSplitHandler:
-		DialogSplitHandler ?settings + GameFrame.dialogSplit, mapSplitHandler
+		DialogSplitHandler ?settings + GameFrame.dialogSplit, overscanSplitHandler
+	dialogEndSplitHandler:
+		DialogEndSplitHandler ?settings + GameFrame.dialogEndSplit, mapSplitHandler
 	overscanSplitHandler:
-		OverscanSplitHandler ?settings + GameFrame.overscanSplit, mapSplitHandler
+		OverscanSplitHandler ?settings + GameFrame.overscanSplit, dialogEndSplitHandler
 	ENDM
 
 ; ix = this
@@ -19,7 +21,10 @@ GameFrameHandler_Construct:
 	ld de,GameFrameHandler.dialogSplitHandler - GameFrameHandler.mapSplitHandler
 	add ix,de
 	call DialogSplitHandler_Construct
-	ld de,GameFrameHandler.overscanSplitHandler - GameFrameHandler.dialogSplitHandler
+	ld de,GameFrameHandler.dialogEndSplitHandler - GameFrameHandler.dialogSplitHandler
+	add ix,de
+	call DialogSplitHandler_Construct
+	ld de,GameFrameHandler.overscanSplitHandler - GameFrameHandler.dialogEndSplitHandler
 	add ix,de
 	call OverscanSplitHandler_Construct
 	ld de,-GameFrameHandler.overscanSplitHandler
@@ -50,9 +55,16 @@ GameFrameHandler_SubmitIY:
 	ex de,hl
 	call SplitHandler_SubmitIY
 	ex de,hl
-	ld de,GameFrameHandler.overscanSplitHandler - GameFrameHandler.dialogSplitHandler
+	ld de,GameFrameHandler.dialogEndSplitHandler - GameFrameHandler.dialogSplitHandler
 	add iy,de
-	ld de,GameFrame.overscanSplit - GameFrame.dialogSplit
+	ld de,GameFrame.dialogEndSplit - GameFrame.dialogSplit
+	add hl,de
+	ex de,hl
+	call SplitHandler_SubmitIY
+	ex de,hl
+	ld de,GameFrameHandler.overscanSplitHandler - GameFrameHandler.dialogEndSplitHandler
+	add iy,de
+	ld de,GameFrame.overscanSplit - GameFrame.dialogEndSplit
 	add hl,de
 	ex de,hl
 	call SplitHandler_SubmitIY

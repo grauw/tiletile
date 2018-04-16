@@ -8,6 +8,8 @@
 	INCLUDE "MapSplitHandler.asm"
 	INCLUDE "DialogSplit.asm"
 	INCLUDE "DialogSplitHandler.asm"
+	INCLUDE "DialogEndSplit.asm"
+	INCLUDE "DialogEndSplitHandler.asm"
 	INCLUDE "OverscanSplit.asm"
 	INCLUDE "OverscanSplitHandler.asm"
 	INCLUDE "GameFrame.asm"

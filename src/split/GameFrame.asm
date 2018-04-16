@@ -6,6 +6,8 @@ GameFrame: MACRO
 		MapSplit
 	dialogSplit:
 		DialogSplit
+	dialogEndSplit:
+		DialogEndSplit
 	overscanSplit:
 		OverscanSplit
 	ENDM
@@ -18,7 +20,10 @@ GameFrame_Construct:
 	ld de,GameFrame.dialogSplit - GameFrame.mapSplit
 	add ix,de
 	call DialogSplit_Construct
-	ld de,GameFrame.overscanSplit - GameFrame.dialogSplit
+	ld de,GameFrame.dialogEndSplit - GameFrame.dialogSplit
+	add ix,de
+	call DialogEndSplit_Construct
+	ld de,GameFrame.overscanSplit - GameFrame.dialogEndSplit
 	add ix,de
 	call OverscanSplit_Construct
 	ld de,-GameFrame.overscanSplit
@@ -27,6 +32,7 @@ GameFrame_Construct:
 
 GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
 	MapSplit_SetDisplayOffset_M ?this + GameFrame.mapSplit, ?displayOffset
+	DialogEndSplit_SetDisplayOffset_M ?this + GameFrame.dialogEndSplit, ?displayOffset
 	ENDM
 
 GameFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
