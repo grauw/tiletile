@@ -2,7 +2,7 @@
 ; A view on a section of the map.
 ;
 MapView_OFFSET_X: equ -4
-MapView_OFFSET_Y: equ -16
+MapView_OFFSET_Y: equ -24
 
 MapView: MACRO
 	tileMap:
@@ -23,7 +23,7 @@ MapView: MACRO
 		db 248
 	height:
 		db 212
-	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 4, 16, 0, 0, VDPCommand_HMMM
+	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
 	ENDM
 
 ; de = map
@@ -304,30 +304,41 @@ MapView_DrawTileColumn: PROC
 	add hl,de
 	call MapView_GetTileCopyCommand_IY
 	ex de,hl
-	ld a,c
-	sub e
-	and 0FH
-	add a,e
-	ld e,a
-	ld a,d
-	adc a,0
-	ld d,a
 	ld a,e
-	and 0F0H
+	and 0FCH
 	ld e,a
 	ld (iy + VDPCommand.dy),e
+	and 0CH
+	ld h,a
 	ld a,c
 	and 0FCH
 	ld c,a
 	ld (iy + VDPCommand.dx),c
-	push af
-	call MapView_GetTileDataPointer
-	pop af
 	and 0CH
-	ld c,a
-	ld b,16
+	ld l,a
+	push hl
+	call MapView_GetTileDataPointer
+	pop bc
 	push ix
-Loop:
+	ld (iy + VDPCommand.nx),4
+	ld a,16
+	sub b
+	ld (iy + VDPCommand.ny),a
+	call DrawTile
+	ld a,b
+	push af
+	ld b,0
+	ld (iy + VDPCommand.ny),16
+	REPT 15
+	call DrawTile
+	ENDM
+	pop af
+	and a
+	ld (iy + VDPCommand.ny),a
+	call nz,DrawTile
+	pop ix
+	ret
+DrawTile:
 	push bc
 	push de
 	push hl
@@ -340,17 +351,16 @@ Loop:
 	or c
 	ld (iy + VDPCommand.sx),a
 	ld a,(ix + Tile.y)
+	or b
 	ld (iy + VDPCommand.sy),a
 	call VDPCommand_ExecuteS2IY
 	ld a,(iy + VDPCommand.dy)
-	add a,16
+	add a,(iy + VDPCommand.ny)
 	ld (iy + VDPCommand.dy),a
 	pop hl
 	pop de
 	pop bc
 	add hl,de
-	djnz Loop
-	pop ix
 	ret
 	ENDP
 
@@ -369,29 +379,40 @@ MapView_DrawTileRow: PROC
 	call MapView_GetTileCopyCommand_IY
 	ex de,hl
 	ld a,e
-	sub c
-	and 0FH
-	add a,c
-	ld c,a
-	ld a,b
-	adc a,0
-	ld b,a
-	ld a,e
-	and 0F0H
+	and 0FCH
 	ld e,a
 	ld (iy + VDPCommand.dy),e
+	and 0CH
+	ld h,a
 	ld a,c
 	and 0FCH
 	ld c,a
 	ld (iy + VDPCommand.dx),c
-	push af
-	call MapView_GetTileDataPointer
-	pop af
 	and 0CH
-	ld c,a
-	ld b,16
+	ld l,a
+	push hl
+	call MapView_GetTileDataPointer
+	pop bc
 	push ix
-Loop:
+	ld (iy + VDPCommand.ny),4
+	ld a,16
+	sub c
+	ld (iy + VDPCommand.nx),a
+	call DrawTile
+	ld a,c
+	push af
+	ld c,0
+	ld (iy + VDPCommand.nx),16
+	REPT 15
+	call DrawTile
+	ENDM
+	pop af
+	and a
+	ld (iy + VDPCommand.nx),a
+	call nz,DrawTile
+	pop ix
+	ret
+DrawTile:
 	push bc
 	push hl
 	ld e,(hl)
@@ -403,16 +424,15 @@ Loop:
 	or c
 	ld (iy + VDPCommand.sx),a
 	ld a,(ix + Tile.y)
+	or b
 	ld (iy + VDPCommand.sy),a
 	call VDPCommand_ExecuteS2IY
 	ld a,(iy + VDPCommand.dx)
-	add a,16
+	add a,(iy + VDPCommand.nx)
 	ld (iy + VDPCommand.dx),a
 	pop hl
 	pop bc
 	inc hl
 	inc hl
-	djnz Loop
-	pop ix
 	ret
 	ENDP
