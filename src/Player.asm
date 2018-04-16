@@ -7,7 +7,7 @@ Player: MACRO
 	x:
 		dw 124
 	y:
-		dw 106
+		dw 120
 	velocityX:
 		dw 0
 	velocityY:

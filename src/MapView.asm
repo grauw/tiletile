@@ -2,7 +2,7 @@
 ; A view on a section of the map.
 ;
 MapView_OFFSET_X: equ -4
-MapView_OFFSET_Y: equ -24
+MapView_OFFSET_Y: equ -8
 
 MapView: MACRO
 	tileMap:
@@ -22,7 +22,7 @@ MapView: MACRO
 	width:
 		db 248
 	height:
-		db 212
+		db 240
 	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
 	ENDM
 
@@ -262,6 +262,7 @@ MapView_Start:
 ; iy = display offset
 MapView_UpdateDisplayOffset:
 	ld a,(ix + MapView.targetY)
+	add a,16
 	call DisplayOffset_SetVerticalOffsetIY
 	ld a,(ix + MapView.targetX)
 	jp DisplayOffset_SetHorizontalOffsetIY
