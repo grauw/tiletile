@@ -35,4 +35,11 @@ MapSplitHandler: MACRO ?settings, ?next
 ; iy = interrupt
 MapSplitHandler_Construct:
 	call SplitHandler_Construct
+	ld a,(VDP_MIRROR_8 + 18)
+	sra a
+	sra a
+	sra a
+	sra a
+	add a,MapSplit_FRAME_LINE
+	ld (ix + MapSplitHandler.super.line),a
 	ret

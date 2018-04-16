@@ -24,4 +24,11 @@ BootSplitHandler: MACRO ?settings, ?next
 ; iy = interrupt
 BootSplitHandler_Construct:
 	call SplitHandler_Construct
+	ld a,(VDP_MIRROR_8 + 18)
+	sra a
+	sra a
+	sra a
+	sra a
+	add a,BootSplit_FRAME_LINE
+	ld (ix + BootSplitHandler.super.line),a
 	ret
