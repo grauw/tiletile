@@ -303,8 +303,7 @@ MapView_DrawTileColumn: PROC
 	ld hl,MapView_OFFSET_Y
 	add hl,de
 	call MapView_GetTileCopyCommand_IY
-	ld d,h
-	ld e,l
+	ex de,hl
 	ld a,c
 	sub e
 	and 0FH
