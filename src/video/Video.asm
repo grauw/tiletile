@@ -17,6 +17,8 @@
 	INCLUDE "PaletteFader.asm"
 	INCLUDE "VDPCommandEx.asm"
 
+Video_VERTICAL_ADJUST: equ 0
+
 Video: MACRO
 	interrupt:
 		dw 0
@@ -173,10 +175,7 @@ Video_Recenter: PROC
 NoOverflow:
 	add a,8
 	and 0FH
-	ld c,a
-	ld a,b
-	and 0F0H
-	or c
+	or Video_VERTICAL_ADJUST << 4
 	ld (VDP_MIRROR_8 + 18),a
 	ld b,18
 	call VDP_SetRegister
