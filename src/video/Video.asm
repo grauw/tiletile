@@ -177,6 +177,7 @@ NoOverflow:
 	ld a,b
 	and 0F0H
 	or c
+	ld (VDP_MIRROR_8 + 18),a
 	ld b,18
 	call VDP_SetRegister
 	ret
