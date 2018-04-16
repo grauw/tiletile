@@ -1,7 +1,7 @@
 ;
 ; A view on a section of the map.
 ;
-MapView_OFFSET_X: equ 0
+MapView_OFFSET_X: equ -4
 MapView_OFFSET_Y: equ -16
 
 MapView: MACRO
@@ -204,7 +204,7 @@ Right:
 	inc bc
 	ld (ix + MapView.x),c
 	ld (ix + MapView.x + 1),b
-	ld hl,256 - 4 - 4
+	ld hl,256 - 4
 	add hl,bc
 	ld c,l
 	ld b,h
@@ -245,7 +245,7 @@ Down:
 	inc de
 	ld (ix + MapView.y),e
 	ld (ix + MapView.y + 1),d
-	ld hl,256 - 4 - 4
+	ld hl,256 - 4
 	add hl,de
 	ex de,hl
 	ld c,(ix + MapView.x)
