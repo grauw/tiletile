@@ -1,6 +1,8 @@
 ;
 ; A set of splits for the frame of the gameplay
 ;
+GameFrame_LINE: equ 224
+
 GameFrame: MACRO
 	mapSplit:
 		MapSplit
