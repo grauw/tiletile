@@ -2,7 +2,7 @@
 ; Map split interrupt handler
 ;
 MapSplitHandler: MACRO ?settings, ?next
-	super: SplitHandler MapSplit_FRAME_LINE, ?settings, ?next
+	super: SplitHandler MapSplit_LINE, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot split
@@ -38,6 +38,6 @@ MapSplitHandler_Construct:
 	sra a
 	sra a
 	sra a
-	add a,MapSplit_FRAME_LINE
+	add a,MapSplit_LINE
 	ld (ix + MapSplitHandler.super.line),a
 	ret

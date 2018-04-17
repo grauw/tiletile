@@ -2,7 +2,7 @@
 ; Dialog split interrupt handler
 ;
 DialogSplitHandler: MACRO ?settings, ?next
-	super: SplitHandler DialogSplit_FRAME_LINE - 2, ?settings, ?next
+	super: SplitHandler DialogSplit_LINE - 2, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot split

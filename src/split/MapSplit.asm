@@ -1,7 +1,7 @@
 ;
 ; Split for gameplay
 ;
-MapSplit_FRAME_LINE: equ 228
+MapSplit_LINE: equ 228
 
 MapSplit: MACRO
 	super: Split

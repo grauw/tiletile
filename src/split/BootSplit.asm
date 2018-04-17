@@ -1,7 +1,7 @@
 ;
 ; Split for gameplay
 ;
-BootSplit_FRAME_LINE: equ 228
+BootSplit_LINE: equ 228
 
 BootSplit: MACRO
 	super: Split
