@@ -5,7 +5,7 @@ MapSplitHandler: MACRO ?settings, ?next
 	super: SplitHandler MapSplit_LINE, ?settings, ?next
 
 	; c = VDP port 1
-	; hl = boot split
+	; hl = map split
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; horizontal offset (characters)

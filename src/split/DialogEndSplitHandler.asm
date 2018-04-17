@@ -5,7 +5,7 @@ DialogEndSplitHandler: MACRO ?settings, ?next
 	super: SplitHandler DialogEndSplit_LINE - 4, ?settings, ?next
 
 	; c = VDP port 1
-	; hl = boot split
+	; hl = dialog end split
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; status register 2

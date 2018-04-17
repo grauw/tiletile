@@ -5,7 +5,7 @@ OverscanSplitHandler: MACRO ?settings, ?next
 	super: SplitHandler OverscanSplit_LINE - 2, ?settings, ?next
 
 	; c = VDP port 1
-	; hl = boot split
+	; hl = overscan split
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; mode 9 (192 lines)

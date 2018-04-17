@@ -5,7 +5,7 @@ DialogSplitHandler: MACRO ?settings, ?next
 	super: SplitHandler DialogSplit_LINE - 2, ?settings, ?next
 
 	; c = VDP port 1
-	; hl = boot split
+	; hl = dialog split
 	; Modifies: af, bc, hl
 	Apply:
 		VDPRegister_SetDI_M  ; disable display
