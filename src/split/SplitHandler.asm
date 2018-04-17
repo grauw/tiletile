@@ -29,6 +29,7 @@ SplitHandler: MACRO ?line, ?settings, ?next
 		xor a
 		ld (pending),a
 		call ?next
+	next: equ $ - 2
 		pop hl
 		IF DEBUG
 		PROFILE_END 10
