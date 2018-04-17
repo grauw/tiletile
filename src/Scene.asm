@@ -202,11 +202,12 @@ Loop:
 ; ix = this
 ; iy = engine
 Scene_Update:
-	call Engine_WaitDisplayedIY
-
 	IF DEBUG
 	PROFILE_FRAME_BEGIN
 	ENDIF
+
+	call Scene_UpdateTriggers
+	call Engine_WaitDisplayedIY
 
 	call Scene_UpdateInput
 	call Scene_TickPrimary
@@ -223,7 +224,6 @@ Scene_Update:
 	call Engine_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
 	call Engine_CopySpriteColorToSecondary
 	call Scene_DrawSpriteAttributes
-	call Scene_UpdateTriggers
 	call Engine_SubmitSecondaryIY
 
 	IF DEBUG
