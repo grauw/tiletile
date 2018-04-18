@@ -246,9 +246,13 @@ Engine_StartIY:
 	ld ix,Engine.gameFrameEven
 	add ix,de
 	call GameFrame_Construct
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTable
+	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
 	ld de,Engine.gameFrameOdd - Engine.gameFrameEven
 	add ix,de
 	call GameFrame_Construct
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTable
+	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
 	ld de,Engine.gameFrameHandler
 	add iy,de
 	call GameFrameHandler_ActivateIY
@@ -298,9 +302,7 @@ Even:
 Odd:
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 Continue:
-	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTable
 	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffset
-	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
 	ld e,(iy + Engine.palette)
 	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d
@@ -333,9 +335,7 @@ Even:
 Odd:
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 Continue:
-	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTable
 	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffset
-	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
 	ld e,(iy + Engine.palette)
 	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d
