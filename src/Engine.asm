@@ -6,13 +6,9 @@ Engine: MACRO
 		db 0
 	input:
 		Input
-	displayOffsetEven:
+	displayOffset:
 		DisplayOffset
-	displayOffsetOdd:
-		DisplayOffset
-	patternNameTableEven:
-		PatternNameTable 0H
-	patternNameTableOdd:
+	patternNameTable:
 		PatternNameTable 0H
 	spriteAttributeTableEven:
 		SpriteAttributeTable 1EE00H
@@ -26,9 +22,7 @@ Engine: MACRO
 		SpritePatternTable 1F800H
 	spritePatternTableOdd:
 		SpritePatternTable 1F000H
-	paletteEven:
-		dw Palette_system
-	paletteOdd:
+	palette:
 		dw Palette_system
 	gameFrameEven:
 		GameFrame
@@ -54,19 +48,13 @@ Engine_Construct:
 	call Input_Construct
 	pop ix
 
-	ld de,Engine.displayOffsetEven
+	ld de,Engine.displayOffset
 	add ix,de
 	call DisplayOffset_Construct
-	ld de,Engine.displayOffsetOdd - Engine.displayOffsetEven
-	add ix,de
-	call DisplayOffset_Construct
-	ld de,Engine.patternNameTableEven - Engine.displayOffsetOdd
+	ld de,Engine.patternNameTable - Engine.displayOffset
 	add ix,de
 	call PatternNameTable_Construct
-	ld de,Engine.patternNameTableOdd - Engine.patternNameTableEven
-	add ix,de
-	call PatternNameTable_Construct
-	ld de,Engine.spriteAttributeTableEven - Engine.patternNameTableOdd
+	ld de,Engine.spriteAttributeTableEven - Engine.patternNameTable
 	add ix,de
 	call SpriteAttributeTable_Construct
 	ld de,Engine.spriteAttributeTableOdd - Engine.spriteAttributeTableEven
@@ -152,32 +140,23 @@ Engine_GetSpritePatternTableOddIY:
 	ret
 
 ; iy = this
-; iy <- current display offset
-Engine_GetDisplayOffsetIY: PROC
-	bit 0,(iy + Engine.frameCount)
-	jr nz,Odd
-	ld de,Engine.displayOffsetEven
+; iy <- display offset
+Engine_GetDisplayOffsetIY:
+	ld de,Engine.displayOffset
 	add iy,de
 	ret
-Odd:
-	ld de,Engine.displayOffsetOdd
-	add iy,de
-	ret
-	ENDP
 
 ; iy = this
 ; iy <- current sprite attribute table
 Engine_GetSpriteAttributeTableIY: PROC
+	ld h,(iy + Engine.displayOffset + DisplayOffset.horizontalOffset)
+	ld l,(iy + Engine.displayOffset + DisplayOffset.verticalOffset)
 	bit 0,(iy + Engine.frameCount)
 	jr nz,Odd
-	ld h,(iy + Engine.displayOffsetEven + DisplayOffset.horizontalOffset)
-	ld l,(iy + Engine.displayOffsetEven + DisplayOffset.verticalOffset)
 	ld de,Engine.spriteAttributeTableEven
 	add iy,de
 	jp SpriteAttributeTable_SetDisplayPositionIY
 Odd:
-	ld h,(iy + Engine.displayOffsetOdd + DisplayOffset.horizontalOffset)
-	ld l,(iy + Engine.displayOffsetOdd + DisplayOffset.verticalOffset)
 	ld de,Engine.spriteAttributeTableOdd
 	add iy,de
 	jp SpriteAttributeTable_SetDisplayPositionIY
@@ -213,30 +192,9 @@ Odd:
 
 ; de = palette
 ; iy = this
-Engine_SetPaletteIY: PROC
-	bit 1,(iy + Engine.frameCount)
-	jr nz,Odd
-	ld (iy + Engine.paletteEven),e
-	ld (iy + Engine.paletteEven + 1),d
-	ret
-Odd:
-	ld (iy + Engine.paletteOdd),e
-	ld (iy + Engine.paletteOdd + 1),d
-	ret
-	ENDP
-
-; de = palette
-; iy = this
-Engine_SetPaletteEvenIY:
-	ld (iy + Engine.paletteEven),e
-	ld (iy + Engine.paletteEven + 1),d
-	ret
-
-; de = palette
-; iy = this
-Engine_SetPaletteOddIY:
-	ld (iy + Engine.paletteOdd),e
-	ld (iy + Engine.paletteOdd + 1),d
+Engine_SetPaletteIY:
+	ld (iy + Engine.palette),e
+	ld (iy + Engine.palette + 1),d
 	ret
 
 ; ix = this
@@ -335,19 +293,16 @@ Engine_SubmitPrimaryIY: PROC
 	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 Even:
-	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
-	ld e,(iy + Engine.paletteEven)
-	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
-	ld e,(iy + Engine.paletteOdd)
-	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetEven
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTable
+	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffset
 	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableEven
+	ld e,(iy + Engine.palette)
+	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d
 	ld de,Engine.gameFrameHandler
 	add iy,de
@@ -373,19 +328,16 @@ Engine_SubmitSecondaryIY: PROC
 	bit 1,(iy + Engine.frameCount)
 	jr nz,Odd
 Even:
-	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableEven
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableEven
-	ld e,(iy + Engine.paletteEven)
-	ld d,(iy + Engine.paletteEven + 1)
 	jr Continue
 Odd:
-	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTableOdd
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
-	ld e,(iy + Engine.paletteOdd)
-	ld d,(iy + Engine.paletteOdd + 1)
 Continue:
-	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffsetOdd
+	GameFrame_SetPatternNameTable_M ix, iy + Engine.patternNameTable
+	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffset
 	GameFrame_SetSpriteAttributeTable_M ix, iy + Engine.spriteAttributeTableOdd
+	ld e,(iy + Engine.palette)
+	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d
 	ld de,Engine.gameFrameHandler
 	add iy,de
