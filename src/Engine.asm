@@ -126,20 +126,6 @@ Engine_GetInputIY:
 	ret
 
 ; iy = this
-; iy <- even sprite pattern table
-Engine_GetSpritePatternTableEvenIY:
-	ld de,Engine.spritePatternTableEven
-	add iy,de
-	ret
-
-; iy = this
-; iy <- odd sprite pattern table
-Engine_GetSpritePatternTableOddIY:
-	ld de,Engine.spritePatternTableOdd
-	add iy,de
-	ret
-
-; iy = this
 ; iy <- display offset
 Engine_GetDisplayOffsetIY:
 	ld de,Engine.displayOffset
@@ -189,6 +175,20 @@ Odd:
 	add iy,de
 	ret
 	ENDP
+
+; iy = this
+; iy <- even sprite pattern table
+Engine_GetSpritePatternTableEvenIY:
+	ld de,Engine.spritePatternTableEven
+	add iy,de
+	ret
+
+; iy = this
+; iy <- odd sprite pattern table
+Engine_GetSpritePatternTableOddIY:
+	ld de,Engine.spritePatternTableOdd
+	add iy,de
+	ret
 
 ; de = palette
 ; iy = this
