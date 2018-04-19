@@ -259,13 +259,22 @@ MapView_Start:
 	ret
 
 ; ix = this
-; iy = display offset
-MapView_UpdateDisplayOffset:
+; iy = game frame
+MapView_UpdateGameFrame:
 	ld a,(ix + MapView.targetY)
 	add a,16
-	call DisplayOffset_SetVerticalOffsetIY
-	ld a,(ix + MapView.targetX)
-	jp DisplayOffset_SetHorizontalOffsetIY
+	ld c,a
+	ld b,(ix + MapView.targetX)
+	jp GameFrame_SetMapPositionIY
+
+; ix = this
+; iy = sprite attribute table
+MapView_UpdateSpriteAttributTable:
+	ld a,(ix + MapView.targetY)
+	add a,16
+	ld l,a
+	ld h,(ix + MapView.targetX)
+	jp SpriteAttributeTable_SetDisplayPositionIY
 
 ; ix = this
 MapView_Draw: PROC

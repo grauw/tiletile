@@ -6,8 +6,6 @@ Engine: MACRO
 		db 0
 	input:
 		Input
-	displayOffset:
-		DisplayOffset
 	patternNameTable:
 		PatternNameTable 0H
 	spriteAttributeTableEven:
@@ -48,10 +46,7 @@ Engine_Construct:
 	call Input_Construct
 	pop ix
 
-	ld de,Engine.displayOffset
-	add ix,de
-	call DisplayOffset_Construct
-	ld de,Engine.patternNameTable - Engine.displayOffset
+	ld de,Engine.patternNameTable
 	add ix,de
 	call PatternNameTable_Construct
 	ld de,Engine.spriteAttributeTableEven - Engine.patternNameTable
@@ -126,26 +121,17 @@ Engine_GetInputIY:
 	ret
 
 ; iy = this
-; iy <- display offset
-Engine_GetDisplayOffsetIY:
-	ld de,Engine.displayOffset
-	add iy,de
-	ret
-
-; iy = this
 ; iy <- current sprite attribute table
 Engine_GetSpriteAttributeTableIY: PROC
-	ld h,(iy + Engine.displayOffset + DisplayOffset.horizontalOffset)
-	ld l,(iy + Engine.displayOffset + DisplayOffset.verticalOffset)
 	bit 0,(iy + Engine.frameCount)
 	jr nz,Odd
 	ld de,Engine.spriteAttributeTableEven
 	add iy,de
-	jp SpriteAttributeTable_SetDisplayPositionIY
+	ret
 Odd:
 	ld de,Engine.spriteAttributeTableOdd
 	add iy,de
-	jp SpriteAttributeTable_SetDisplayPositionIY
+	ret
 	ENDP
 
 ; iy = this
@@ -196,6 +182,20 @@ Engine_SetPaletteIY:
 	ld (iy + Engine.palette),e
 	ld (iy + Engine.palette + 1),d
 	ret
+
+; iy = this
+; iy <- current game frame
+Engine_GetGameFrameIY: PROC
+	bit 0,(iy + Engine.frameCount)
+	jr nz,Odd
+	ld de,Engine.gameFrameEven
+	add iy,de
+	ret
+Odd:
+	ld de,Engine.gameFrameOdd
+	add iy,de
+	ret
+	ENDP
 
 ; ix = this
 ; ix <- interrupt
@@ -302,7 +302,6 @@ Even:
 Odd:
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 Continue:
-	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffset
 	ld e,(iy + Engine.palette)
 	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d
@@ -335,7 +334,6 @@ Even:
 Odd:
 	GameFrame_SetSpritePatternTable_M ix, iy + Engine.spritePatternTableOdd
 Continue:
-	GameFrame_SetDisplayOffset_M ix, iy + Engine.displayOffset
 	ld e,(iy + Engine.palette)
 	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d

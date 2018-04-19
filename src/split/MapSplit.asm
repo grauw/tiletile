@@ -36,13 +36,10 @@ MapSplit_Construct:
 	ld (ix + MapSplit.spritePattern + VDPRegister.value),a
 	ret
 
-MapSplit_SetDisplayOffset_M: MACRO ?this, ?displayOffset
-	ld a,(?displayOffset + DisplayOffset.horizontalOffsetCharacters)
-	ld (?this + MapSplit.horizontalOffsetCharacters + VDPRegister.value),a
-	ld a,(?displayOffset + DisplayOffset.horizontalOffsetDots)
-	ld (?this + MapSplit.horizontalOffsetDots + VDPRegister.value),a
-	ld a,(?displayOffset + DisplayOffset.verticalOffset)
-	ld (?this + MapSplit.verticalOffset + VDPRegister.value),a
+MapSplit_SetDisplayOffset_M: MACRO ?this, ?horizontalDots, ?horizontalCharacters, ?vertical
+	ld (?this + MapSplit.horizontalOffsetDots + VDPRegister.value),?horizontalDots
+	ld (?this + MapSplit.horizontalOffsetCharacters + VDPRegister.value),?horizontalCharacters
+	ld (?this + MapSplit.verticalOffset + VDPRegister.value),?vertical
 	ENDM
 
 MapSplit_SetPatternNameTable_M: MACRO ?this, ?patternNameTable

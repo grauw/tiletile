@@ -32,10 +32,20 @@ GameFrame_Construct:
 	add ix,de
 	ret
 
-GameFrame_SetDisplayOffset_M: MACRO ?this, ?displayOffset
-	MapSplit_SetDisplayOffset_M ?this + GameFrame.mapSplit, ?displayOffset
-	DialogEndSplit_SetDisplayOffset_M ?this + GameFrame.dialogEndSplit, ?displayOffset
-	ENDM
+; b = x
+; c = y
+; iy = this
+GameFrame_SetMapPositionIY:
+	ld a,b
+	neg
+	and 07H
+	dec b
+	srl b
+	srl b
+	srl b
+	MapSplit_SetDisplayOffset_M (iy + GameFrame.mapSplit), a, b, c
+	DialogEndSplit_SetDisplayOffset_M (iy + GameFrame.dialogEndSplit), a, b, c
+	ret
 
 GameFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
 	MapSplit_SetPatternNameTable_M ?this + GameFrame.mapSplit, ?patternNameTable

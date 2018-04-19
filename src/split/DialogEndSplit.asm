@@ -34,11 +34,8 @@ DialogEndSplit_Construct:
 	ld (ix + DialogEndSplit.mode8 + VDPRegister.value),a
 	ret
 
-DialogEndSplit_SetDisplayOffset_M: MACRO ?this, ?displayOffset
-	ld a,(?displayOffset + DisplayOffset.horizontalOffsetCharacters)
-	ld (?this + DialogEndSplit.horizontalOffsetCharacters + VDPRegister.value),a
-	ld a,(?displayOffset + DisplayOffset.horizontalOffsetDots)
-	ld (?this + DialogEndSplit.horizontalOffsetDots + VDPRegister.value),a
-	ld a,(?displayOffset + DisplayOffset.verticalOffset)
-	ld (?this + DialogEndSplit.verticalOffset + VDPRegister.value),a
+DialogEndSplit_SetDisplayOffset_M: MACRO ?this, ?horizontalDots, ?horizontalCharacters, ?vertical
+	ld (?this + DialogEndSplit.horizontalOffsetDots + VDPRegister.value),?horizontalDots
+	ld (?this + DialogEndSplit.horizontalOffsetCharacters + VDPRegister.value),?horizontalCharacters
+	ld (?this + DialogEndSplit.verticalOffset + VDPRegister.value),?vertical
 	ENDM

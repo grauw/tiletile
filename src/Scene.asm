@@ -211,7 +211,7 @@ Scene_Update:
 
 	call Scene_UpdateInput
 	call Scene_TickPrimary
-	call Scene_UpdateDisplayOffset
+	call Scene_UpdateGameFrame
 	call Scene_DrawSpritePatterns
 	call Scene_DrawSpriteColors
 	call Scene_DrawSpriteAttributes
@@ -219,9 +219,9 @@ Scene_Update:
 	call Engine_SubmitPrimaryIY
 
 	call Scene_TickSecondary
-	call Scene_UpdateDisplayOffset
 	call Scene_DrawBitmap
 	call Engine_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
+	call Scene_UpdateGameFrame
 	call Engine_CopySpriteColorToSecondary
 	call Scene_DrawSpriteAttributes
 	call Engine_SubmitSecondaryIY
@@ -300,6 +300,8 @@ Scene_TickPrimary:
 	call Weather_TickPrimary
 	pop ix
 
+	call Scene_Tick
+
 	IF DEBUG
 	PROFILE_END 1
 	ENDIF
@@ -322,9 +324,26 @@ Scene_TickSecondary:
 	call Weather_TickSecondary
 	pop ix
 
+	call Scene_Tick
+
 	IF DEBUG
 	PROFILE_END 1
 	ENDIF
+	ret
+
+; ix = this
+; iy = engine
+Scene_Tick:
+	push ix
+	call Scene_GetPlayer
+	call Player_GetPosition
+	pop ix
+	push ix
+	ex de,hl
+	call Scene_GetMapView
+	ex de,hl
+	call MapView_SetTargetPosition
+	pop ix
 	ret
 
 ; ix = this
@@ -378,23 +397,16 @@ Exiting:
 
 ; ix = this
 ; iy = engine
-Scene_UpdateDisplayOffset:
+Scene_UpdateGameFrame:
 	IF DEBUG
 	PROFILE_BEGIN 2
 	ENDIF
 	push iy
-	call Engine_GetDisplayOffsetIY
+	call Engine_GetGameFrameIY
 
 	push ix
-	call Scene_GetPlayer
-	call Player_GetPosition
-	pop ix
-	push ix
-	push de
 	call Scene_GetMapView
-	pop de
-	call MapView_SetTargetPosition
-	call MapView_UpdateDisplayOffset
+	call MapView_UpdateGameFrame
 	pop ix
 
 	pop iy
@@ -411,6 +423,11 @@ Scene_DrawSpriteAttributes:
 	ENDIF
 	push iy
 	call Engine_GetSpriteAttributeTableIY
+
+	push ix
+	call Scene_GetMapView
+	call MapView_UpdateSpriteAttributTable
+	pop ix
 
 	ld a,0
 	call SpriteAttributeTable_SetAttributeWriteIY

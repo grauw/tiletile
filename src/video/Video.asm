@@ -2,7 +2,6 @@
 ; Video subsystem
 ;
 	INCLUDE "VDPRegister.asm"
-	INCLUDE "DisplayOffset.asm"
 	INCLUDE "VRAMTable.asm"
 	INCLUDE "VRAMTableCopy.asm"
 	INCLUDE "PatternNameTable.asm"
