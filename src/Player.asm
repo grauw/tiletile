@@ -290,9 +290,9 @@ Player_CanMove:
 	push bc
 	push de
 	push ix
-	push de
+	ex de,hl
 	call Player_GetTileMap
-	pop de
+	ex de,hl
 	call TileMap_PixelToTilePosition
 	call TileMap_GetTile
 	call Tile_GetCollision
