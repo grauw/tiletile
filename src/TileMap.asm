@@ -1,15 +1,13 @@
 ;
 ; A tile map
 ;
-TileMap: MACRO ?width, ?height, ?data, ?dataRows
+TileMap: MACRO ?width, ?height, ?data
 	width:
 		dw ?width
 	height:
 		dw ?height
 	data:
 		dw ?data
-	dataRows:
-		dw ?dataRows
 	ENDM
 
 ; bc = x (pixels)
@@ -39,32 +37,15 @@ TileMap_PixelToTilePosition:
 ; de = y
 ; ix = this
 ; ix <- tile
-; Modifies: f, bc, de
-TileMap_GetTile: PROC
-	ld l,(ix + TileMap.height)
-	ld h,(ix + TileMap.height + 1)
-	scf
-	sbc hl,de
-	jr nc,NoClip
-	ld de,0
-NoClip:
-	ld l,(ix + TileMap.dataRows)
-	ld h,(ix + TileMap.dataRows + 1)
-	add hl,de
-	add hl,de
-	ld e,(hl)
-	inc hl
-	ld h,(hl)
-	ld l,e
-	add hl,bc
-	add hl,bc
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	ld ixl,e
-	ld ixh,d
+; Modifies: af, bc, de, hl
+TileMap_GetTile:
+	call TileMap_GetTileDataPointer
+	ld a,(hl)
+	ld ixl,a
+	inc l
+	ld a,(hl)
+	ld ixh,a
 	ret
-	ENDP
 
 ; bc = x
 ; de = y

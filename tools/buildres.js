@@ -65,7 +65,7 @@ class TileMap {
 	toAsm() {
 		var lines = [];
 		lines.push(`${this.name}_instance:`)
-		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.name}_data, ${this.name}_dataRows`);
+		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.name}_data`);
 		lines.push("");
 		lines.push(`\tSECTION ROM_${this.name}`);
 		lines.push(`${this.name}_data:`);
@@ -73,11 +73,6 @@ class TileMap {
 			lines.push(`\tdw ${this.tileSet.name}_${tile.getName()}`);
 		}
 		lines.push("\tENDS");
-		lines.push("");
-		lines.push(`${this.name}_dataRows:`);
-		for (let y = 0; y < this.height; y++) {
-			lines.push(`\tdw ${this.name}_data + ${y * this.width << 1}`);
-		}
 		lines.push("");
 		lines.push(this.tileSet.toAsm());
 		return lines.join("\n");
