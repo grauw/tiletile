@@ -20,6 +20,8 @@ Application_Main:
 
 	call System_SetDirectBIOSHandlers
 
+	call VDP_InitMirrorsOnVDPUpgrades
+
 	call MemoryTest_Test
 
 	ld ix,Application_instance
