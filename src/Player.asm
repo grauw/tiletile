@@ -145,6 +145,20 @@ Player_GetPosition:
 	ret
 
 ; ix = this
+; ix <- tile
+Player_GetTile:
+	ld c,(ix + Player.x)
+	ld b,(ix + Player.x + 1)
+	ld e,(ix + Player.y)
+	ld d,(ix + Player.y + 1)
+	ex de,hl
+	call Player_GetTileMap
+	ex de,hl
+	call TileMap_PixelToTilePosition
+	call TileMap_GetTile
+	ret
+
+; ix = this
 ; iy = input
 Player_UpdateInput:
 	ld a,(iy + Input.newStick)
