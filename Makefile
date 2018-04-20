@@ -15,3 +15,6 @@ run: all
 
 run2: all
 	openmsx -cart bin/tiletile.rom -romtype KonamiSCC -machine Sanyo_PHC-70FD -script openmsx.tcl
+
+run3: all
+	openmsx -cart bin/tiletile.rom -romtype KonamiSCC -machine Sony_HB-F1XV -script openmsx.tcl
