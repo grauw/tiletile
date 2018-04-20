@@ -533,7 +533,7 @@ Scene_UpdateTriggers:
 	push ix
 	call Scene_GetPlayer
 	call Player_GetTile
-	call Tile_GetCollision
+	Tile_GetCollision_M ix, a
 	pop ix
 
 	push ix

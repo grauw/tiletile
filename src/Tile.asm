@@ -18,10 +18,15 @@ Tile: MACRO ?imageindex, ?tilesbank, ?collision
 	ENDM
 
 ; ix = this
-; a <- collision ID
-Tile_GetCollision:
-	ld a,(ix + Tile.collision)
-	ret
+Tile_GetCollision_M: MACRO ?this, ?register
+	ld ?register,(?this + Tile.collision)
+	ENDM
+
+; ix = this
+; f <- nz: solid
+Tile_IsSolid_M: MACRO ?this
+	bit 7,(?this + Tile.collision)
+	ENDM
 
 ; ix = this
 Tile_Load:

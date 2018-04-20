@@ -316,11 +316,13 @@ Player_CanMove:
 	ex de,hl
 	call TileMap_PixelToTilePosition
 	call TileMap_GetTile
-	call Tile_GetCollision
-	cp 128
+	Tile_IsSolid_M ix
 	pop ix
 	pop de
 	pop bc
+	scf
+	ret z
+	ccf
 	ret
 
 ; b = sprites remaining
