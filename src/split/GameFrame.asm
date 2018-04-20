@@ -4,6 +4,13 @@
 GameFrame_LINE: equ 224
 
 GameFrame: MACRO
+	super: Split
+	dialogActive:
+		db 0
+	dialogStartLine:
+		db 0
+	dialogEndLine:
+		db 0
 	mapSplit:
 		MapSplit
 	dialogSplit:
@@ -66,3 +73,18 @@ GameFrame_SetSpritePatternTable_M: MACRO ?this, ?spritePatternTable
 GameFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
 	MapSplit_SetPalette_M ?this + GameFrame.mapSplit, ?palettelow, ?palettehigh
 	ENDM
+
+; a = dialog height (0 .. 24)
+; iy = this
+GameFrame_SetDialogOffsetIY:
+	ld b,a
+	add a,255
+	sbc a,a
+	ld (iy + GameFrame.dialogActive),a
+	ld a,DialogEndSplit_LINE - 4 - 24
+	add a,b
+	ld (iy + GameFrame.dialogEndLine),a
+	ld a,DialogSplit_LINE - 2 + 24
+	sub b
+	ld (iy + GameFrame.dialogStartLine),a
+	ret

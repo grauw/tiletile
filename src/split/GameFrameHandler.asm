@@ -8,9 +8,26 @@ GameFrameHandler: MACRO ?settings
 	; c = VDP port 1
 	; hl = game frame
 	; Modifies: af, bc, hl
-	Apply:
+	Apply: PROC
 		push de
-		ld de,GameFrame.mapSplit
+		bit 0,(hl)
+		inc hl
+		jr nz,Dialog
+	NoDialog:
+		ld de,overscanSplitHandler
+		ld (mapSplitHandler + SplitHandler.next),de
+		inc hl
+		jr Continue
+	Dialog:
+		ld de,dialogSplitHandler
+		ld (mapSplitHandler + SplitHandler.next),de
+		ld a,(hl)
+		inc hl
+		ld (dialogSplitHandler + SplitHandler.line),a
+		ld a,(hl)
+		ld (dialogEndSplitHandler + SplitHandler.line),a
+	Continue:
+		ld de,GameFrame.mapSplit - 2
 		add hl,de
 		ld (mapSplitHandler + SplitHandler.settings),hl
 		ld de,GameFrame.dialogSplit - GameFrame.mapSplit
@@ -24,6 +41,7 @@ GameFrameHandler: MACRO ?settings
 		ld (overscanSplitHandler + SplitHandler.settings),hl
 		pop de
 		jp super.Return
+		ENDP
 
 	mapSplitHandler:
 		MapSplitHandler ?settings + GameFrame.mapSplit, dialogSplitHandler

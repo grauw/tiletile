@@ -344,6 +344,11 @@ Scene_Tick:
 	ex de,hl
 	call MapView_SetTargetPosition
 	pop ix
+
+	push ix
+	call Scene_GetDialog
+	call Dialog_Tick
+	pop ix
 	ret
 
 ; ix = this
@@ -407,6 +412,11 @@ Scene_UpdateGameFrame:
 	push ix
 	call Scene_GetMapView
 	call MapView_UpdateGameFrame
+	pop ix
+
+	push ix
+	call Scene_GetDialog
+	call Dialog_UpdateGameFrame
 	pop ix
 
 	pop iy
@@ -536,6 +546,11 @@ Scene_UpdateTriggers:
 	push ix
 	call Scene_GetWeather
 	call Weather_UpdateTriggers
+	pop ix
+
+	push ix
+	call Scene_GetDialog
+	call Dialog_UpdateTriggers
 	pop ix
 
 	IF DEBUG
