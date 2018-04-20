@@ -184,59 +184,10 @@ Player_UpdateInput:
 
 ; ix = this
 ; iy = engine
-Player_TickPrimary: PROC
-	ld c,(ix + Player.velocityX)
-	ld b,(ix + Player.velocityX + 1)
-	ld e,(ix + Player.velocityY)
-	ld d,(ix + Player.velocityY + 1)
-	ld a,c
-	and a
-	jp m,Left
-	jr nz,Right
-	ld a,e
-	and a
-	jp m,Up
-	jr nz,Down
-	ld (ix + Player.moving),0
-	jr Continue
-Left:
-	ld (ix + Player.direction),15
-	ld (ix + Player.moving),1
-	jr Continue
-Right:
-	ld (ix + Player.direction),5
-	ld (ix + Player.moving),1
-	jr Continue
-Up:
-	ld (ix + Player.direction),10
-	ld (ix + Player.moving),1
-	jr Continue
-Down:
-	ld (ix + Player.direction),0
-	ld (ix + Player.moving),1
-	jr Continue
-Continue:
-	ld l,(ix + Player.x)
-	ld h,(ix + Player.x + 1)
-	add hl,bc
-	add hl,bc
-	ld c,l
-	ld b,h
-	ld l,(ix + Player.y)
-	ld h,(ix + Player.y + 1)
-	add hl,de
-	add hl,de
-	ex de,hl
-	call Player_CanMove16x16
-	jr c,Player_TickSecondary
-Blocked:
-	ld (ix + Player.velocityX),0
-	ld (ix + Player.velocityX + 1),0
-	ld (ix + Player.velocityY),0
-	ld (ix + Player.velocityY + 1),0
-	ld (ix + Player.moving),0
-	ret
-	ENDP
+Player_TickPrimary:
+	call Player_TickVelocity
+	call Player_TickMovingDirection
+	jp Player_TickSecondary
 
 ; ix = this
 ; iy = engine
@@ -256,6 +207,61 @@ Player_TickSecondary:
 	ld (ix + Player.y),l
 	ld (ix + Player.y + 1),h
 	ret
+
+; ix = this
+Player_TickVelocity:
+	ld c,(ix + Player.velocityX)
+	ld b,(ix + Player.velocityX + 1)
+	ld e,(ix + Player.velocityY)
+	ld d,(ix + Player.velocityY + 1)
+	ld l,(ix + Player.x)
+	ld h,(ix + Player.x + 1)
+	add hl,bc
+	add hl,bc
+	ld c,l
+	ld b,h
+	ld l,(ix + Player.y)
+	ld h,(ix + Player.y + 1)
+	add hl,de
+	add hl,de
+	ex de,hl
+	call Player_CanMove16x16
+	ret c
+	ld (ix + Player.velocityX),0
+	ld (ix + Player.velocityX + 1),0
+	ld (ix + Player.velocityY),0
+	ld (ix + Player.velocityY + 1),0
+	ret
+
+; ix = this
+Player_TickMovingDirection: PROC
+	ld a,(ix + Player.velocityX)
+	and a
+	jp m,Left
+	jr nz,Right
+	ld a,(ix + Player.velocityY)
+	and a
+	jp m,Up
+	jr nz,Down
+	ld (ix + Player.moving),0
+	ret
+Left:
+	ld (ix + Player.direction),15
+	ld (ix + Player.moving),1
+	ret
+Right:
+	ld (ix + Player.direction),5
+	ld (ix + Player.moving),1
+	ret
+Up:
+	ld (ix + Player.direction),10
+	ld (ix + Player.moving),1
+	ret
+Down:
+	ld (ix + Player.direction),0
+	ld (ix + Player.moving),1
+	ret
+	ENDP
 
 ; bc = x
 ; de = y
