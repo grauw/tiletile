@@ -31,6 +31,16 @@ Player: MACRO
 		VRAMTableCopy 0, 0, 8 * SpritePattern._size
 	ENDM
 
+PlayerControl: MACRO ?rldu
+	x: equ (?rldu >> 3 & 1) - (?rldu >> 2 & 1)
+	y: equ (?rldu >> 1 & 1) - (?rldu >> 0 & 1)
+	velocityX:
+		dw x * Player_SPEED
+	velocityY:
+		dw y * Player_SPEED
+	_size:
+	ENDM
+
 ; de = tile map
 ; ix = this
 Player_Construct:
@@ -166,9 +176,9 @@ Player_UpdateInput:
 	and 0FH
 	add a,a
 	add a,a
-	add a,Player_velocityLUT & 0FFH
+	add a,Player_controlLUT & 0FFH
 	ld l,a
-	ld h,Player_velocityLUT >> 8
+	ld h,Player_controlLUT >> 8
 	ld c,(hl)
 	inc l
 	ld b,(hl)
@@ -457,21 +467,8 @@ Continue:
 	ENDP
 
 ;
-	ALIGN_FIT8 16 * 4
-Player_velocityLUT:
-	dw  0           ,  0             ; RLDU
-	dw  0           ,  Player_SPEED  ; RLD.
-	dw  0           , -Player_SPEED  ; RL.U
-	dw  0           ,  0             ; RL..
-	dw  Player_SPEED,  0             ; R.DU
-	dw  Player_SPEED,  Player_SPEED  ; R.D.
-	dw  Player_SPEED, -Player_SPEED  ; R..U
-	dw  Player_SPEED,  0             ; R...
-	dw -Player_SPEED,  0             ; .LDU
-	dw -Player_SPEED,  Player_SPEED  ; .LD.
-	dw -Player_SPEED, -Player_SPEED  ; .L.U
-	dw -Player_SPEED,  0             ; .L..
-	dw  0           ,  0             ; ..DU
-	dw  0           ,  Player_SPEED  ; ..D.
-	dw  0           , -Player_SPEED  ; ...U
-	dw  0           ,  0             ; ....
+	ALIGN_FIT8 16 * PlayerControl._size
+Player_controlLUT:
+	REPT 16, ?value
+	PlayerControl ?value ^ 15
+	ENDM
