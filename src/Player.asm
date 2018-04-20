@@ -459,19 +459,19 @@ Continue:
 ;
 	ALIGN_FIT8 16 * 4
 Player_velocityLUT:
-	dw  0           ,  0             ; RLUD
+	dw  0           ,  0             ; RLDU
 	dw  0           ,  Player_SPEED  ; RLD.
 	dw  0           , -Player_SPEED  ; RL.U
 	dw  0           ,  0             ; RL..
-	dw  Player_SPEED,  0             ; R.UD
+	dw  Player_SPEED,  0             ; R.DU
 	dw  Player_SPEED,  Player_SPEED  ; R.D.
 	dw  Player_SPEED, -Player_SPEED  ; R..U
 	dw  Player_SPEED,  0             ; R...
-	dw -Player_SPEED,  0             ; .LUD
+	dw -Player_SPEED,  0             ; .LDU
 	dw -Player_SPEED,  Player_SPEED  ; .LD.
 	dw -Player_SPEED, -Player_SPEED  ; .L.U
 	dw -Player_SPEED,  0             ; .L..
-	dw  0           ,  0             ; ..UD
+	dw  0           ,  0             ; ..DU
 	dw  0           ,  Player_SPEED  ; ..D.
 	dw  0           , -Player_SPEED  ; ...U
 	dw  0           ,  0             ; ....
