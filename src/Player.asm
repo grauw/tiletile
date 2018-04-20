@@ -1,6 +1,7 @@
 ;
 ;
 ;
+Player_SPEED: equ 2
 Player_PATTERNS: equ 8
 Player_COLLIDER_WIDTH: equ 16
 Player_COLLIDER_HEIGHT: equ 8
@@ -450,19 +451,19 @@ Continue:
 ;
 	ALIGN_FIT8 16 * 4
 Player_velocityLUT:
-	dw  0,  0  ; RLUD
-	dw  0,  2  ; RLD.
-	dw  0, -2  ; RL.U
-	dw  0,  0  ; RL..
-	dw  2,  0  ; R.UD
-	dw  2,  2  ; R.D.
-	dw  2, -2  ; R..U
-	dw  2,  0  ; R...
-	dw -2,  0  ; .LUD
-	dw -2,  2  ; .LD.
-	dw -2, -2  ; .L.U
-	dw -2,  0  ; .L..
-	dw  0,  0  ; ..UD
-	dw  0,  2  ; ..D.
-	dw  0, -2  ; ...U
-	dw  0,  0  ; ....
+	dw  0           ,  0             ; RLUD
+	dw  0           ,  Player_SPEED  ; RLD.
+	dw  0           , -Player_SPEED  ; RL.U
+	dw  0           ,  0             ; RL..
+	dw  Player_SPEED,  0             ; R.UD
+	dw  Player_SPEED,  Player_SPEED  ; R.D.
+	dw  Player_SPEED, -Player_SPEED  ; R..U
+	dw  Player_SPEED,  0             ; R...
+	dw -Player_SPEED,  0             ; .LUD
+	dw -Player_SPEED,  Player_SPEED  ; .LD.
+	dw -Player_SPEED, -Player_SPEED  ; .L.U
+	dw -Player_SPEED,  0             ; .L..
+	dw  0           ,  0             ; ..UD
+	dw  0           ,  Player_SPEED  ; ..D.
+	dw  0           , -Player_SPEED  ; ...U
+	dw  0           ,  0             ; ....
