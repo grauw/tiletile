@@ -18,3 +18,6 @@ run2: all
 
 run3: all
 	openmsx -cart bin/tiletile.rom -romtype KonamiSCC -machine Sony_HB-F1XV -script openmsx.tcl
+
+run4: all
+	openmsx -cart bin/tiletile.rom -romtype KonamiSCC -machine Al_Alamiah_AX370 -script openmsx.tcl
