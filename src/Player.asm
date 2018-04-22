@@ -11,6 +11,8 @@ Player: MACRO
 		dw 124
 	y:
 		dw 120
+	control:
+		dw Player_controlLUT + 15 * PlayerControl._size
 	velocityX:
 		dw 0
 	velocityY:
@@ -177,27 +179,25 @@ Player_UpdateInput:
 	add a,a
 	add a,a
 	add a,Player_controlLUT & 0FFH
-	ld l,a
-	ld h,Player_controlLUT >> 8
-	ld c,(hl)
-	inc l
-	ld b,(hl)
-	inc l
-	ld e,(hl)
-	inc l
-	ld d,(hl)
-	ld (ix + Player.velocityX),c
-	ld (ix + Player.velocityX + 1),b
-	ld (ix + Player.velocityY),e
-	ld (ix + Player.velocityY + 1),d
+	ld (ix + Player.control),a
+	ld a,0
+	adc a,Player_controlLUT >> 8
+	ld (ix + Player.control + 1),a
 	ret
 
 ; ix = this
 ; iy = engine
 Player_TickPrimary:
+	push iy
+	ld e,(ix + Player.control)
+	ld d,(ix + Player.control + 1)
+	ld iyl,e
+	ld iyh,d
 	call Player_TickVelocity
 	call Player_TickMovingDirection
-	jp Player_TickSecondary
+	call Player_TickSecondary
+	pop iy
+	ret
 
 ; ix = this
 ; iy = engine
@@ -219,11 +219,16 @@ Player_TickSecondary:
 	ret
 
 ; ix = this
+; iy = control
 Player_TickVelocity:
-	ld c,(ix + Player.velocityX)
-	ld b,(ix + Player.velocityX + 1)
-	ld e,(ix + Player.velocityY)
-	ld d,(ix + Player.velocityY + 1)
+	ld c,(iy + PlayerControl.velocityX)
+	ld b,(iy + PlayerControl.velocityX + 1)
+	ld e,(iy + PlayerControl.velocityY)
+	ld d,(iy + PlayerControl.velocityY + 1)
+	ld (ix + Player.velocityX),c
+	ld (ix + Player.velocityX + 1),b
+	ld (ix + Player.velocityY),e
+	ld (ix + Player.velocityY + 1),d
 	ld l,(ix + Player.x)
 	ld h,(ix + Player.x + 1)
 	add hl,bc
@@ -467,7 +472,6 @@ Continue:
 	ENDP
 
 ;
-	ALIGN_FIT8 16 * PlayerControl._size
 Player_controlLUT:
 	REPT 16, ?value
 	PlayerControl ?value ^ 15
