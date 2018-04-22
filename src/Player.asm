@@ -40,6 +40,8 @@ PlayerControl: MACRO ?rldu
 		dw x * Player_SPEED
 	velocityY:
 		dw y * Player_SPEED
+	direction:
+		db x < 0 ? 15 : x > 0 ? 5 : y < 0 ? 10 : 0
 	_size:
 	ENDM
 
@@ -176,8 +178,10 @@ Player_GetTile:
 Player_UpdateInput:
 	ld a,(iy + Input.newStick)
 	and 0FH
+	ld b,a
 	add a,a
 	add a,a
+	add a,b
 	add a,Player_controlLUT & 0FFH
 	ld (ix + Player.control),a
 	ld a,0
@@ -249,34 +253,18 @@ Player_TickVelocity:
 	ret
 
 ; ix = this
-Player_TickMovingDirection: PROC
+; iy = control
+Player_TickMovingDirection:
 	ld a,(ix + Player.velocityX)
+	or (ix + Player.velocityY)
+	add a,-1
+	sbc a,a
+	ld (ix + Player.moving),a
 	and a
-	jp m,Left
-	jr nz,Right
-	ld a,(ix + Player.velocityY)
-	and a
-	jp m,Up
-	jr nz,Down
-	ld (ix + Player.moving),0
+	ret z
+	ld a,(iy + PlayerControl.direction)
+	ld (ix + Player.direction),a
 	ret
-Left:
-	ld (ix + Player.direction),15
-	ld (ix + Player.moving),1
-	ret
-Right:
-	ld (ix + Player.direction),5
-	ld (ix + Player.moving),1
-	ret
-Up:
-	ld (ix + Player.direction),10
-	ld (ix + Player.moving),1
-	ret
-Down:
-	ld (ix + Player.direction),0
-	ld (ix + Player.moving),1
-	ret
-	ENDP
 
 ; bc = x
 ; de = y
