@@ -28,3 +28,44 @@ Loop:
 	and b
 	jr z,Loop  ; z: display, nz: h-blank
 	ENDM
+
+; Have status register 2 selected.
+; c = VDP port 1
+; Modifies: af, b
+Split_PollNoHR_M: MACRO
+	ld b,00100000B
+Loop:
+	in a,(c)
+	and b
+	jr nz,Loop  ; z: display, nz: h-blank
+	ENDM
+
+; Have status register 2 selected.
+; c = VDP port 1
+; Modifies: af, b
+Split_PollHRStart_M: MACRO
+	ld b,00100000B
+LoopNoHR:
+	in a,(c)
+	and b
+	jr nz,LoopNoHR  ; z: display, nz: h-blank
+LoopHR:
+	in a,(c)
+	and b
+	jr z,LoopHR  ; z: display, nz: h-blank
+	ENDM
+
+; Have status register 2 selected.
+; c = VDP port 1
+; Modifies: af, b
+Split_PollHREnd_M: MACRO
+	ld b,00100000B
+LoopHR:
+	in a,(c)
+	and b
+	jr z,LoopHR  ; z: display, nz: h-blank
+LoopNoHR:
+	in a,(c)
+	and b
+	jr nz,LoopNoHR  ; z: display, nz: h-blank
+	ENDM

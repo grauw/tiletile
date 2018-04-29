@@ -10,7 +10,7 @@ OverscanSplitHandler: MACRO ?settings, ?next
 	Apply:
 		VDPRegister_SetDI_M  ; mode 9 (192 lines)
 		VDPRegister_SetDI_M  ; status register 2
-		Split_PollHR_M
+		Split_PollHREnd_M
 		VDPRegister_SetDI_M  ; mode 9 (212 lines)
 		jp super.Return
 	ENDM
