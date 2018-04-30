@@ -72,6 +72,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "TileSet.asm"
 	INCLUDE "TileMap.asm"
 	INCLUDE "Image.asm"
+	INCLUDE "Character.asm"
 	INCLUDE "Dialog.asm"
 	INCLUDE "MapView.asm"
 	INCLUDE "Player.asm"

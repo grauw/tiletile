@@ -518,6 +518,13 @@ Scene_DrawBitmap:
 	pop ix
 	pop iy
 
+	push iy
+	push ix
+	call Scene_GetDialog
+	call Dialog_DrawBitmap
+	pop ix
+	pop iy
+
 	IF DEBUG
 	PROFILE_END 7
 	ENDIF
