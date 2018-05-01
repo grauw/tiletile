@@ -1,18 +1,21 @@
 ;
 ; Split for dialog
 ;
-DialogEndSplit_LINE: equ 208 - 4
+DialogEndSplit_LINE: equ 208 - 6
+DialogEndSplit_VERTICAL_OFFSET: equ -160
 
 DialogEndSplit: MACRO
 	super: Split
 		VDPRegister 15, 2
+	verticalOffset1:
+		VDPRegister 23
 	horizontalOffsetCharacters:
 		VDPRegister 26
 	horizontalOffsetDots:
 		VDPRegister 27
 	mode1Blank:
 		VDPRegister 1
-	verticalOffset:
+	verticalOffset2:
 		VDPRegister 23
 	mode8:
 		VDPRegister 8
@@ -37,5 +40,11 @@ DialogEndSplit_Construct:
 DialogEndSplit_SetDisplayOffset_M: MACRO ?this, ?horizontalDots, ?horizontalCharacters, ?vertical
 	ld (?this + DialogEndSplit.horizontalOffsetDots + VDPRegister.value),?horizontalDots
 	ld (?this + DialogEndSplit.horizontalOffsetCharacters + VDPRegister.value),?horizontalCharacters
-	ld (?this + DialogEndSplit.verticalOffset + VDPRegister.value),?vertical
+	ld (?this + DialogEndSplit.verticalOffset2 + VDPRegister.value),?vertical
+	ENDM
+
+DialogEndSplit_SetDialogOffset_M: MACRO ?this, ?height
+	ld a,DialogEndSplit_VERTICAL_OFFSET + Dialog_MAX_HEIGHT
+	sub ?height
+	ld (?this + DialogEndSplit.verticalOffset1),a
 	ENDM

@@ -13,12 +13,17 @@ DialogSplitHandler: MACRO ?settings, ?next
 		Split_PollHR_M
 		VDPRegister_SetDI_M  ; enable display
 		VDPRegister_SetDI_M  ; pattern name base
-		ld a,(hl)
-		VDPRegister_SetDI_M  ; vertical offset
+		VDPRegister_SetDI_M  ; vertical offset 1
+		Split_PollHR_M
 		VDPRegister_SetDI_M  ; horizontal offset (characters)
 		VDPRegister_SetDI_M  ; horizontal offset (dots)
 		VDPRegister_SetDI_M  ; disable sprites
+		Split_PollHR_M
+		Split_PollHRStart_M
+		ld a,(hl)
 		ld (VDP_MIRROR_8 + 23),a
+		Split_PollHRStart_M
+		VDPRegister_SetDI_M  ; vertical offset 2
 		jp super.Return
 	ENDM
 

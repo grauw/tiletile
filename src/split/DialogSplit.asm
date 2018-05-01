@@ -12,12 +12,14 @@ DialogSplit: MACRO
 	mode1Display:
 		VDPRegister 1
 		VDPRegister 2, 3 << 5 | 00011111B
-	verticalOffset:
-		VDPRegister 23, DialogSplit_VERTICAL_OFFSET
+	verticalOffset1:
+		VDPRegister 23
 		VDPRegister 26, 0
 		VDPRegister 27, 0
 	mode8:
 		VDPRegister 8
+	verticalOffset2:
+		VDPRegister 23, DialogSplit_VERTICAL_OFFSET
 	_size:
 	ENDM
 
@@ -32,3 +34,9 @@ DialogSplit_Construct:
 	or 00000010B
 	ld (ix + DialogSplit.mode8 + VDPRegister.value),a
 	ret
+
+DialogSplit_SetDialogOffset_M: MACRO ?this, ?height
+	ld a,DialogSplit_VERTICAL_OFFSET - Dialog_MAX_HEIGHT
+	add a,?height
+	ld (?this + DialogSplit.verticalOffset1),a
+	ENDM

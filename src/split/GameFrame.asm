@@ -85,4 +85,6 @@ GameFrame_SetDialogOffset_M: MACRO ?this, ?height
 	ld a,DialogEndSplit_LINE - Dialog_MAX_HEIGHT
 	add a,?height
 	ld (?this + GameFrame.dialogEndLine),a
+	DialogSplit_SetDialogOffset_M ?this + GameFrame.dialogSplit, b
+	DialogEndSplit_SetDialogOffset_M ?this + GameFrame.dialogEndSplit, b
 	ENDM
