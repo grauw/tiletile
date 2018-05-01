@@ -74,17 +74,15 @@ GameFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
 	MapSplit_SetPalette_M ?this + GameFrame.mapSplit, ?palettelow, ?palettehigh
 	ENDM
 
-; a = dialog height (0 .. 24)
-; iy = this
-GameFrame_SetDialogOffsetIY:
-	ld b,a
+GameFrame_SetDialogOffset_M: MACRO ?this, ?height
+	ld a,?height
 	add a,255
 	sbc a,a
-	ld (iy + GameFrame.dialogActive),a
-	ld a,DialogEndSplit_LINE - 4 - 24
-	add a,b
-	ld (iy + GameFrame.dialogEndLine),a
-	ld a,DialogSplit_LINE - 2 + 24
-	sub b
-	ld (iy + GameFrame.dialogStartLine),a
-	ret
+	ld (?this + GameFrame.dialogActive),a
+	ld a,DialogEndSplit_LINE - 4 - Dialog_MAX_HEIGHT
+	add a,?height
+	ld (?this + GameFrame.dialogEndLine),a
+	ld a,DialogSplit_LINE - 2 + Dialog_MAX_HEIGHT
+	sub ?height
+	ld (?this + GameFrame.dialogStartLine),a
+	ENDM

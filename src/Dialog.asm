@@ -74,9 +74,11 @@ Show:
 	ENDP
 
 ; ix = this
+; iy = game frame
 Dialog_UpdateGameFrame:
-	ld a,(ix + Dialog.height)
-	jp GameFrame_SetDialogOffsetIY
+	ld b,(ix + Dialog.height)
+	GameFrame_SetDialogOffset_M iy, b
+	ret
 
 ; ix = this
 Dialog_DrawBitmap:
