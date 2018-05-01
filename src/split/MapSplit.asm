@@ -19,6 +19,7 @@ MapSplit: MACRO
 		VDPRegister 11
 	spritePattern:
 		VDPRegister 6
+		VDPRegister 16, 0
 	palette:
 		dw Palette_black
 	_size:

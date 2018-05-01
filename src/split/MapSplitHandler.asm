@@ -16,6 +16,7 @@ MapSplitHandler: MACRO ?settings, ?next
 		VDPRegister_SetDI_M  ; sprite attribute base LSB
 		VDPRegister_SetDI_M  ; sprite attribute base MSB
 		VDPRegister_SetDI_M  ; sprite pattern base
+		VDPRegister_SetDI_M  ; palette index
 		ld b,(hl)
 		inc hl
 		ld h,(hl)

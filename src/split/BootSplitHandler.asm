@@ -8,6 +8,7 @@ BootSplitHandler: MACRO ?settings, ?next
 	; hl = boot split
 	; Modifies: af, bc, hl
 	Apply:
+		VDPRegister_SetDI_M  ; palette index
 		ld b,(hl)
 		inc hl
 		ld h,(hl)
