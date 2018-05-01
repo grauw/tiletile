@@ -12,6 +12,13 @@ proc dihaltcallback {} {
 }
 set di_halt_callback dihaltcallback
 
+proc cpuspeed {x} {
+	variable z80_freq [expr 3579545 * $x]
+	variable z80_freq_locked false
+	variable cmdtiming broken
+	set z80_freq
+}
+
 profile_osd
 
 set throttle off
