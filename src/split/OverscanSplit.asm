@@ -1,7 +1,7 @@
 ;
 ; Split for overscan
 ;
-OverscanSplit_LINE: equ 212
+OverscanSplit_LINE: equ 212 - 2
 
 OverscanSplit: MACRO
 	super: Split

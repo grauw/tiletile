@@ -1,7 +1,7 @@
 ;
 ; Split for dialog
 ;
-DialogEndSplit_LINE: equ 208
+DialogEndSplit_LINE: equ 208 - 4
 
 DialogEndSplit: MACRO
 	super: Split

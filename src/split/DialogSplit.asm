@@ -1,7 +1,8 @@
 ;
 ; Split for dialog
 ;
-DialogSplit_LINE: equ 160
+DialogSplit_LINE: equ 160 - 2
+DialogSplit_VERTICAL_OFFSET: equ -160
 
 DialogSplit: MACRO
 	super: Split
@@ -12,7 +13,7 @@ DialogSplit: MACRO
 		VDPRegister 1
 		VDPRegister 2, 3 << 5 | 00011111B
 	verticalOffset:
-		VDPRegister 23, -DialogSplit_LINE
+		VDPRegister 23, DialogSplit_VERTICAL_OFFSET
 		VDPRegister 26, 0
 		VDPRegister 27, 0
 	mode8:

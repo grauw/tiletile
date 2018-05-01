@@ -2,7 +2,7 @@
 ; Dialog split interrupt handler
 ;
 DialogEndSplitHandler: MACRO ?settings, ?next
-	super: SplitHandler DialogEndSplit_LINE - 4, ?settings, ?next
+	super: SplitHandler DialogEndSplit_LINE, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = dialog end split
