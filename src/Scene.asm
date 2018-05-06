@@ -212,17 +212,17 @@ Scene_Update:
 	call Scene_UpdateInput
 	call Scene_TickPrimary
 	call Scene_UpdateGameFrame
+	call Scene_UpdatePalette
+	call Scene_DrawSpriteAttributes
 	call Scene_DrawSpritePatterns
 	call Scene_DrawSpriteColors
-	call Scene_DrawSpriteAttributes
-	call Scene_UpdatePalette
 	call Engine_SubmitPrimaryIY
 
 	call Scene_TickSecondary
 	call Scene_DrawBitmap
 	call Engine_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
-	call Scene_UpdateGameFrame
 	call Engine_CopySpriteColorToSecondary
+	call Scene_UpdateGameFrame
 	call Scene_DrawSpriteAttributes
 	call Engine_SubmitSecondaryIY
 
