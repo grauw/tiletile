@@ -81,7 +81,7 @@ Dialog_UpdateGameFrame:
 	ret
 
 ; ix = this
-Dialog_DrawBitmap:
+Dialog_DrawBitmap: PROC
 	bit 0,(ix + Dialog.active)
 	ret z
 	ld e,ixl
@@ -119,6 +119,7 @@ NoNewline:
 	add a,(iy + VDPCommand.nx)
 	ld (iy + VDPCommand.dx),a
 	ret
+	ENDP
 
 ;
 Dialog_testText:
