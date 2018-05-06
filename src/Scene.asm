@@ -219,13 +219,14 @@ Scene_Update:
 	call Engine_SubmitPrimaryIY
 
 	call Scene_TickSecondary
-	call Scene_DrawBitmap
+	call Scene_DrawBitmapPrimary
 	call Engine_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
 	call Engine_CopySpriteColorToSecondary
 	call Scene_UpdateMusic
 	call Scene_UpdateGameFrame
 	call Scene_DrawSpriteAttributes
 	call Engine_SubmitSecondaryIY
+	call Scene_DrawBitmapSecondary
 
 	IF DEBUG
 	PROFILE_FRAME_END
@@ -507,7 +508,7 @@ Scene_DrawSpritePatterns:
 
 ; ix = this
 ; iy = engine
-Scene_DrawBitmap:
+Scene_DrawBitmapPrimary:
 	IF DEBUG
 	PROFILE_BEGIN 7
 	ENDIF
@@ -518,6 +519,18 @@ Scene_DrawBitmap:
 	call MapView_DrawBitmap
 	pop ix
 	pop iy
+
+	IF DEBUG
+	PROFILE_END 7
+	ENDIF
+	ret
+
+; ix = this
+; iy = engine
+Scene_DrawBitmapSecondary:
+	IF DEBUG
+	PROFILE_BEGIN 7
+	ENDIF
 
 	push iy
 	push ix

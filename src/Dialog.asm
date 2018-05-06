@@ -5,6 +5,7 @@ Dialog_OPEN_SPEED: equ 6
 Dialog_MAX_HEIGHT: equ 24
 Dialog_START_X: equ 16
 Dialog_START_Y: equ 5
+Dialog_LINE_WIDTH: equ 232
 Dialog_LINE_HEIGHT: equ 10
 
 Dialog: MACRO ?uiImage
@@ -13,7 +14,9 @@ Dialog: MACRO ?uiImage
 	height:
 		db 0
 	text:
-		dw Dialog_testText
+		dw 0
+	clear:
+		db 0
 	glyphs:
 		dw Glyph_glyphs
 	uiImage:
@@ -21,7 +24,7 @@ Dialog: MACRO ?uiImage
 	patternName:
 		PatternNameTable 18000H
 	drawCommand:
-		VDPCommand 0, 300H, Dialog_START_X, 300H + Dialog_START_Y, 0, 0, 0, 0, VDPCommand_HMMM
+		VDPCommand 0, 300H, Dialog_START_X, 300H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_HMMM
 	ENDM
 
 ; ix = this
@@ -49,9 +52,23 @@ Dialog_Load:
 ; ix = this
 Dialog_UpdateTriggers:
 	and a
-	ld (ix + Dialog.active),a
-	ret z
+	jp z,Dialog_Hide
+	bit 0,(ix + Dialog.active)
+	ret nz
+	ld de,Dialog_testText
+	jp Dialog_Show
+
+; de = text
+Dialog_Show:
+	ld (ix + Dialog.text),e
+	ld (ix + Dialog.text + 1),d
 	ld (ix + Dialog.active),-1
+	ld (ix + Dialog.clear),-1
+	ret
+
+; de = text
+Dialog_Hide:
+	ld (ix + Dialog.active),0
 	ret
 
 ; ix = this
@@ -81,9 +98,36 @@ Dialog_UpdateGameFrame:
 	ret
 
 ; ix = this
+; iy = engine
 Dialog_DrawBitmap: PROC
 	bit 0,(ix + Dialog.active)
 	ret z
+	bit 0,(ix + Dialog.clear)
+	jr nz,Clear
+	push iy
+	call Engine_GetInputIY
+	bit 4,(iy + Input.newStick)
+	pop iy
+	call z,Dialog_DrawGlyph
+	jp Dialog_DrawGlyph
+Clear:
+	ld (ix + Dialog.clear),0
+	ld e,ixl
+	ld d,ixh
+	ld iy,Dialog.drawCommand
+	add iy,de
+	ld (iy + VDPCommand.dx),Dialog_START_X
+	ld (iy + VDPCommand.dy),Dialog_START_Y
+	ld (iy + VDPCommand.nx),Dialog_LINE_WIDTH
+	ld (iy + VDPCommand.ny),Dialog_LINE_HEIGHT * 4
+	ld (iy + VDPCommand.command),VDPCommand_HMMV
+	call VDPCommand_ExecuteS2IY
+	ld (iy + VDPCommand.command),VDPCommand_HMMM
+	ret
+	ENDP
+
+; ix = this
+Dialog_DrawGlyph: PROC
 	ld e,ixl
 	ld d,ixh
 	ld iy,Dialog.drawCommand
