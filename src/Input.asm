@@ -100,5 +100,5 @@ Input_GetKeyboardAsJoystickIY:
 ;
 	ALIGN_FIT8 64
 Input_keyboardAsJoystickLUT: REPT 64, ?i
-	db (?i & 1) << 2 | (?i & 2) >> 1 | (?i & 4) >> 1 | (?i & 8) | (?i & 16) | (?i & 32) | 0C0H
+	db (?i & 1) << 2 | (?i & 2) >> 1 | (?i & 4) >> 1 | (?i & 8) | (?i & 32) >> 1 | (?i & 16) << 1 | 0C0H
 	ENDM
