@@ -72,6 +72,8 @@ GameFrame_SetSpritePatternTable_M: MACRO ?this, ?spritePatternTable
 
 GameFrame_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
 	MapSplit_SetPalette_M ?this + GameFrame.mapSplit, ?palettelow, ?palettehigh
+	DialogSplit_SetPalette_M ?this + GameFrame.dialogSplit, ?palettelow, ?palettehigh
+	DialogEndSplit_SetPalette_M ?this + GameFrame.dialogEndSplit, ?palettelow, ?palettehigh
 	ENDM
 
 GameFrame_SetDialogOffset_M: MACRO ?this, ?height

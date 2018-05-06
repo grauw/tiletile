@@ -9,19 +9,28 @@ DialogEndSplit: MACRO
 		VDPRegister 15, 2
 	verticalOffset1:
 		VDPRegister 23
+		VDPRegister 16, 12
+	mapColor12:
+		PaletteColor 4, 2, 1
+	mapColor13:
+		PaletteColor 5, 3, 2
+	mapColor14:
+		PaletteColor 6, 5, 3
 	horizontalOffsetCharacters:
 		VDPRegister 26
 	horizontalOffsetDots:
 		VDPRegister 27
 	mode1Blank:
 		VDPRegister 1
-	verticalOffset2:
-		VDPRegister 23
 	mode8:
 		VDPRegister 8
 	mode1Display:
 		VDPRegister 1
 		VDPRegister 2, 0 << 5 | 00011111B
+	mapColor15:
+		PaletteColor 7, 7, 6
+	verticalOffset2:
+		VDPRegister 23
 	_size:
 	ENDM
 
@@ -47,4 +56,27 @@ DialogEndSplit_SetDialogOffset_M: MACRO ?this, ?height
 	ld a,DialogEndSplit_VERTICAL_OFFSET + Dialog_MAX_HEIGHT
 	sub ?height
 	ld (?this + DialogEndSplit.verticalOffset1),a
+	ENDM
+
+DialogEndSplit_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh
+	push iy
+	ld iyl,?palettelow
+	ld iyh,?palettehigh
+	ld a,(iy + Palette.color12)
+	ld (?this + DialogEndSplit.mapColor12),a
+	ld a,(iy + Palette.color12 + 1)
+	ld (?this + DialogEndSplit.mapColor12 + 1),a
+	ld a,(iy + Palette.color13)
+	ld (?this + DialogEndSplit.mapColor13),a
+	ld a,(iy + Palette.color13 + 1)
+	ld (?this + DialogEndSplit.mapColor13 + 1),a
+	ld a,(iy + Palette.color14)
+	ld (?this + DialogEndSplit.mapColor14),a
+	ld a,(iy + Palette.color14 + 1)
+	ld (?this + DialogEndSplit.mapColor14 + 1),a
+	ld a,(iy + Palette.color15)
+	ld (?this + DialogEndSplit.mapColor15),a
+	ld a,(iy + Palette.color15 + 1)
+	ld (?this + DialogEndSplit.mapColor15 + 1),a
+	pop iy
 	ENDM
