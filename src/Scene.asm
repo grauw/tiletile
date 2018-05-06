@@ -222,6 +222,7 @@ Scene_Update:
 	call Scene_DrawBitmap
 	call Engine_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
 	call Engine_CopySpriteColorToSecondary
+	call Scene_UpdateMusic
 	call Scene_UpdateGameFrame
 	call Scene_DrawSpriteAttributes
 	call Engine_SubmitSecondaryIY
@@ -555,5 +556,21 @@ Scene_UpdateTriggers:
 
 	IF DEBUG
 	PROFILE_END 8
+	ENDIF
+	ret
+
+; ix = this
+; iy = engine
+Scene_UpdateMusic:
+	IF DEBUG
+	PROFILE_BEGIN 9
+	ENDIF
+
+	ld b,0
+	djnz $
+	djnz $
+
+	IF DEBUG
+	PROFILE_END 9
 	ENDIF
 	ret
