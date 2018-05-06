@@ -14,8 +14,8 @@ Dialog: MACRO ?uiImage
 		db 0
 	text:
 		dw Dialog_testText
-	characters:
-		dw Character_characters
+	glyphs:
+		dw Glyph_glyphs
 	uiImage:
 		dw ?uiImage
 	patternName:
@@ -106,14 +106,14 @@ Loop:
 	jr Loop
 NoNewline:
 	sub 32
-	ld e,(ix + Dialog.characters)
-	ld d,(ix + Dialog.characters + 1)
+	ld e,(ix + Dialog.glyphs)
+	ld d,(ix + Dialog.glyphs + 1)
 	ld l,a
 	ld h,0
 	add hl,hl
 	add hl,hl
 	add hl,de
-	call Character_SetCopyHL
+	call Glyph_SetCopyHL
 	call VDPCommand_ExecuteS2IY
 	ld a,(iy + VDPCommand.dx)
 	add a,(iy + VDPCommand.nx)
