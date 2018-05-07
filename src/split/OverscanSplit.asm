@@ -5,9 +5,9 @@ OverscanSplit_LINE: equ 212 - 3
 
 OverscanSplit: MACRO
 	super: Split
-		VDPRegister 15, 2
 	mode9_192:
 		VDPRegister 9
+		VDPRegister 15, 2
 	mode9_212:
 		VDPRegister 9
 	_size:
