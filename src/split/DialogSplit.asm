@@ -12,13 +12,13 @@ DialogSplit: MACRO
 		VDPRegister 1
 	mode8:
 		VDPRegister 8
-	mode1Display:
-		VDPRegister 1
 		VDPRegister 2, 3 << 5 | 00011111B
 	verticalOffset1:
 		VDPRegister 23
 	color10:
 		PaletteColor 2, 3, 5
+	mode1Display:
+		VDPRegister 1
 		VDPRegister 26, 0
 		VDPRegister 27, 0
 	color11:

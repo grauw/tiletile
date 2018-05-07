@@ -22,13 +22,13 @@ DialogEndSplit: MACRO
 		VDPRegister 27
 	mode1Blank:
 		VDPRegister 1
+		VDPRegister 2, 0 << 5 | 00011111B
+	mapColor15:
+		PaletteColor 7, 7, 6
 	mode8:
 		VDPRegister 8
 	mode1Display:
 		VDPRegister 1
-		VDPRegister 2, 0 << 5 | 00011111B
-	mapColor15:
-		PaletteColor 7, 7, 6
 	verticalOffset2:
 		VDPRegister 23
 	_size:

@@ -14,12 +14,12 @@ DialogSplitHandler: MACRO ?settings, ?next
 		VDPRegister_SetDI_M  ; disable display
 		VDPRegister_SetDI_M  ; disable sprites
 		Split_PollHR_M
-		VDPRegister_SetDI_M  ; enable display
 		VDPRegister_SetDI_M  ; pattern name base
 		VDPRegister_SetDI_M  ; vertical offset 1
 		inc c
 		PaletteColor_SetDI_M  ; color 10
 		dec c
+		VDPRegister_SetDI_M  ; enable display
 		Split_PollHR_M
 		VDPRegister_SetDI_M  ; horizontal offset (characters)
 		VDPRegister_SetDI_M  ; horizontal offset (dots)
