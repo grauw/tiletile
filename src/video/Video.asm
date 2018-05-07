@@ -176,12 +176,3 @@ NoOverflow:
 	call VDP_SetRegister
 	ret
 	ENDP
-
-; iy = this
-Video_ToggleFrequencyIY:
-	ld a,(VDP_MIRROR_8 + 9)
-	xor 00000010B
-	ld (VDP_MIRROR_8 + 9),a
-	ld b,9
-	call VDP_SetRegister
-	ret

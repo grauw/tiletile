@@ -281,7 +281,7 @@ Scene_UpdateDisplayFrequency:
 	push iy
 	call Scene_GetEngine_IY
 	call Engine_GetVideoIY
-	call Video_ToggleFrequencyIY
+	call Engine_ToggleDisplayFrequencyIY
 	pop iy
 	ret
 

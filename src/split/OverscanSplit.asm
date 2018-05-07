@@ -15,9 +15,12 @@ OverscanSplit: MACRO
 
 ; ix = this
 OverscanSplit_Construct:
+	ret
+
+OverscanSplit_UpdateMode9_M: MACRO ?this
 	ld a,(VDP_MIRROR_8 + 9)
 	and 01111111B
-	ld (ix + OverscanSplit.mode9_192 + VDPRegister.value),a
+	ld (?this + OverscanSplit.mode9_192 + VDPRegister.value),a
 	or 10000000B
-	ld (ix + OverscanSplit.mode9_212 + VDPRegister.value),a
-	ret
+	ld (?this + OverscanSplit.mode9_212 + VDPRegister.value),a
+	ENDM

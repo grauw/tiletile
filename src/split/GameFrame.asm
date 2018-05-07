@@ -54,6 +54,10 @@ GameFrame_SetMapPositionIY:
 	DialogEndSplit_SetDisplayOffset_M (iy + GameFrame.dialogEndSplit), a, b, c
 	ret
 
+GameFrame_UpdateMode9_M: MACRO ?this
+	OverscanSplit_UpdateMode9_M ?this + GameFrame.overscanSplit
+	ENDM
+
 GameFrame_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
 	MapSplit_SetPatternNameTable_M ?this + GameFrame.mapSplit, ?patternNameTable
 	ENDM

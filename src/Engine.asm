@@ -184,6 +184,13 @@ Engine_SetPaletteIY:
 	ret
 
 ; iy = this
+Engine_ToggleDisplayFrequencyIY:
+	ld a,(VDP_MIRROR_8 + 9)
+	xor 2
+	ld (VDP_MIRROR_8 + 9),a
+	ret
+
+; iy = this
 ; iy <- current game frame
 Engine_GetGameFrameIY: PROC
 	bit 0,(iy + Engine.frameCount)
@@ -305,6 +312,7 @@ Continue:
 	ld e,(iy + Engine.palette)
 	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d
+	GameFrame_UpdateMode9_M ix
 	ld de,Engine.gameFrameHandler
 	add iy,de
 	ld e,ixl
@@ -337,6 +345,7 @@ Continue:
 	ld e,(iy + Engine.palette)
 	ld d,(iy + Engine.palette + 1)
 	GameFrame_SetPalette_M ix, e, d
+	GameFrame_UpdateMode9_M ix
 	ld de,Engine.gameFrameHandler
 	add iy,de
 	ld e,ixl
