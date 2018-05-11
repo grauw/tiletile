@@ -7,6 +7,7 @@ Dialog_START_X: equ 16
 Dialog_START_Y: equ 5
 Dialog_LINE_WIDTH: equ 232
 Dialog_LINE_HEIGHT: equ 10
+Dialog_LINE_COUNT: equ 4
 
 Dialog: MACRO ?uiImage
 	active:
@@ -119,7 +120,7 @@ Clear:
 	ld (iy + VDPCommand.dx),Dialog_START_X
 	ld (iy + VDPCommand.dy),Dialog_START_Y
 	ld (iy + VDPCommand.nx),Dialog_LINE_WIDTH
-	ld (iy + VDPCommand.ny),Dialog_LINE_HEIGHT * 4
+	ld (iy + VDPCommand.ny),Dialog_LINE_HEIGHT * Dialog_LINE_COUNT
 	ld (iy + VDPCommand.command),VDPCommand_HMMV
 	call VDPCommand_ExecuteS2IY
 	ld (iy + VDPCommand.command),VDPCommand_HMMM
