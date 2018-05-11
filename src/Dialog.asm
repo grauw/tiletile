@@ -4,10 +4,10 @@
 Dialog_OPEN_SPEED: equ 6
 Dialog_MAX_HEIGHT: equ 24
 Dialog_START_X: equ 16
-Dialog_START_Y: equ 5
+Dialog_START_Y: equ 7
 Dialog_LINE_WIDTH: equ 232
-Dialog_LINE_HEIGHT: equ 10
-Dialog_LINE_COUNT: equ 4
+Dialog_LINE_HEIGHT: equ 12
+Dialog_LINE_COUNT: equ 3
 
 Dialog: MACRO ?uiImage
 	active:
