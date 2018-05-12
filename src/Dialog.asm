@@ -18,6 +18,8 @@ Dialog: MACRO ?uiImage
 		dw 0
 	clear:
 		db 0
+	kerning:
+		db 0
 	glyphs:
 		dw Glyph_glyphs - 32 * Glyph._size
 	uiImage:
@@ -25,7 +27,7 @@ Dialog: MACRO ?uiImage
 	patternName:
 		PatternNameTable 18000H
 	drawCommand:
-		VDPCommand 0, 300H, Dialog_START_X, 300H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_HMMM
+		VDPCommand 0, 300H, Dialog_START_X, 300H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_LMMM
 	ENDM
 
 ; ix = this
@@ -113,6 +115,7 @@ Dialog_DrawBitmap: PROC
 	jp Dialog_DrawGlyph
 Clear:
 	ld (ix + Dialog.clear),0
+	ld (ix + Dialog.kerning),0
 	ld e,ixl
 	ld d,ixh
 	ld iy,Dialog.drawCommand
@@ -123,7 +126,7 @@ Clear:
 	ld (iy + VDPCommand.ny),Dialog_LINE_HEIGHT * Dialog_LINE_COUNT
 	ld (iy + VDPCommand.command),VDPCommand_HMMV
 	call VDPCommand_ExecuteS2IY
-	ld (iy + VDPCommand.command),VDPCommand_HMMM
+	ld (iy + VDPCommand.command),VDPCommand_LMMM
 	ret
 	ENDP
 
@@ -148,8 +151,10 @@ Loop:
 	ld a,(iy + VDPCommand.dy)
 	add a,Dialog_LINE_HEIGHT
 	ld (iy + VDPCommand.dy),a
+	ld (ix + Dialog.kerning),0
 	jr Loop
 NoNewline:
+	push af
 	ld e,(ix + Dialog.glyphs)
 	ld d,(ix + Dialog.glyphs + 1)
 	ld l,a
@@ -158,10 +163,27 @@ NoNewline:
 	add hl,hl
 	add hl,de
 	call Glyph_SetCopyHL
+	bit 7,(ix + Dialog.kerning)
+	jr z,NoKerning
+	and Glyph_CAPITAL | Glyph_ASCENDER
+	jr nz,NoKerning
+	dec (iy + VDPCommand.dx)
+NoKerning:
 	call VDPCommand_ExecuteS2IY
 	ld a,(iy + VDPCommand.dx)
 	add a,(iy + VDPCommand.nx)
 	ld (iy + VDPCommand.dx),a
+	pop af
+	cp "f"
+	jr z,Kerning1
+	cp "F"
+	jr z,Kerning1
+	cp "T"
+	jr z,Kerning1
+	ld (ix + Dialog.kerning),0
+	ret
+Kerning1:
+	ld (ix + Dialog.kerning),-1
 	ret
 	ENDP
 
