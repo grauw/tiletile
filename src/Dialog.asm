@@ -19,7 +19,7 @@ Dialog: MACRO ?uiImage
 	clear:
 		db 0
 	glyphs:
-		dw Glyph_glyphs
+		dw Glyph_glyphs - 32 * Glyph._size
 	uiImage:
 		dw ?uiImage
 	patternName:
@@ -150,7 +150,6 @@ Loop:
 	ld (iy + VDPCommand.dy),a
 	jr Loop
 NoNewline:
-	sub 32
 	ld e,(ix + Dialog.glyphs)
 	ld d,(ix + Dialog.glyphs + 1)
 	ld l,a
