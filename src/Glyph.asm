@@ -119,22 +119,22 @@ Glyph_glyphs:
 	Glyph  46, 60, 2, Glyph_ASCENDER   ; i
 	Glyph  48, 60, 4, Glyph_ASCENDER   ; j
 	Glyph  52, 60, 6, Glyph_ASCENDER   ; k
-	Glyph  58, 60, 4, Glyph_ASCENDER   ; l
-	Glyph  62, 60, 8                   ; m
-	Glyph  70, 60, 6                   ; n
-	Glyph  76, 60, 6                   ; o
-	Glyph  82, 60, 6, Glyph_DESCENDER  ; p
-	Glyph  88, 60, 6, Glyph_DESCENDER  ; q
-	Glyph  94, 60, 6                   ; r
-	Glyph 100, 60, 6                   ; s
-	Glyph 106, 60, 4, Glyph_ASCENDER   ; t
-	Glyph 110, 60, 6                   ; u
-	Glyph 116, 60, 6                   ; v
-	Glyph 122, 60, 8                   ; w
-	Glyph 130, 60, 6                   ; x
-	Glyph 136, 60, 6, Glyph_DESCENDER  ; y
-	Glyph 142, 60, 6                   ; z
-	Glyph 192, 72, 4                   ; {
-	Glyph 196, 72, 2                   ; |
-	Glyph 198, 72, 4                   ; }
-	Glyph 202, 72, 6                   ; ~
+	Glyph  58, 60, 2, Glyph_ASCENDER   ; l
+	Glyph  60, 60, 8                   ; m
+	Glyph  68, 60, 6                   ; n
+	Glyph  74, 60, 6                   ; o
+	Glyph  80, 60, 6, Glyph_DESCENDER  ; p
+	Glyph  86, 60, 6, Glyph_DESCENDER  ; q
+	Glyph  92, 60, 6                   ; r
+	Glyph  98, 60, 6                   ; s
+	Glyph 104, 60, 4, Glyph_ASCENDER   ; t
+	Glyph 108, 60, 6                   ; u
+	Glyph 114, 60, 6                   ; v
+	Glyph 120, 60, 8                   ; w
+	Glyph 128, 60, 6                   ; x
+	Glyph 134, 60, 6, Glyph_DESCENDER  ; y
+	Glyph 140, 60, 6                   ; z
+	Glyph 190, 72, 4                   ; {
+	Glyph 194, 72, 2                   ; |
+	Glyph 196, 72, 4                   ; }
+	Glyph 200, 72, 6                   ; ~
