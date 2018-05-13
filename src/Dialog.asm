@@ -27,7 +27,7 @@ Dialog: MACRO ?uiImage
 	patternName:
 		PatternNameTable 18000H
 	drawCommand:
-		VDPCommand 0, 300H, Dialog_START_X, 300H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_LMMM
+		VDPCommand 0, 300H, Dialog_START_X, 300H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_LMMM | VDPCommand_TIMP
 	ENDM
 
 ; ix = this
@@ -126,7 +126,7 @@ Clear:
 	ld (iy + VDPCommand.ny),Dialog_LINE_HEIGHT * Dialog_LINE_COUNT
 	ld (iy + VDPCommand.command),VDPCommand_HMMV
 	call VDPCommand_ExecuteS2IY
-	ld (iy + VDPCommand.command),VDPCommand_LMMM
+	ld (iy + VDPCommand.command),VDPCommand_LMMM | VDPCommand_TIMP
 	ret
 	ENDP
 
