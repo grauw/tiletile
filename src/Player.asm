@@ -14,9 +14,9 @@ Player: MACRO
 	control:
 		dw Player_controlLUT + 15 * PlayerControl._size
 	velocityX:
-		dw 0
+		db 0
 	velocityY:
-		dw 0
+		db 0
 	direction:
 		db 0  ; 0 = down, 5 = left, 10 = up, 15 = right
 	moving:
@@ -37,9 +37,9 @@ PlayerControl: MACRO ?rldu
 	x: equ (?rldu >> 3 & 1) - (?rldu >> 2 & 1)
 	y: equ (?rldu >> 1 & 1) - (?rldu >> 0 & 1)
 	velocityX:
-		dw x * Player_SPEED
+		db x * Player_SPEED
 	velocityY:
-		dw y * Player_SPEED
+		db y * Player_SPEED
 	direction:
 		db x < 0 ? 15 : x > 0 ? 5 : y < 0 ? 10 : 0
 	_size:
@@ -93,7 +93,6 @@ Player_UpdateInput:
 	and 0FH
 	ld b,a
 	add a,a
-	add a,a
 	add a,b
 	add a,Player_controlLUT & 0FFH
 	ld (ix + Player.control),a
@@ -122,14 +121,20 @@ Player_TickSecondary:
 	ld l,(ix + Player.x)
 	ld h,(ix + Player.x + 1)
 	ld c,(ix + Player.velocityX)
-	ld b,(ix + Player.velocityX + 1)
+	ld a,c
+	add a,a
+	sbc a,a  ; sign extend
+	ld b,a
 	add hl,bc
 	ld (ix + Player.x),l
 	ld (ix + Player.x + 1),h
 	ld l,(ix + Player.y)
 	ld h,(ix + Player.y + 1)
 	ld c,(ix + Player.velocityY)
-	ld b,(ix + Player.velocityY + 1)
+	ld a,c
+	add a,a
+	sbc a,a  ; sign extend
+	ld b,a
 	add hl,bc
 	ld (ix + Player.y),l
 	ld (ix + Player.y + 1),h
@@ -153,30 +158,32 @@ Player_TickMovingDirection:
 ; iy = control
 Player_TickVelocity:
 	ld c,(iy + PlayerControl.velocityX)
-	ld b,(iy + PlayerControl.velocityX + 1)
 	ld e,(iy + PlayerControl.velocityY)
-	ld d,(iy + PlayerControl.velocityY + 1)
 	ld (ix + Player.velocityX),c
-	ld (ix + Player.velocityX + 1),b
 	ld (ix + Player.velocityY),e
-	ld (ix + Player.velocityY + 1),d
 	ld l,(ix + Player.x)
 	ld h,(ix + Player.x + 1)
-	add hl,bc
+	ld a,c
+	add a,a
+	ld c,a
+	sbc a,a  ; sign extend
+	ld b,a
 	add hl,bc
 	ld c,l
 	ld b,h
 	ld l,(ix + Player.y)
 	ld h,(ix + Player.y + 1)
-	add hl,de
+	ld a,e
+	add a,a
+	ld e,a
+	sbc a,a  ; sign extend
+	ld d,a
 	add hl,de
 	ex de,hl
 	call Player_CanMove16x16
 	ret c
 	ld (ix + Player.velocityX),0
-	ld (ix + Player.velocityX + 1),0
 	ld (ix + Player.velocityY),0
-	ld (ix + Player.velocityY + 1),0
 	ret
 
 ; bc = x
