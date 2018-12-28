@@ -50,94 +50,7 @@ PlayerControl: MACRO ?rldu
 Player_Construct:
 	ld (ix + Player.tileMap),e
 	ld (ix + Player.tileMap + 1),d
-	ld e,ixl
-	ld d,ixh
-	ld iy,Player.sourcePatterns
-	add iy,de
-	ld a,0
-	call SpritePatternTable_SetPatternWriteIY
-	push ix
-	ld ix,FieldSet_may0_standDown
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standDown
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_standRight
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standRight
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_standUp
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standUp
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_standLeft
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standLeft
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft3
-	call Tile_LoadToSpritePatternTable
-	pop ix
+	call Player_LoadSourceSpritePatterns
 	ret
 
 ; ix = this
@@ -393,6 +306,103 @@ Player_DrawSpriteColors:
 	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid8CC
 	jp SpriteColorTable_WriteColorIY
+
+; b = patterns remaining (x4)
+; c = write port
+; ix = this
+; iy = sprite pattern table
+; b <- patterns remaining (x4)
+; c <- write port
+Player_LoadSourceSpritePatterns:
+	ld e,ixl
+	ld d,ixh
+	ld iy,Player.sourcePatterns
+	add iy,de
+	ld a,0
+	call SpritePatternTable_SetPatternWriteIY
+	push ix
+	ld ix,FieldSet_may0_standDown
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standDown
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runDown3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runDown3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_standRight
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standRight
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runRight3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runRight3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_standUp
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standUp
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runUp3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runUp3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_standLeft
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_standLeft
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft0
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft1
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft2
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may0_runLeft3
+	call Tile_LoadToSpritePatternTable
+	ld ix,FieldSet_may1_runLeft3
+	call Tile_LoadToSpritePatternTable
+	pop ix
+	ret
 
 ; b = patterns remaining (x4)
 ; c = write port
