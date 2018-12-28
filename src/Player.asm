@@ -345,23 +345,26 @@ Player_DrawSpriteAttributes:
 	ld a,(ix + Player.y)
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
 	add a,-30
-	ld l,(ix + Player.patternBase)
-	REPT 4
-	SpriteAttributeTable_WriteAttribute_M h, a, l
-	inc l
-	inc l
-	inc l
-	inc l
-	ENDM
+	ld l,a
 	add a,16
-	REPT 3
-	SpriteAttributeTable_WriteAttribute_M h, a, l
-	inc l
-	inc l
-	inc l
-	inc l
-	ENDM
-	SpriteAttributeTable_WriteAttribute_M h, a, l
+	ld e,a
+	ld a,(ix + Player.patternBase)
+	ld d,4
+	SpriteAttributeTable_WriteAttribute_M h, l, a
+	add a,d
+	SpriteAttributeTable_WriteAttribute_M h, l, a
+	add a,d
+	SpriteAttributeTable_WriteAttribute_M h, l, a
+	add a,d
+	SpriteAttributeTable_WriteAttribute_M h, l, a
+	add a,d
+	SpriteAttributeTable_WriteAttribute_M h, e, a
+	add a,d
+	SpriteAttributeTable_WriteAttribute_M h, e, a
+	add a,d
+	SpriteAttributeTable_WriteAttribute_M h, e, a
+	add a,d
+	SpriteAttributeTable_WriteAttribute_M h, e, a
 	ret
 
 ; b = sprites remaining
