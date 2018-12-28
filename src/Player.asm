@@ -137,6 +137,20 @@ Player_TickSecondary:
 
 ; ix = this
 ; iy = control
+Player_TickMovingDirection:
+	ld a,(ix + Player.velocityX)
+	or (ix + Player.velocityY)
+	add a,-1
+	sbc a,a
+	ld (ix + Player.moving),a
+	and a
+	ret z
+	ld a,(iy + PlayerControl.direction)
+	ld (ix + Player.direction),a
+	ret
+
+; ix = this
+; iy = control
 Player_TickVelocity:
 	ld c,(iy + PlayerControl.velocityX)
 	ld b,(iy + PlayerControl.velocityX + 1)
@@ -163,20 +177,6 @@ Player_TickVelocity:
 	ld (ix + Player.velocityX + 1),0
 	ld (ix + Player.velocityY),0
 	ld (ix + Player.velocityY + 1),0
-	ret
-
-; ix = this
-; iy = control
-Player_TickMovingDirection:
-	ld a,(ix + Player.velocityX)
-	or (ix + Player.velocityY)
-	add a,-1
-	sbc a,a
-	ld (ix + Player.moving),a
-	and a
-	ret z
-	ld a,(iy + PlayerControl.direction)
-	ld (ix + Player.direction),a
 	ret
 
 ; bc = x
