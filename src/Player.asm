@@ -25,6 +25,10 @@ Player: MACRO
 		db 0
 	tileMap:
 		dw 0
+	tileMapWidthStride:
+		dw 0
+	currentTile:
+		dw 0
 	patternBase:
 		db 0
 	sourcePatterns:
@@ -50,7 +54,17 @@ PlayerControl: MACRO ?rldu
 Player_Construct:
 	ld (ix + Player.tileMap),e
 	ld (ix + Player.tileMap + 1),d
+	push ix
+	call Player_GetTileMap
+	ld l,(ix + TileMap.widthStride)
+	ld h,(ix + TileMap.widthStride + 1)
+	pop ix
+	ld (ix + Player.tileMapWidthStride),l
+	ld (ix + Player.tileMapWidthStride + 1),h
 	call Player_LoadSourceSpritePatterns
+	ld bc,124
+	ld de,120
+	call Player_SetPosition
 	ret
 
 ; ix = this
@@ -72,46 +86,86 @@ Player_GetPosition:
 	ld d,(ix + Player.y + 1)
 	ret
 
+; bc <- x
+; de <- y
+; ix = this
+Player_SetPosition:
+	ld (ix + Player.x),c
+	ld (ix + Player.x + 1),b
+	ld (ix + Player.y),e
+	ld (ix + Player.y + 1),d
+	push ix
+	ex de,hl
+	call Player_GetTileMap
+	ex de,hl
+	call TileMap_PixelToTilePosition
+	call TileMap_GetTileDataPointer
+	pop ix
+	ld (ix + Player.currentTile),l
+	ld (ix + Player.currentTile + 1),h
+	ret
+
 ; ix = this
 ; ix <- tile
 Player_GetTile:
-	ld c,(ix + Player.x)
-	ld b,(ix + Player.x + 1)
-	ld e,(ix + Player.y)
-	ld d,(ix + Player.y + 1)
-	ex de,hl
-	call Player_GetTileMap
-	ex de,hl
-	call TileMap_PixelToTilePosition
-	call TileMap_GetTile
+	ld l,(ix + Player.currentTile)
+	ld h,(ix + Player.currentTile + 1)
+	ld a,(hl)
+	ld ixl,a
+	inc l
+	ld a,(hl)
+	ld ixh,a
 	ret
 
-; c = x offset
-; e = y offset
+; c = x offset (range: -16 .. 16)
+; e = y offset (range: -16 .. 16)
 ; ix = this
 ; ix <- tile
 Player_GetTileWithOffset:
-	ld l,(ix + Player.x)
-	ld h,(ix + Player.x + 1)
-	ld a,c
-	add a,a
-	sbc a,a  ; sign extend
-	ld b,a
-	add hl,bc
-	ld c,l
-	ld b,h
-	ld l,(ix + Player.y)
-	ld h,(ix + Player.y + 1)
-	ld a,e
-	add a,a
-	sbc a,a  ; sign extend
-	ld d,a
-	add hl,de
-	call Player_GetTileMap
-	ex de,hl
-	call TileMap_PixelToTilePosition
-	call TileMap_GetTile
+	call Player_GetTileDataPointerWithOffset
+	ld a,(hl)
+	ld ixl,a
+	inc l
+	ld a,(hl)
+	ld ixh,a
 	ret
+
+; c = x offset (range: -16 .. 16)
+; e = y offset (range: -16 .. 16)
+; ix = this
+; hl <- tile pointer
+Player_GetTileDataPointerWithOffset: PROC
+	ld l,(ix + Player.currentTile)
+	ld h,(ix + Player.currentTile + 1)
+	ld a,(ix + Player.x)
+	and 0FH
+	add a,c
+	and 0F0H
+	jr z,ContinueX
+	jp p,IncreaseX
+DecreaseX:
+	dec hl
+	dec hl
+	jr ContinueX
+IncreaseX:
+	inc hl
+	inc hl
+ContinueX:
+	ld a,(ix + Player.y)
+	and 0FH
+	add a,e
+	and 0F0H
+	ret z
+	ld e,(ix + Player.tileMapWidthStride)
+	ld d,(ix + Player.tileMapWidthStride + 1)
+	jp p,IncreaseY
+DecreaseY:
+	sbc hl,de
+	ret
+IncreaseY:
+	add hl,de
+	ret
+	ENDP
 
 ; ix = this
 ; iy = input
@@ -138,6 +192,7 @@ Player_TickPrimary:
 	ld iyh,d
 	call Player_TickVelocity
 	call Player_TickMovingDirection
+	call Player_TickPosition
 	pop iy
 	call Player_TickSecondary
 	ret
@@ -179,6 +234,17 @@ Player_TickMovingDirection:
 	ret z
 	ld a,(iy + PlayerControl.direction)
 	ld (ix + Player.direction),a
+	ret
+
+; ix = this
+Player_TickPosition:
+	ld c,(ix + Player.velocityX)
+	ld e,(ix + Player.velocityY)
+	sla c
+	sla e
+	call Player_GetTileDataPointerWithOffset
+	ld (ix + Player.currentTile),l
+	ld (ix + Player.currentTile + 1),h
 	ret
 
 ; ix = this

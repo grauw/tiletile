@@ -6,6 +6,8 @@ TileMap: MACRO ?width, ?height, ?data
 		dw ?width
 	height:
 		dw ?height
+	widthStride:
+		dw ?width * 2
 	data:
 		dw ?data
 	ENDM
@@ -74,5 +76,38 @@ Continue:
 	ld e,(ix + TileMap.data)
 	ld d,(ix + TileMap.data + 1)
 	add hl,de
+	ret
+	ENDP
+
+; c = x offset
+; e = y offset
+; hl = tile data pointer
+; ix = this
+; hl <- tile data pointer
+TileMap_OffsetTileDataPointer: PROC
+	ld a,c
+	add a,a
+	sbc a,a  ; sign extend
+	ld b,a
+	add hl,bc
+	add hl,bc
+	ld a,e
+	and a
+	ret z
+	ld e,(ix + TileMap.widthStride)
+	ld d,(ix + TileMap.widthStride + 1)
+	jp p,Increase
+Decrease:
+	neg
+	ld b,a
+DecreaseLoop:
+	sbc hl,de
+	djnz DecreaseLoop
+	ret
+Increase:
+	ld b,a
+IncreaseLoop:
+	add hl,de
+	djnz IncreaseLoop
 	ret
 	ENDP
