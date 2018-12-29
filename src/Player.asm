@@ -86,6 +86,33 @@ Player_GetTile:
 	call TileMap_GetTile
 	ret
 
+; c = x offset
+; e = y offset
+; ix = this
+; ix <- tile
+Player_GetTileWithOffset:
+	ld l,(ix + Player.x)
+	ld h,(ix + Player.x + 1)
+	ld a,c
+	add a,a
+	sbc a,a  ; sign extend
+	ld b,a
+	add hl,bc
+	ld c,l
+	ld b,h
+	ld l,(ix + Player.y)
+	ld h,(ix + Player.y + 1)
+	ld a,e
+	add a,a
+	sbc a,a  ; sign extend
+	ld d,a
+	add hl,de
+	call Player_GetTileMap
+	ex de,hl
+	call TileMap_PixelToTilePosition
+	call TileMap_GetTile
+	ret
+
 ; ix = this
 ; iy = input
 Player_UpdateInput:
@@ -161,84 +188,60 @@ Player_TickVelocity:
 	ld e,(iy + PlayerControl.velocityY)
 	ld (ix + Player.velocityX),c
 	ld (ix + Player.velocityY),e
-	ld l,(ix + Player.x)
-	ld h,(ix + Player.x + 1)
-	ld a,c
-	add a,a
-	ld c,a
-	sbc a,a  ; sign extend
-	ld b,a
-	add hl,bc
-	ld c,l
-	ld b,h
-	ld l,(ix + Player.y)
-	ld h,(ix + Player.y + 1)
-	ld a,e
-	add a,a
-	ld e,a
-	sbc a,a  ; sign extend
-	ld d,a
-	add hl,de
-	ex de,hl
+	sla c
+	sla e
 	call Player_CanMove16x16
 	ret c
 	ld (ix + Player.velocityX),0
 	ld (ix + Player.velocityY),0
 	ret
 
-; bc = x
-; de = y
+; c = x
+; e = y
 ; ix = this
 ; f <- c: can
 Player_CanMove16x16:
-	ld hl,-Player_COLLIDER_WIDTH / 2
-	add hl,bc
-	ld c,l
-	ld b,h
-	ld hl,-Player_COLLIDER_HEIGHT / 2
-	add hl,de
-	ex de,hl
+	ld a,c
+	add a,-Player_COLLIDER_WIDTH / 2
+	ld c,a
+	ld a,e
+	add a,-Player_COLLIDER_HEIGHT / 2
+	ld e,a
 	call Player_CanMove
 	ret nc
-	ld hl,Player_COLLIDER_HEIGHT - 1
-	add hl,de
-	ex de,hl
+	ld a,e
+	add a,Player_COLLIDER_HEIGHT - 1
+	ld e,a
 	call Player_CanMove
 	ret nc
-	ld hl,Player_COLLIDER_WIDTH - 1
-	add hl,bc
-	ld c,l
-	ld b,h
+	ld a,c
+	add a,Player_COLLIDER_WIDTH - 1
+	ld c,a
 	call Player_CanMove
 	ret nc
-	ld hl,-(Player_COLLIDER_HEIGHT - 1)
-	add hl,de
-	ex de,hl
+	ld a,e
+	add a,-(Player_COLLIDER_HEIGHT - 1)
+	ld e,a
 	call Player_CanMove
 	ret nc
-	ld hl,-(Player_COLLIDER_WIDTH / 2 - 1)
-	add hl,bc
-	ld c,l
-	ld b,h
-	ld hl,Player_COLLIDER_HEIGHT / 2
-	add hl,de
-	ex de,hl
+	ld a,c
+	add a,-(Player_COLLIDER_WIDTH / 2 - 1)
+	ld c,a
+	ld a,e
+	add a,Player_COLLIDER_HEIGHT / 2
+	ld e,a
 	scf
 	ret
 
-; bc = x
-; de = y
+; c = x
+; e = y
 ; ix = this
 ; f <- c: can
 Player_CanMove:
 	push bc
 	push de
 	push ix
-	ex de,hl
-	call Player_GetTileMap
-	ex de,hl
-	call TileMap_PixelToTilePosition
-	call TileMap_GetTile
+	call Player_GetTileWithOffset
 	Tile_IsSolid_M ix
 	pop ix
 	pop de
