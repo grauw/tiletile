@@ -138,8 +138,8 @@ Player_TickPrimary:
 	ld iyh,d
 	call Player_TickVelocity
 	call Player_TickMovingDirection
-	call Player_TickSecondary
 	pop iy
+	call Player_TickSecondary
 	ret
 
 ; ix = this
