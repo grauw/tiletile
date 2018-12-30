@@ -2,7 +2,6 @@
 ;
 ;
 Player_SPEED: equ 4
-Player_PATTERNS: equ 8
 Player_COLLIDER_WIDTH: equ 16
 Player_COLLIDER_HEIGHT: equ 8
 
@@ -17,28 +16,12 @@ Player: MACRO
 		db 0
 	velocityY:
 		db 0
-	spriteX:
-		db 0
-	spriteY:
-		db 0
-	direction:
-		db 0  ; 0 = down, 5 = left, 10 = up, 15 = right
-	moving:
-		db 0
-	movingStep:
-		db 0
 	tileMap:
 		dw 0
 	tileMapWidthStride:
 		dw 0
 	currentTile:
 		dw 0
-	patternBase:
-		db 0
-	sourcePatterns:
-		SpritePatternTable 1C000H
-	patternCopy:
-		VRAMTableCopy 0, 0, 8 * SpritePattern._size
 	ENDM
 
 PlayerControl: MACRO ?rldu
@@ -65,7 +48,6 @@ Player_Construct:
 	pop ix
 	ld (ix + Player.tileMapWidthStride),l
 	ld (ix + Player.tileMapWidthStride + 1),h
-	call Player_LoadSourceSpritePatterns
 	ld bc,124
 	ld de,120
 	call Player_SetPosition
@@ -98,8 +80,6 @@ Player_SetPosition:
 	ld (ix + Player.x + 1),b
 	ld (ix + Player.y),e
 	ld (ix + Player.y + 1),d
-	ld (ix + Player.spriteX),c
-	ld (ix + Player.spriteY),e
 	push ix
 	ex de,hl
 	call Player_GetTileMap
@@ -191,50 +171,8 @@ Player_UpdateInput:
 ; ix = this
 ; iy = engine
 Player_TickPrimary:
-	push iy
-	ld e,(ix + Player.control)
-	ld d,(ix + Player.control + 1)
-	ld iyl,e
-	ld iyh,d
 	call Player_TickVelocity
-	call Player_TickMovingDirection
 	call Player_TickPosition
-	pop iy
-	ld b,(ix + Player.spriteX)
-	ld a,(ix + Player.x)
-	sub b
-	sra a
-	add a,b
-	ld (ix + Player.spriteX),a
-	ld b,(ix + Player.spriteY)
-	ld a,(ix + Player.y)
-	sub b
-	sra a
-	add a,b
-	ld (ix + Player.spriteY),a
-	ret
-
-; ix = this
-; iy = engine
-Player_TickSecondary:
-	ld a,(ix + Player.x)
-	ld (ix + Player.spriteX),a
-	ld a,(ix + Player.y)
-	ld (ix + Player.spriteY),a
-	ret
-
-; ix = this
-; iy = control
-Player_TickMovingDirection:
-	ld a,(ix + Player.velocityX)
-	or (ix + Player.velocityY)
-	add a,-1
-	sbc a,a
-	ld (ix + Player.moving),a
-	and a
-	ret z
-	ld a,(iy + PlayerControl.direction)
-	ld (ix + Player.direction),a
 	ret
 
 ; ix = this
@@ -269,8 +207,14 @@ Player_TickPosition:
 ; ix = this
 ; iy = control
 Player_TickVelocity:
+	push iy
+	ld e,(ix + Player.control)
+	ld d,(ix + Player.control + 1)
+	ld iyl,e
+	ld iyh,d
 	ld c,(iy + PlayerControl.velocityX)
 	ld e,(iy + PlayerControl.velocityY)
+	pop iy
 	ld (ix + Player.velocityX),c
 	ld (ix + Player.velocityY),e
 	call Player_CanMove16x16
@@ -333,237 +277,6 @@ Player_CanMove:
 	ret z
 	ccf
 	ret
-
-; b = sprites remaining
-; c = write port
-; ix = this
-; iy = sprite attribute table
-; b <- sprites remaining
-; c <- write port
-Player_DrawSpriteAttributes:
-	ld a,b
-	cp 8
-	ret c
-	ld a,(ix + Player.spriteX)
-	add a,(iy + SpriteAttributeTable.worldOffsetX)
-	add a,-8
-	ld h,a
-	ld a,(ix + Player.spriteY)
-	add a,(iy + SpriteAttributeTable.worldOffsetY)
-	add a,-30
-	ld l,a
-	add a,16
-	ld e,a
-	ld a,(ix + Player.patternBase)
-	ld d,4
-	SpriteAttributeTable_WriteAttribute_M h, l, a
-	add a,d
-	SpriteAttributeTable_WriteAttribute_M h, l, a
-	add a,d
-	SpriteAttributeTable_WriteAttribute_M h, l, a
-	add a,d
-	SpriteAttributeTable_WriteAttribute_M h, l, a
-	add a,d
-	SpriteAttributeTable_WriteAttribute_M h, e, a
-	add a,d
-	SpriteAttributeTable_WriteAttribute_M h, e, a
-	add a,d
-	SpriteAttributeTable_WriteAttribute_M h, e, a
-	add a,d
-	SpriteAttributeTable_WriteAttribute_M h, e, a
-	ret
-
-; b = sprites remaining
-; c = write port
-; ix = this
-; iy = sprite color table
-; b <- sprites remaining
-; c <- write port
-Player_DrawSpriteColors:
-	ld a,b
-	cp 8
-	ret c
-	ld hl,SpriteColor_solid1
-	call SpriteColorTable_WriteColorIY
-	ld hl,SpriteColor_solid2CC
-	call SpriteColorTable_WriteColorIY
-	ld hl,SpriteColor_solid4CC
-	call SpriteColorTable_WriteColorIY
-	ld hl,SpriteColor_solid8CC
-	call SpriteColorTable_WriteColorIY
-	ld hl,SpriteColor_solid1
-	call SpriteColorTable_WriteColorIY
-	ld hl,SpriteColor_solid2CC
-	call SpriteColorTable_WriteColorIY
-	ld hl,SpriteColor_solid4CC
-	call SpriteColorTable_WriteColorIY
-	ld hl,SpriteColor_solid8CC
-	jp SpriteColorTable_WriteColorIY
-
-; b = patterns remaining (x4)
-; c = write port
-; ix = this
-; iy = sprite pattern table
-; b <- patterns remaining (x4)
-; c <- write port
-Player_LoadSourceSpritePatterns:
-	ld e,ixl
-	ld d,ixh
-	ld iy,Player.sourcePatterns
-	add iy,de
-	ld a,0
-	call SpritePatternTable_SetPatternWriteIY
-	push ix
-	ld ix,FieldSet_may0_standDown
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standDown
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runDown3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runDown3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_standRight
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standRight
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runRight3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runRight3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_standUp
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standUp
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runUp3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runUp3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_standLeft
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_standLeft
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft0
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft1
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft2
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may0_runLeft3
-	call Tile_LoadToSpritePatternTable
-	ld ix,FieldSet_may1_runLeft3
-	call Tile_LoadToSpritePatternTable
-	pop ix
-	ret
-
-; b = patterns remaining (x4)
-; c = write port
-; ix = this
-; iy = sprite pattern table
-; b <- patterns remaining (x4)
-; c <- write port
-Player_InitializeSpritePatterns:
-	ld a,b
-	and 3
-	call nz,System_ThrowException
-	ld a,SpritePatternTable_COUNT
-	sub b
-	ld (ix + Player.patternBase),a
-	REPT Player_PATTERNS
-	ld hl,SpritePattern_blank
-	call SpritePatternTable_WritePatternIY
-	ENDM
-	ret
-
-; ix = this
-; iy = sprite pattern table
-Player_DrawSpritePatterns:
-	push iy
-	ld e,ixl
-	ld d,ixh
-	ld iy,Player.patternCopy
-	add iy,de
-	call Player_GetSourcePatternOffset
-	ld de,Player.sourcePatterns
-	add ix,de
-	call VRAMTableCopy_SetSourceIY
-	ld de,-Player.sourcePatterns
-	add ix,de
-	ld l,(ix + Player.patternBase)
-	ld h,0
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ex (sp),ix
-	call VRAMTableCopy_SetDestinationIY
-	ex (sp),ix
-	call VRAMTableCopy_ExecuteIY
-	pop iy
-	ret
-
-; ix = this
-; hl <- pattern offset
-Player_GetSourcePatternOffset: PROC
-	bit 0,(ix + Player.moving)
-	jr nz,Moving
-NotMoving:
-	xor a
-	ld (ix + Player.movingStep),a
-	jr Continue
-Moving:
-	ld a,(ix + Player.movingStep)
-	inc (ix + Player.movingStep)
-	rra
-	rra
-	and 00000011B
-	inc a
-Continue:
-	add a,(ix + Player.direction)
-	ld l,0
-	ld h,a
-	ret
-	ENDP
 
 ;
 Player_controlLUT:

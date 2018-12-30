@@ -76,6 +76,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Dialog.asm"
 	INCLUDE "MapView.asm"
 	INCLUDE "Player.asm"
+	INCLUDE "PlayerView.asm"
 	INCLUDE "Scene.asm"
 	INCLUDE "Weather.asm"
 	INCLUDE "Sunny.asm"

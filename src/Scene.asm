@@ -18,6 +18,8 @@ Scene: MACRO ?tileset, ?tilemap, ?uiImage
 		MapView
 	player:
 		Player
+	playerView:
+		PlayerView
 	weather:
 		Weather
 	paletteFader:
@@ -49,6 +51,15 @@ Scene_Construct:
 	call Scene_GetPlayer
 	pop de
 	call Player_Construct
+	ld e,ixl
+	ld d,ixh
+	pop ix
+
+	push ix
+	push de
+	call Scene_GetPlayerView
+	pop de
+	call PlayerView_Construct
 	pop ix
 
 	push ix
@@ -125,6 +136,13 @@ Scene_GetPlayer:
 	ret
 
 ; ix = this
+; ix <- player view
+Scene_GetPlayerView:
+	ld de,Scene.playerView
+	add ix,de
+	ret
+
+; ix = this
 ; ix <- weather
 Scene_GetWeather:
 	ld de,Scene.weather
@@ -174,8 +192,8 @@ Scene_InitializeSpritePatterns:
 	ld a,0
 	call SpritePatternTable_SetPatternWriteIY
 	push ix
-	call Scene_GetPlayer
-	call Player_InitializeSpritePatterns
+	call Scene_GetPlayerView
+	call PlayerView_InitializeSpritePatterns
 	pop ix
 	push ix
 	call Scene_GetWeather
@@ -307,6 +325,11 @@ Scene_TickPrimary:
 	pop ix
 
 	push ix
+	call Scene_GetPlayerView
+	call PlayerView_TickPrimary
+	pop ix
+
+	push ix
 	call Scene_GetWeather
 	call Weather_TickPrimary
 	pop ix
@@ -326,8 +349,8 @@ Scene_TickSecondary:
 	ENDIF
 
 	push ix
-	call Scene_GetPlayer
-	call Player_TickSecondary
+	call Scene_GetPlayerView
+	call PlayerView_TickSecondary
 	pop ix
 
 	push ix
@@ -451,8 +474,8 @@ Scene_DrawSpriteAttributes:
 	call Weather_DrawSpriteAttributes
 	pop ix
 	push ix
-	call Scene_GetPlayer
-	call Player_DrawSpriteAttributes
+	call Scene_GetPlayerView
+	call PlayerView_DrawSpriteAttributes
 	pop ix
 	call SpriteAttributeTable_FinishWriteIY
 
@@ -478,8 +501,8 @@ Scene_DrawSpriteColors:
 	call Weather_DrawSpriteColors
 	pop ix
 	push ix
-	call Scene_GetPlayer
-	call Player_DrawSpriteColors
+	call Scene_GetPlayerView
+	call PlayerView_DrawSpriteColors
 	pop ix
 	call SpriteColorTable_FinishWriteIY
 
@@ -499,8 +522,8 @@ Scene_DrawSpritePatterns:
 	call Engine_GetSpritePatternTableIY
 
 	push ix
-	call Scene_GetPlayer
-	call Player_DrawSpritePatterns
+	call Scene_GetPlayerView
+	call PlayerView_DrawSpritePatterns
 	pop ix
 
 	pop iy
