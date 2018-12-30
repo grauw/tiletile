@@ -83,12 +83,13 @@ PlayerView_TickMovingDirection:
 	add a,-1
 	sbc a,a
 	ld (ix + PlayerView.moving),a
-	ret z
 	ld e,(iy + Player.control)
 	ld d,(iy + Player.control + 1)
 	ld iyl,e
 	ld iyh,d
 	ld a,(iy + PlayerControl.direction)
+	and a
+	ret m
 	ld (ix + PlayerView.direction),a
 	ret
 

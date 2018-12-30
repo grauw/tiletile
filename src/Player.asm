@@ -32,7 +32,7 @@ PlayerControl: MACRO ?rldu
 	velocityY:
 		db y * Player_SPEED
 	direction:
-		db x < 0 ? 15 : x > 0 ? 5 : y < 0 ? 10 : 0
+		db x < 0 ? 15 : x > 0 ? 5 : y < 0 ? 10 : y > 0 ? 0 : -1
 	_size:
 	ENDM
 
