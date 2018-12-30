@@ -1,7 +1,7 @@
 ;
 ;
 ;
-Player_SPEED: equ 2
+Player_SPEED: equ 4
 Player_PATTERNS: equ 8
 Player_COLLIDER_WIDTH: equ 16
 Player_COLLIDER_HEIGHT: equ 8
@@ -16,6 +16,10 @@ Player: MACRO
 	velocityX:
 		db 0
 	velocityY:
+		db 0
+	spriteX:
+		db 0
+	spriteY:
 		db 0
 	direction:
 		db 0  ; 0 = down, 5 = left, 10 = up, 15 = right
@@ -94,6 +98,8 @@ Player_SetPosition:
 	ld (ix + Player.x + 1),b
 	ld (ix + Player.y),e
 	ld (ix + Player.y + 1),d
+	ld (ix + Player.spriteX),c
+	ld (ix + Player.spriteY),e
 	push ix
 	ex de,hl
 	call Player_GetTileMap
@@ -194,12 +200,50 @@ Player_TickPrimary:
 	call Player_TickMovingDirection
 	call Player_TickPosition
 	pop iy
-	call Player_TickSecondary
+	ld b,(ix + Player.spriteX)
+	ld a,(ix + Player.x)
+	sub b
+	sra a
+	add a,b
+	ld (ix + Player.spriteX),a
+	ld b,(ix + Player.spriteY)
+	ld a,(ix + Player.y)
+	sub b
+	sra a
+	add a,b
+	ld (ix + Player.spriteY),a
 	ret
 
 ; ix = this
 ; iy = engine
 Player_TickSecondary:
+	ld a,(ix + Player.x)
+	ld (ix + Player.spriteX),a
+	ld a,(ix + Player.y)
+	ld (ix + Player.spriteY),a
+	ret
+
+; ix = this
+; iy = control
+Player_TickMovingDirection:
+	ld a,(ix + Player.velocityX)
+	or (ix + Player.velocityY)
+	add a,-1
+	sbc a,a
+	ld (ix + Player.moving),a
+	and a
+	ret z
+	ld a,(iy + PlayerControl.direction)
+	ld (ix + Player.direction),a
+	ret
+
+; ix = this
+Player_TickPosition:
+	ld c,(ix + Player.velocityX)
+	ld e,(ix + Player.velocityY)
+	call Player_GetTileDataPointerWithOffset
+	ld (ix + Player.currentTile),l
+	ld (ix + Player.currentTile + 1),h
 	ld l,(ix + Player.x)
 	ld h,(ix + Player.x + 1)
 	ld c,(ix + Player.velocityX)
@@ -224,38 +268,11 @@ Player_TickSecondary:
 
 ; ix = this
 ; iy = control
-Player_TickMovingDirection:
-	ld a,(ix + Player.velocityX)
-	or (ix + Player.velocityY)
-	add a,-1
-	sbc a,a
-	ld (ix + Player.moving),a
-	and a
-	ret z
-	ld a,(iy + PlayerControl.direction)
-	ld (ix + Player.direction),a
-	ret
-
-; ix = this
-Player_TickPosition:
-	ld c,(ix + Player.velocityX)
-	ld e,(ix + Player.velocityY)
-	sla c
-	sla e
-	call Player_GetTileDataPointerWithOffset
-	ld (ix + Player.currentTile),l
-	ld (ix + Player.currentTile + 1),h
-	ret
-
-; ix = this
-; iy = control
 Player_TickVelocity:
 	ld c,(iy + PlayerControl.velocityX)
 	ld e,(iy + PlayerControl.velocityY)
 	ld (ix + Player.velocityX),c
 	ld (ix + Player.velocityY),e
-	sla c
-	sla e
 	call Player_CanMove16x16
 	ret c
 	ld (ix + Player.velocityX),0
@@ -327,11 +344,11 @@ Player_DrawSpriteAttributes:
 	ld a,b
 	cp 8
 	ret c
-	ld a,(ix + Player.x)
+	ld a,(ix + Player.spriteX)
 	add a,(iy + SpriteAttributeTable.worldOffsetX)
 	add a,-8
 	ld h,a
-	ld a,(ix + Player.y)
+	ld a,(ix + Player.spriteY)
 	add a,(iy + SpriteAttributeTable.worldOffsetY)
 	add a,-30
 	ld l,a

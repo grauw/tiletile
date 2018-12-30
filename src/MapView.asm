@@ -15,6 +15,10 @@ MapView: MACRO
 		dw 0
 	targetY:
 		dw 0
+	scrollX:
+		db 0
+	scrollY:
+		db 0
 	maxX:
 		dw 0
 	maxY:
@@ -81,6 +85,32 @@ MapView_GetTileCopyCommand_IY:
 	ld d,ixh
 	ld iy,MapView.tileCopyCommand
 	add iy,de
+	ret
+
+; ix = this
+; iy = engine
+MapView_TickPrimary:
+	ld b,(ix + MapView.scrollX)
+	ld a,(ix + MapView.targetX)
+	sub b
+	sra a
+	add a,b
+	ld (ix + MapView.scrollX),a
+	ld b,(ix + MapView.scrollY)
+	ld a,(ix + MapView.targetY)
+	sub b
+	sra a
+	add a,b
+	ld (ix + MapView.scrollY),a
+	ret
+
+; ix = this
+; iy = engine
+MapView_TickSecondary:
+	ld a,(ix + MapView.targetX)
+	ld (ix + MapView.scrollX),a
+	ld a,(ix + MapView.targetY)
+	ld (ix + MapView.scrollY),a
 	ret
 
 ; bc = x
@@ -261,19 +291,19 @@ MapView_Start:
 ; ix = this
 ; iy = game frame
 MapView_UpdateGameFrame:
-	ld a,(ix + MapView.targetY)
+	ld a,(ix + MapView.scrollY)
 	add a,16
 	ld c,a
-	ld b,(ix + MapView.targetX)
+	ld b,(ix + MapView.scrollX)
 	jp GameFrame_SetMapPositionIY
 
 ; ix = this
 ; iy = sprite attribute table
 MapView_UpdateSpriteAttributTable:
-	ld a,(ix + MapView.targetY)
+	ld a,(ix + MapView.scrollY)
 	add a,16
 	ld l,a
-	ld h,(ix + MapView.targetX)
+	ld h,(ix + MapView.scrollX)
 	jp SpriteAttributeTable_SetDisplayPositionIY
 
 ; ix = this

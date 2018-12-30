@@ -295,6 +295,15 @@ Scene_TickPrimary:
 	push ix
 	call Scene_GetPlayer
 	call Player_TickPrimary
+	call Player_GetPosition
+	pop ix
+
+	push ix
+	ex de,hl
+	call Scene_GetMapView
+	ex de,hl
+	call MapView_SetTargetPosition
+	call MapView_TickPrimary
 	pop ix
 
 	push ix
@@ -322,6 +331,11 @@ Scene_TickSecondary:
 	pop ix
 
 	push ix
+	call Scene_GetMapView
+	call MapView_TickSecondary
+	pop ix
+
+	push ix
 	call Scene_GetWeather
 	call Weather_TickSecondary
 	pop ix
@@ -336,17 +350,6 @@ Scene_TickSecondary:
 ; ix = this
 ; iy = engine
 Scene_Tick:
-	push ix
-	call Scene_GetPlayer
-	call Player_GetPosition
-	pop ix
-	push ix
-	ex de,hl
-	call Scene_GetMapView
-	ex de,hl
-	call MapView_SetTargetPosition
-	pop ix
-
 	push ix
 	call Scene_GetDialog
 	call Dialog_Tick
