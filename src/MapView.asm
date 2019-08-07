@@ -27,7 +27,7 @@ MapView: MACRO
 		db 248
 	height:
 		db 240
-	tileCopyCommand: VDPCommand 0, 200H, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
+	tileCopyCommand: VDPCommand 0, Tile_PAGE << 8, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
 	ENDM
 
 ; de = map
