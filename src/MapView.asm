@@ -7,66 +7,23 @@ MapView_OFFSET_Y: equ -8
 MapView: MACRO
 	tileMap:
 		dw 0
+	camera:
+		dw 0
 	x:
 		dw 0
 	y:
 		dw 0
-	targetX:
-		dw 0
-	targetY:
-		dw 0
-	scrollX:
-		db 0
-	scrollY:
-		db 0
-	maxX:
-		dw 0
-	maxY:
-		dw 0
-	width:
-		db 248
-	height:
-		db 240
 	tileCopyCommand: VDPCommand 0, Tile_PAGE << 8, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
 	ENDM
 
 ; de = map
+; hl = camera
 ; ix = this
 MapView_Construct:
 	ld (ix + MapView.tileMap),e
 	ld (ix + MapView.tileMap + 1),d
-	push ix
-	call MapView_GetTileMap
-	ld l,(ix + TileMap.width)
-	ld h,(ix + TileMap.width + 1)
-	pop ix
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ld e,(ix + MapView.width)
-	ld d,0
-	and a
-	sbc hl,de
-	call c,System_ThrowException
-	ld (ix + MapView.maxX),l
-	ld (ix + MapView.maxX + 1),h
-	push ix
-	call MapView_GetTileMap
-	ld l,(ix + TileMap.height)
-	ld h,(ix + TileMap.height + 1)
-	pop ix
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ld e,(ix + MapView.height)
-	ld d,0
-	and a
-	sbc hl,de
-	call c,System_ThrowException
-	ld (ix + MapView.maxY),l
-	ld (ix + MapView.maxY + 1),h
+	ld (ix + MapView.camera),l
+	ld (ix + MapView.camera + 1),h
 	ret
 
 ; ix = this
@@ -79,6 +36,15 @@ MapView_GetTileMap:
 	ret
 
 ; ix = this
+; ix <- camera
+MapView_GetCamera:
+	ld e,(ix + MapView.camera)
+	ld d,(ix + MapView.camera + 1)
+	ld ixl,e
+	ld ixh,d
+	ret
+
+; ix = this
 ; iy <- tile copy command
 MapView_GetTileCopyCommand_IY:
 	ld e,ixl
@@ -86,90 +52,6 @@ MapView_GetTileCopyCommand_IY:
 	ld iy,MapView.tileCopyCommand
 	add iy,de
 	ret
-
-; ix = this
-; iy = engine
-MapView_TickPrimary:
-	ld b,(ix + MapView.scrollX)
-	ld a,(ix + MapView.targetX)
-	sub b
-	sra a
-	add a,b
-	ld (ix + MapView.scrollX),a
-	ld b,(ix + MapView.scrollY)
-	ld a,(ix + MapView.targetY)
-	sub b
-	sra a
-	add a,b
-	ld (ix + MapView.scrollY),a
-	ret
-
-; ix = this
-; iy = engine
-MapView_TickSecondary:
-	ld a,(ix + MapView.targetX)
-	ld (ix + MapView.scrollX),a
-	ld a,(ix + MapView.targetY)
-	ld (ix + MapView.scrollY),a
-	ret
-
-; bc = x
-; de = y
-; ix = this
-MapView_SetTargetPosition:
-	push bc
-	ex de,hl
-	call MapView_SetTargetY
-	pop hl
-	jp MapView_SetTargetX
-
-; hl = target x
-; ix = this
-MapView_SetTargetX: PROC
-	ld e,(ix + MapView.width)
-	ld d,0
-	srl e  ; center
-	sbc hl,de
-	jp m,Negative
-	ld (ix + MapView.targetX),l
-	ld (ix + MapView.targetX + 1),h
-	ld e,(ix + MapView.maxX)
-	ld d,(ix + MapView.maxX + 1)
-	sbc hl,de
-	ret c
-	ret z
-	ld (ix + MapView.targetX),e
-	ld (ix + MapView.targetX + 1),d
-	ret
-Negative:
-	ld (ix + MapView.targetX),0
-	ld (ix + MapView.targetX + 1),0
-	ret
-	ENDP
-
-; hl = target y
-; ix = this
-MapView_SetTargetY: PROC
-	ld e,(ix + MapView.height)
-	ld d,0
-	srl e  ; center
-	sbc hl,de
-	jp m,Negative
-	ld (ix + MapView.targetY),l
-	ld (ix + MapView.targetY + 1),h
-	ld e,(ix + MapView.maxY)
-	ld d,(ix + MapView.maxY + 1)
-	sbc hl,de
-	ret c
-	ret z
-	ld (ix + MapView.targetY),e
-	ld (ix + MapView.targetY + 1),d
-	ret
-Negative:
-	ld (ix + MapView.targetY),0
-	ld (ix + MapView.targetY + 1),0
-	ret
-	ENDP
 
 ; bc = x
 ; de = y
@@ -205,8 +87,11 @@ MapView_DrawBitmap:
 
 ; ix = this
 MapView_MoveHorizontal: PROC
-	ld l,(ix + MapView.targetX)
-	ld h,(ix + MapView.targetX + 1)
+	push ix
+	call MapView_GetCamera
+	ld l,(ix + Camera.x)
+	ld h,(ix + Camera.x + 1)
+	pop ix
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
 	res 0,l
@@ -246,8 +131,11 @@ Right:
 
 ; ix = this
 MapView_MoveVertical: PROC
-	ld l,(ix + MapView.targetY)
-	ld h,(ix + MapView.targetY + 1)
+	push ix
+	call MapView_GetCamera
+	ld l,(ix + Camera.y)
+	ld h,(ix + Camera.y + 1)
+	pop ix
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
 	res 0,l
@@ -288,24 +176,6 @@ Down:
 MapView_Start:
 	call MapView_Draw
 	ret
-
-; ix = this
-; iy = game frame
-MapView_UpdateGameFrame:
-	ld a,(ix + MapView.scrollY)
-	add a,16
-	ld c,a
-	ld b,(ix + MapView.scrollX)
-	jp GameFrame_SetMapPositionIY
-
-; ix = this
-; iy = sprite attribute table
-MapView_UpdateSpriteAttributTable:
-	ld a,(ix + MapView.scrollY)
-	add a,16
-	ld l,a
-	ld h,(ix + MapView.scrollX)
-	jp SpriteAttributeTable_SetDisplayPositionIY
 
 ; ix = this
 MapView_Draw: PROC

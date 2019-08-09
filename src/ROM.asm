@@ -74,6 +74,7 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Image.asm"
 	INCLUDE "Glyph.asm"
 	INCLUDE "Dialog.asm"
+	INCLUDE "Camera.asm"
 	INCLUDE "MapView.asm"
 	INCLUDE "Player.asm"
 	INCLUDE "PlayerView.asm"

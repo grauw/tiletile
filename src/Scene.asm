@@ -14,6 +14,8 @@ Scene: MACRO ?tileset, ?tilemap, ?uiImage
 		db 0
 	dialog:
 		Dialog ?uiImage
+	camera:
+		Camera
 	mapView:
 		MapView
 	player:
@@ -36,6 +38,15 @@ Scene_Construct:
 	call Scene_GetDialog
 	call Dialog_Construct
 	pop ix
+
+	push ix
+	call Scene_GetTileMap_DE
+	push de
+	call Scene_GetCamera
+	pop de
+	call Camera_Construct
+	ex (sp),ix
+	pop hl
 
 	push ix
 	call Scene_GetTileMap_DE
@@ -118,6 +129,13 @@ Scene_GetTileMap_DE:
 ; ix <- dialog
 Scene_GetDialog:
 	ld de,Scene.dialog
+	add ix,de
+	ret
+
+; ix = this
+; ix <- camera
+Scene_GetCamera:
+	ld de,Scene.camera
 	add ix,de
 	ret
 
@@ -318,10 +336,10 @@ Scene_TickPrimary:
 
 	push ix
 	ex de,hl
-	call Scene_GetMapView
+	call Scene_GetCamera
 	ex de,hl
-	call MapView_SetTargetPosition
-	call MapView_TickPrimary
+	call Camera_SetTargetPosition
+	call Camera_TickPrimary
 	pop ix
 
 	push ix
@@ -354,8 +372,8 @@ Scene_TickSecondary:
 	pop ix
 
 	push ix
-	call Scene_GetMapView
-	call MapView_TickSecondary
+	call Scene_GetCamera
+	call Camera_TickSecondary
 	pop ix
 
 	push ix
@@ -438,8 +456,8 @@ Scene_UpdateGameFrame:
 	call Engine_GetGameFrameIY
 
 	push ix
-	call Scene_GetMapView
-	call MapView_UpdateGameFrame
+	call Scene_GetCamera
+	call Camera_UpdateGameFrame
 	pop ix
 
 	push ix
@@ -463,8 +481,8 @@ Scene_DrawSpriteAttributes:
 	call Engine_GetSpriteAttributeTableIY
 
 	push ix
-	call Scene_GetMapView
-	call MapView_UpdateSpriteAttributTable
+	call Scene_GetCamera
+	call Camera_UpdateSpriteAttributTable
 	pop ix
 
 	ld a,0
