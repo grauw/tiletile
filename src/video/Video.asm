@@ -109,6 +109,50 @@ Video_StartIY:
 	ld b,27
 	call VDP_SetRegister
 	call Video_Recenter
+	call Video_FuzzTheV9958
+	ret
+
+Video_FuzzTheV9958:
+	ld a,(VDP_MIRROR_0 + 0)
+	or 10000001B  ; undocumented
+	ld (VDP_MIRROR_0 + 0),a
+	ld b,0
+	call VDP_SetRegister
+	ld a,(VDP_MIRROR_0 + 1)
+	or 10000100B  ; undocumented
+	ld (VDP_MIRROR_0 + 1),a
+	ld b,1
+	call VDP_SetRegister
+	ld a,(VDP_MIRROR_8 + 8)
+	or 00000100B  ; undocumented
+	ld (VDP_MIRROR_8 + 8),a
+	ld b,8
+	call VDP_SetRegister
+	ld a,(VDP_MIRROR_8 + 9)
+	or 01000000B  ; undocumented
+	ld (VDP_MIRROR_8 + 9),a
+	ld b,9
+	call VDP_SetRegister
+	ld a,(VDP_MIRROR_25 + 25)
+	or 11010100B  ; undocumented + CMD + WTE
+	ld (VDP_MIRROR_25 + 25),a
+	ld b,25
+	call VDP_SetRegister
+	ld a,11111111B
+	ld b,24
+	call VDP_SetRegister
+	ld a,11111111B
+	ld b,28
+	call VDP_SetRegister
+	ld a,11111111B
+	ld b,29
+	call VDP_SetRegister
+	ld a,11111111B
+	ld b,30
+	call VDP_SetRegister
+	ld a,11111111B
+	ld b,31
+	call VDP_SetRegister
 	ret
 
 ; iy = this
