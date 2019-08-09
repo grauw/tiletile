@@ -4,10 +4,10 @@
 Tile_PAGE: equ 2
 
 Tile: MACRO ?imageindex, ?tilesbank, ?collision
-	image:
-		dw 0A000H + (?imageindex << 7 & 1FFFH)
 	imageBank:
 		db ?tilesbank + (?imageindex >> 6)
+	image:
+		dw 0A000H + (?imageindex << 7 & 1FFFH)
 	x:
 		db (?imageindex & 0FH) << 4
 	y:
