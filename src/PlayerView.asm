@@ -188,12 +188,7 @@ PlayerView_DrawSpriteColors:
 	ld hl,SpriteColor_solid1
 	jp SpriteColorTable_WriteColorIY
 
-; b = patterns remaining (x4)
-; c = write port
 ; ix = this
-; iy = sprite pattern table
-; b <- patterns remaining (x4)
-; c <- write port
 PlayerView_LoadSourceSpritePatterns:
 	ld e,ixl
 	ld d,ixh
