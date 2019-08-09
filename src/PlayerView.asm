@@ -113,7 +113,7 @@ PlayerView_TickSecondary:
 ; c <- write port
 PlayerView_DrawSpriteAttributes:
 	ld a,b
-	cp 8
+	cp PlayerView_PATTERNS
 	ret c
 	ld a,(ix + PlayerView.x)
 	add a,(iy + SpriteAttributeTable.worldOffsetX)
@@ -152,7 +152,7 @@ PlayerView_DrawSpriteAttributes:
 ; c <- write port
 PlayerView_DrawSpriteColors:
 	ld a,b
-	cp 8
+	cp PlayerView_PATTERNS
 	ret c
 	ld hl,SpriteColor_solid1
 	call SpriteColorTable_WriteColorIY
