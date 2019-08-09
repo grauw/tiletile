@@ -10,6 +10,8 @@ PlayerView: MACRO
 		db 0
 	y:
 		db 0
+	frame:
+		db 0
 	direction:
 		db 0  ; 0 = down, 5 = left, 10 = up, 15 = right
 	moving:
@@ -56,6 +58,7 @@ PlayerView_TickPrimary:
 	call PlayerView_TickInterpolatePosition
 	call PlayerView_TickMovingDirection
 	pop iy
+	inc (ix + PlayerView.frame)
 	ret
 
 ; ix = this
@@ -103,6 +106,7 @@ PlayerView_TickSecondary:
 	ld a,(iy + Player.y)
 	ld (ix + PlayerView.y),a
 	pop iy
+	inc (ix + PlayerView.frame)
 	ret
 
 ; b = sprites remaining
@@ -111,9 +115,9 @@ PlayerView_TickSecondary:
 ; iy = sprite attribute table
 ; b <- sprites remaining
 ; c <- write port
-PlayerView_DrawSpriteAttributes:
+PlayerView_DrawSpriteAttributes: PROC
 	ld a,b
-	cp PlayerView_PATTERNS
+	cp PlayerView_PATTERNS + 1
 	ret c
 	ld a,(ix + PlayerView.x)
 	add a,(iy + SpriteAttributeTable.worldOffsetX)
@@ -142,7 +146,18 @@ PlayerView_DrawSpriteAttributes:
 	SpriteAttributeTable_WriteAttribute_M h, e, a
 	add a,d
 	SpriteAttributeTable_WriteAttribute_M h, e, a
+	inc e
+	inc e
+	inc e
+	inc e
+	add a,d
+	bit 0,(ix + PlayerView.frame)
+	jr nz,ShadowContinue
+	add a,d
+ShadowContinue:
+	SpriteAttributeTable_WriteAttribute_M h, e, a
 	ret
+	ENDP
 
 ; b = sprites remaining
 ; c = write port
@@ -152,7 +167,7 @@ PlayerView_DrawSpriteAttributes:
 ; c <- write port
 PlayerView_DrawSpriteColors:
 	ld a,b
-	cp PlayerView_PATTERNS
+	cp PlayerView_PATTERNS + 1
 	ret c
 	ld hl,SpriteColor_solid1
 	call SpriteColorTable_WriteColorIY
@@ -169,6 +184,8 @@ PlayerView_DrawSpriteColors:
 	ld hl,SpriteColor_solid4CC
 	call SpriteColorTable_WriteColorIY
 	ld hl,SpriteColor_solid8CC
+	call SpriteColorTable_WriteColorIY
+	ld hl,SpriteColor_solid1
 	jp SpriteColorTable_WriteColorIY
 
 ; b = patterns remaining (x4)
@@ -285,6 +302,10 @@ PlayerView_InitializeSpritePatterns:
 	ld hl,SpritePattern_blank
 	call SpritePatternTable_WritePatternIY
 	ENDM
+	ld hl,PlayerView_shadowPattern
+	call SpritePatternTable_WritePatternIY
+	ld hl,SpritePattern_blank
+	call SpritePatternTable_WritePatternIY
 	ret
 
 ; ix = this
@@ -335,3 +356,10 @@ Continue:
 	ld h,a
 	ret
 	ENDP
+
+;
+PlayerView_shadowPattern:
+	SpritePattern 0, 0, 0, 0, 0, 0, 0, 0,
+	              0, 7, 31, 63, 63, 31, 7, 0,
+	              0, 0, 0, 0, 0, 0, 0, 0,
+	              0, 224, 248, 252, 252, 248, 224, 0
