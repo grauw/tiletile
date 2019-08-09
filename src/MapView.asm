@@ -175,6 +175,7 @@ Negative:
 ; de = y
 ; ix = this
 ; hl <- tile pointer pointer
+; de <- row stride
 ; Modifies: af, bc, de
 MapView_GetTileDataPointer:
 	push ix
