@@ -288,7 +288,7 @@ PlayerView_LoadSourceSpritePatterns:
 ; c <- write port
 PlayerView_InitializeSpritePatterns:
 	ld a,b
-	and 3
+	and 15  ; alignment for copy
 	call nz,System_ThrowException
 	ld a,SpritePatternTable_COUNT
 	sub b
