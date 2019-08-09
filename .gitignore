@@ -3,6 +3,7 @@
 /node_modules/
 /doc/experiments/
 
+/.vscode/
 /.project
 /.externalToolBuilders/
 .DS_Store
