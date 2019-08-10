@@ -10,9 +10,9 @@ MapView: MACRO
 	camera:
 		dw 0
 	x:
-		dw 0
+		dw MapView_OFFSET_X
 	y:
-		dw 0
+		dw MapView_OFFSET_Y
 	tileCopyCommand: VDPCommand 0, Tile_PAGE << 8, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
 	ENDM
 
@@ -91,6 +91,8 @@ MapView_MoveHorizontal: PROC
 	call MapView_GetCamera
 	ld l,(ix + Camera.x)
 	ld h,(ix + Camera.x + 1)
+	ld de,MapView_OFFSET_X
+	add hl,de
 	pop ix
 	ld c,(ix + MapView.x)
 	ld b,(ix + MapView.x + 1)
@@ -101,7 +103,7 @@ MapView_MoveHorizontal: PROC
 	and a
 	sbc hl,bc
 	jr z,Idle
-	jr nc,Right
+	jp p,Right
 Left:
 	dec bc
 	dec bc
@@ -135,6 +137,8 @@ MapView_MoveVertical: PROC
 	call MapView_GetCamera
 	ld l,(ix + Camera.y)
 	ld h,(ix + Camera.y + 1)
+	ld de,MapView_OFFSET_Y
+	add hl,de
 	pop ix
 	ld e,(ix + MapView.y)
 	ld d,(ix + MapView.y + 1)
@@ -145,7 +149,7 @@ MapView_MoveVertical: PROC
 	and a
 	sbc hl,de
 	jr z,Idle
-	jr nc,Down
+	jp p,Down
 Up:
 	dec de
 	dec de
@@ -205,14 +209,7 @@ Loop:
 ; de = y
 ; ix = this
 MapView_DrawTileColumn: PROC
-	IF MapView_OFFSET_X
-	ld hl,MapView_OFFSET_X
-	add hl,bc
-	ld c,l
-	ld b,h
-	ENDIF
-	ld hl,MapView_OFFSET_Y
-	add hl,de
+	ex de,hl
 	call MapView_GetTileCopyCommand_IY
 	ex de,hl
 	ld a,e
@@ -279,14 +276,7 @@ DrawTile:
 ; de = y
 ; ix = this
 MapView_DrawTileRow: PROC
-	IF MapView_OFFSET_X
-	ld hl,MapView_OFFSET_X
-	add hl,bc
-	ld c,l
-	ld b,h
-	ENDIF
-	ld hl,MapView_OFFSET_Y
-	add hl,de
+	ex de,hl
 	call MapView_GetTileCopyCommand_IY
 	ex de,hl
 	ld a,e
