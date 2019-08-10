@@ -337,3 +337,81 @@ DrawTile:
 	inc hl
 	ret
 	ENDP
+
+; bc = x
+; de = y
+; ix = tile
+; iy = this
+MapView_DrawTileIY: PROC
+	ld l,(iy + MapView.x)
+	ld h,(iy + MapView.x + 1)
+	and a
+	sbc hl,bc
+	jp m,ClampMaxX
+ClampMinX:
+	ld a,h
+	and a
+	ret nz
+	ld h,l
+	ld a,16
+	sub l
+	ret c
+	ret z
+	ld l,a
+	jr SetX
+ClampMaxX:
+	inc h
+	ret nz
+	ld a,l
+	and a
+	ret z
+	cp 16
+	jr c,SetX
+	ld l,16
+SetX:
+	ld a,(ix + Tile.x)
+	add a,h
+	ld (iy + MapView.tileCopyCommand.sx),a
+	ld a,c
+	add a,h
+	ld (iy + MapView.tileCopyCommand.dx),a
+	ld (iy + MapView.tileCopyCommand.nx),l
+	ld l,(iy + MapView.y)
+	ld h,(iy + MapView.y + 1)
+	and a
+	sbc hl,de
+	jp m,ClampMaxY
+ClampMinY:
+	ld a,h
+	and a
+	ret nz
+	ld h,l
+	ld a,16
+	sub l
+	ret c
+	ret z
+	ld l,a
+	jr SetY
+ClampMaxY:
+	inc h
+	ret nz
+	ld a,l
+	and a
+	ret z
+	cp 16
+	jr c,SetY
+	ld l,16
+SetY:
+	ld a,(ix + Tile.y)
+	add a,h
+	ld (iy + MapView.tileCopyCommand.sy),a
+	ld a,e
+	add a,h
+	ld (iy + MapView.tileCopyCommand.dy),a
+	ld (iy + MapView.tileCopyCommand.ny),l
+	ld e,iyl
+	ld d,iyh
+	ld hl,MapView.tileCopyCommand
+	add hl,de
+	jp VDPCommand_Execute_HL
+	ENDP
