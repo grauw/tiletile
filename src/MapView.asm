@@ -413,5 +413,5 @@ SetY:
 	ld d,iyh
 	ld hl,MapView.tileCopyCommand
 	add hl,de
-	jp VDPCommand_Execute_HL
+	jp VDPCommand_ExecuteS2HL
 	ENDP
