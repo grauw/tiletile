@@ -1,4 +1,7 @@
+source lib/neonlib/tools/symbols.tcl
 source lib/neonlib/tools/profile.tcl
+
+symbols::load bin/tiletile.sym
 
 ext debugdevice
 set debugoutput stdout
@@ -19,7 +22,36 @@ proc cpuspeed {x} {
 	set z80_freq
 }
 
-profile_osd
+proc my_slot_pc {} {
+	address_in_slot [reg pc] 1 0
+}
 
+debug set_bp -once [symbol Scene_Run] {[my_slot_pc]} {
+	set throttle on
+
+	profile::section_scope_bp frame [symbol Scene_Update] {[my_slot_pc]}
+	profile::section_scope_bp input [symbol Scene_UpdateInput] {[my_slot_pc]}
+	profile::section_scope_bp tick [symbol Scene_TickPrimary] {[my_slot_pc]}
+	profile::section_scope_bp tick [symbol Scene_TickSecondary] {[my_slot_pc]}
+	profile::section_scope_bp gamef [symbol Scene_UpdateGameFrame] {[my_slot_pc]}
+	profile::section_scope_bp spt [symbol Scene_DrawSpritePatterns] {[my_slot_pc]}
+	profile::section_scope_bp sct [symbol Scene_DrawSpriteColors] {[my_slot_pc]}
+	profile::section_scope_bp sct [symbol Engine_CopySpriteColorToSecondary] {[my_slot_pc]}
+	profile::section_scope_bp sat [symbol Scene_DrawSpriteAttributes] {[my_slot_pc]}
+	profile::section_scope_bp pal [symbol Scene_UpdatePalette] {[my_slot_pc]}
+	profile::section_scope_bp bmp [symbol Scene_DrawBitmapPrimary] {[my_slot_pc]}
+	profile::section_scope_bp bmp [symbol Scene_DrawBitmapSecondary] {[my_slot_pc]}
+	# profile::section_scope_bp copy [symbol VDPCommand_ExecuteS2HL] {[my_slot_pc]}
+	# profile::section_begin_bp vdprdy [expr [symbol VDPCommand_ExecuteS2HL.WaitReady] - 2] {[my_slot_pc]}
+	# profile::section_end_bp vdprdy [expr [symbol VDPCommand_ExecuteS2HL.WaitReady] + 5] {[my_slot_pc]}
+	profile::section_scope_bp trig [symbol Scene_UpdateTriggers] {[my_slot_pc]}
+	profile::section_scope_bp mus [symbol Scene_UpdateMusic] {[my_slot_pc]}
+	profile::section_scope_bp sync [symbol SplitHandler_WaitIY] {[my_slot_pc]}
+	profile::section_irq_bp int
+
+	profile::section_exclude int [profile::section_list {int frame}]
+	profile::section_exclude sync frame
+}
+
+profile_osd
 set throttle off
-after time 5 "set throttle on"

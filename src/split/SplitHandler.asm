@@ -31,16 +31,10 @@ SplitHandler: MACRO ?line, ?settings, ?next
 		call ?next
 	next: equ $ - 2
 		pop hl
-		IF DEBUG
-		PROFILE_END 10
-		ENDIF
 		jp Interrupt_Return
 	; c = VDP port 1
 	; Modifies: af, bc
 	Entry:
-		IF DEBUG
-		PROFILE_BEGIN 10
-		ENDIF
 		push hl
 		ld hl,?settings
 	settings: equ $ - 2
@@ -82,14 +76,13 @@ SplitHandler_SubmitSameSplitIY:
 	ret
 
 ; iy = this
-SplitHandler_WaitIY:
+SplitHandler_WaitIY: PROC
 	bit 0,(iy + SplitHandler.pending)
 	ret z
-	IF DEBUG
-	PROFILE_BEGIN 29
-	ENDIF
 	halt
-	IF DEBUG
-	PROFILE_END 29
-	ENDIF
-	jr SplitHandler_WaitIY
+Loop:
+	bit 0,(iy + SplitHandler.pending)
+	ret z
+	halt
+	jr Loop
+	ENDP

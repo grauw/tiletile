@@ -277,19 +277,11 @@ Engine_StopIY:
 
 ; iy = this
 Engine_CopySpriteColorToSecondary:
-	IF DEBUG
-	PROFILE_BEGIN 4
-	ENDIF
-
 	ld e,iyl
 	ld d,iyh
 	ld hl,Engine.spriteColorCopy
 	add hl,de
 	call VRAMTableCopy_ExecuteHL
-
-	IF DEBUG
-	PROFILE_END 4
-	ENDIF
 	ret
 
 ; iy = this

@@ -256,10 +256,6 @@ Loop:
 ; ix = this
 ; iy = engine
 Scene_Update:
-	IF DEBUG
-	PROFILE_FRAME_BEGIN
-	ENDIF
-
 	call Scene_UpdateTriggers
 	call Engine_WaitDisplayedIY
 
@@ -281,18 +277,11 @@ Scene_Update:
 	call Scene_DrawSpriteAttributes
 	call Engine_SubmitSecondaryIY
 	call Scene_DrawBitmapSecondary
-
-	IF DEBUG
-	PROFILE_FRAME_END
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_UpdateInput:
-	IF DEBUG
-	PROFILE_BEGIN 0
-	ENDIF
 	push iy
 	call Engine_GetInputIY
 
@@ -312,9 +301,6 @@ Scene_UpdateInput:
 	call Scene_UpdateDisplayFrequency
 
 	pop iy
-	IF DEBUG
-	PROFILE_END 0
-	ENDIF
 	ret
 
 ; ix = this
@@ -342,10 +328,6 @@ Scene_UpdateDisplayFrequency:
 ; ix = this
 ; iy = engine
 Scene_TickPrimary:
-	IF DEBUG
-	PROFILE_BEGIN 1
-	ENDIF
-
 	push ix
 	call Scene_GetPlayer
 	call Player_TickPrimary
@@ -371,19 +353,11 @@ Scene_TickPrimary:
 	pop ix
 
 	call Scene_Tick
-
-	IF DEBUG
-	PROFILE_END 1
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_TickSecondary:
-	IF DEBUG
-	PROFILE_BEGIN 1
-	ENDIF
-
 	push ix
 	call Scene_GetPlayerView
 	call PlayerView_TickSecondary
@@ -400,10 +374,6 @@ Scene_TickSecondary:
 	pop ix
 
 	call Scene_Tick
-
-	IF DEBUG
-	PROFILE_END 1
-	ENDIF
 	ret
 
 ; ix = this
@@ -422,11 +392,7 @@ Scene_Tick:
 
 ; ix = this
 ; iy = engine
-Scene_UpdatePalette: PROC
-	IF DEBUG
-	PROFILE_BEGIN 6
-	ENDIF
-
+Scene_UpdatePalette:
 	ld de,Palette_black
 	call Scene_UpdatePaletteFade
 	push ix
@@ -436,12 +402,7 @@ Scene_UpdatePalette: PROC
 	call Weather_UpdatePalette
 	pop ix
 	call Engine_SetPaletteIY
-
-	IF DEBUG
-	PROFILE_END 6
-	ENDIF
 	ret
-	ENDP
 
 ; de = palette
 ; ix = this
@@ -472,9 +433,6 @@ Exiting:
 ; ix = this
 ; iy = engine
 Scene_UpdateGameFrame:
-	IF DEBUG
-	PROFILE_BEGIN 2
-	ENDIF
 	push iy
 	call Engine_GetGameFrameIY
 
@@ -489,17 +447,11 @@ Scene_UpdateGameFrame:
 	pop ix
 
 	pop iy
-	IF DEBUG
-	PROFILE_END 2
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_DrawSpriteAttributes:
-	IF DEBUG
-	PROFILE_BEGIN 5
-	ENDIF
 	push iy
 	call Engine_GetSpriteAttributeTableIY
 
@@ -521,17 +473,11 @@ Scene_DrawSpriteAttributes:
 	call SpriteAttributeTable_FinishWriteIY
 
 	pop iy
-	IF DEBUG
-	PROFILE_END 5
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_DrawSpriteColors:
-	IF DEBUG
-	PROFILE_BEGIN 4
-	ENDIF
 	push iy
 	call Engine_GetSpriteColorTableIY
 
@@ -548,17 +494,11 @@ Scene_DrawSpriteColors:
 	call SpriteColorTable_FinishWriteIY
 
 	pop iy
-	IF DEBUG
-	PROFILE_END 4
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_DrawSpritePatterns:
-	IF DEBUG
-	PROFILE_BEGIN 3
-	ENDIF
 	push iy
 	call Engine_GetSpritePatternTableIY
 
@@ -568,37 +508,22 @@ Scene_DrawSpritePatterns:
 	pop ix
 
 	pop iy
-	IF DEBUG
-	PROFILE_END 3
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_DrawBitmapPrimary:
-	IF DEBUG
-	PROFILE_BEGIN 7
-	ENDIF
-
 	push iy
 	push ix
 	call Scene_GetMapView
 	call MapView_DrawBitmap
 	pop ix
 	pop iy
-
-	IF DEBUG
-	PROFILE_END 7
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_DrawBitmapSecondary:
-	IF DEBUG
-	PROFILE_BEGIN 7
-	ENDIF
-
 	push ix
 	push iy
 	call Scene_GetMapView_IY
@@ -613,19 +538,11 @@ Scene_DrawBitmapSecondary:
 	call Dialog_DrawBitmap
 	pop ix
 	pop iy
-
-	IF DEBUG
-	PROFILE_END 7
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_UpdateTriggers:
-	IF DEBUG
-	PROFILE_BEGIN 8
-	ENDIF
-
 	push ix
 	call Scene_GetPlayer
 	call Player_GetTile
@@ -641,24 +558,12 @@ Scene_UpdateTriggers:
 	call Scene_GetDialog
 	call Dialog_UpdateTriggers
 	pop ix
-
-	IF DEBUG
-	PROFILE_END 8
-	ENDIF
 	ret
 
 ; ix = this
 ; iy = engine
 Scene_UpdateMusic:
-	IF DEBUG
-	PROFILE_BEGIN 9
-	ENDIF
-
 	ld b,0
 	djnz $
 	djnz $
-
-	IF DEBUG
-	PROFILE_END 9
-	ENDIF
 	ret
