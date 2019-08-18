@@ -414,11 +414,11 @@ class PNGLoader {
  * Type checker, intended for use at the start of any function.
  * Primitive types are checked by a string, objects by their constructor.
  * Use an array to denote optionality. Example:
- * 
+ *
  * function myFunction(aNumber, aFunction, anOptionalString) {
  *     checkTypes(arguments, "number", Function, ["string"])
  * }
- * 
+ *
  * @param {Array} args An array-like list of arguments.
  * @param {string|Function|Array} types... The types to check against.
  */

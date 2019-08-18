@@ -9,17 +9,17 @@ var filename = process.argv[2];
 fs.readFile(filename, "ascii", function(err, data) {
 	if (err)
 		throw err;
-	
+
 	data = data.replace(/[ \t]+/g, " ");
 	var lines = data.split("\n");
-	
+
 	for (var i = 3; i < process.argv.length; i++) {
 		var address = parseInt(process.argv[i], 16);
 		if (isNaN(address)) {
 			console.log("Unable to parse argument: " + process.argv[i]);
 			continue;
 		}
-		
+
 		var labelName = "*** Not Found";
 		var labelDistance = Infinity;
 		for (var j = 0; j < lines.length; j++) {
