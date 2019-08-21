@@ -13,7 +13,8 @@ MapView: MACRO
 		dw MapView_OFFSET_X
 	y:
 		dw MapView_OFFSET_Y
-	tileCopyCommand: VDPCommand 0, Tile_PAGE << 8, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
+	tileCopyCommand:
+		VDPCommand 0, Tile_PAGE << 8, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
 	ENDM
 
 ; de = map

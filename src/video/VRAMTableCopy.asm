@@ -2,7 +2,8 @@
 ; VDP command to copy between VRAM tables
 ;
 VRAMTableCopy: MACRO ?source = 0, ?destination = 0, ?size = 0
-	super: VDPCommand 0, ?source >> 7, 0, ?destination >> 7, 100H, ?size >> 7, 0, 0, VDPCommand_YMMM
+	super:
+		VDPCommand 0, ?source >> 7, 0, ?destination >> 7, 100H, ?size >> 7, 0, 0, VDPCommand_YMMM
 	ENDM
 
 ; hl = offset

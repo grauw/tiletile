@@ -4,7 +4,8 @@
 OverscanSplit_LINE: equ 212 - 3
 
 OverscanSplit: MACRO
-	super: Split
+	super:
+		Split
 	mode9_192:
 		VDPRegister 9
 		VDPRegister 15, 2
@@ -20,7 +21,7 @@ OverscanSplit_Construct:
 OverscanSplit_UpdateMode9_M: MACRO ?this
 	ld a,(VDP_MIRROR_8 + 9)
 	and 01111111B
-	ld (?this + OverscanSplit.mode9_192 + VDPRegister.value),a
+	ld (?this + OverscanSplit.mode9_192.value),a
 	or 10000000B
-	ld (?this + OverscanSplit.mode9_212 + VDPRegister.value),a
+	ld (?this + OverscanSplit.mode9_212.value),a
 	ENDM

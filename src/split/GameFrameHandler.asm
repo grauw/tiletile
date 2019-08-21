@@ -3,7 +3,8 @@
 ;
 GameFrameHandler: MACRO ?settings
 	this:
-	super: SplitHandler GameFrame_LINE, ?settings, mapSplitHandler
+	super:
+		SplitHandler GameFrame_LINE, ?settings, mapSplitHandler
 
 	; c = VDP port 1
 	; hl = game frame

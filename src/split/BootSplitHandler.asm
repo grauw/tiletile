@@ -2,7 +2,8 @@
 ; Split for boot
 ;
 BootSplitHandler: MACRO ?settings, ?next
-	super: SplitHandler BootSplit_LINE, ?settings, ?next
+	super:
+		SplitHandler BootSplit_LINE, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = boot split

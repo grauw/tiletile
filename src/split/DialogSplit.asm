@@ -5,7 +5,8 @@ DialogSplit_LINE: equ 160 - 3
 DialogSplit_VERTICAL_OFFSET: equ -160
 
 DialogSplit: MACRO
-	super: Split
+	super:
+		Split
 		VDPRegister 15, 2
 		VDPRegister 16, 10
 	mode1Blank:
@@ -45,12 +46,12 @@ DialogSplit: MACRO
 DialogSplit_Construct:
 	ld a,(VDP_MIRROR_0 + 1)
 	and 10111111B
-	ld (ix + DialogSplit.mode1Blank + VDPRegister.value),a
+	ld (ix + DialogSplit.mode1Blank.value),a
 	or 01000000B
-	ld (ix + DialogSplit.mode1Display + VDPRegister.value),a
+	ld (ix + DialogSplit.mode1Display.value),a
 	ld a,(VDP_MIRROR_8 + 8)
 	or 00000010B
-	ld (ix + DialogSplit.mode8 + VDPRegister.value),a
+	ld (ix + DialogSplit.mode8.value),a
 	push iy
 	ld iy,UIImage_palette
 	ld a,(iy + Palette.color10)

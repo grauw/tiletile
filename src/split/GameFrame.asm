@@ -4,7 +4,8 @@
 GameFrame_LINE: equ 224
 
 GameFrame: MACRO
-	super: Split
+	super:
+		Split
 	dialogActive:
 		db 0
 	dialogStartLine:

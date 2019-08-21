@@ -5,7 +5,8 @@ SpritePatternTable_COUNT: equ 256
 SpritePatternTable_SIZE: equ SpritePatternTable_COUNT * SpritePattern._size / 4
 
 SpritePatternTable: MACRO ?address
-	super: VRAMTable ?address
+	super:
+		VRAMTable ?address
 	baseRegister6:
 		db 0
 	ENDM

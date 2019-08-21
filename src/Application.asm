@@ -111,6 +111,7 @@ Application_EnterMainLoop:
 ;
 	SECTION RAM
 
-Application_instance: Application
+Application_instance:
+	Application
 
 	ENDS

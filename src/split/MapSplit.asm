@@ -4,7 +4,8 @@
 MapSplit_LINE: equ 228
 
 MapSplit: MACRO
-	super: Split
+	super:
+		Split
 	horizontalOffsetCharacters:
 		VDPRegister 26, 0
 	horizontalOffsetDots:
@@ -28,43 +29,43 @@ MapSplit: MACRO
 ; ix = this
 MapSplit_Construct:
 	ld a,(VDP_MIRROR_0 + 2)
-	ld (ix + MapSplit.patternName + VDPRegister.value),a
+	ld (ix + MapSplit.patternName.value),a
 	ld a,(VDP_MIRROR_0 + 5)
-	ld (ix + MapSplit.spriteAttributeLSB + VDPRegister.value),a
+	ld (ix + MapSplit.spriteAttributeLSB.value),a
 	ld a,(VDP_MIRROR_8 + 11)
-	ld (ix + MapSplit.spriteAttributeMSB + VDPRegister.value),a
+	ld (ix + MapSplit.spriteAttributeMSB.value),a
 	ld a,(VDP_MIRROR_0 + 6)
-	ld (ix + MapSplit.spritePattern + VDPRegister.value),a
+	ld (ix + MapSplit.spritePattern.value),a
 	ret
 
 MapSplit_SetDisplayOffset_M: MACRO ?this, ?horizontalDots, ?horizontalCharacters, ?vertical
-	ld (?this + MapSplit.horizontalOffsetDots + VDPRegister.value),?horizontalDots
-	ld (?this + MapSplit.horizontalOffsetCharacters + VDPRegister.value),?horizontalCharacters
-	ld (?this + MapSplit.verticalOffset + VDPRegister.value),?vertical
+	ld (?this + MapSplit.horizontalOffsetDots.value),?horizontalDots
+	ld (?this + MapSplit.horizontalOffsetCharacters.value),?horizontalCharacters
+	ld (?this + MapSplit.verticalOffset.value),?vertical
 	ENDM
 
 MapSplit_SetPatternNameTable_M: MACRO ?this, ?patternNameTable
 	ld a,(?patternNameTable + PatternNameTable.baseRegister2)
-	ld (?this + MapSplit.patternName + VDPRegister.value),a
+	ld (?this + MapSplit.patternName.value),a
 	ENDM
 
 MapSplit_SetSpriteAttributeTable_M: MACRO ?this, ?spriteAttributeTable
 	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister5)
-	ld (?this + MapSplit.spriteAttributeLSB + VDPRegister.value),a
+	ld (?this + MapSplit.spriteAttributeLSB.value),a
 	ld a,(?spriteAttributeTable + SpriteAttributeTable.baseRegister11)
-	ld (?this + MapSplit.spriteAttributeMSB + VDPRegister.value),a
+	ld (?this + MapSplit.spriteAttributeMSB.value),a
 	ENDM
 
 MapSplit_SetSpriteColorTable_M: MACRO ?this, ?spriteColorTable
 	ld a,(?spriteColorTable + SpriteColorTable.baseRegister5)
-	ld (?this + SpriteColorTable.spriteAttributeLSB + VDPRegister.value),a
+	ld (?this + SpriteColorTable.spriteAttributeLSB.value),a
 	ld a,(?spriteColorTable + SpriteColorTable.baseRegister11)
-	ld (?this + SpriteColorTable.spriteAttributeMSB + VDPRegister.value),a
+	ld (?this + SpriteColorTable.spriteAttributeMSB.value),a
 	ENDM
 
 MapSplit_SetSpritePatternTable_M: MACRO ?this, ?spritePatternTable
 	ld a,(?spritePatternTable + SpritePatternTable.baseRegister6)
-	ld (?this + MapSplit.spritePattern + VDPRegister.value),a
+	ld (?this + MapSplit.spritePattern.value),a
 	ENDM
 
 MapSplit_SetPalette_M: MACRO ?this, ?palettelow, ?palettehigh

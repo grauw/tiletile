@@ -5,7 +5,8 @@ SpriteColorTable_COUNT: equ 32
 SpriteColorTable_SIZE: equ SpriteColorTable_COUNT * SpriteColor._size
 
 SpriteColorTable: MACRO ?address
-	super: VRAMTable ?address
+	super:
+		VRAMTable ?address
 	baseRegister5:
 		db 0
 	baseRegister11:

@@ -2,7 +2,8 @@
 ; Overscan split interrupt handler
 ;
 OverscanSplitHandler: MACRO ?settings, ?next
-	super: SplitHandler OverscanSplit_LINE, ?settings, ?next
+	super:
+		SplitHandler OverscanSplit_LINE, ?settings, ?next
 
 	; c = VDP port 1
 	; hl = overscan split

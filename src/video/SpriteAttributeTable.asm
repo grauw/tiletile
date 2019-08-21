@@ -5,7 +5,8 @@ SpriteAttributeTable_COUNT: equ 32
 SpriteAttributeTable_SIZE: equ SpriteAttributeTable_COUNT * SpriteAttribute._size
 
 SpriteAttributeTable: MACRO ?address
-	super: VRAMTable ?address
+	super:
+		VRAMTable ?address
 	baseRegister5:
 		db 0
 	baseRegister11:

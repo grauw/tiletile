@@ -2,7 +2,8 @@
 ; Timer interrupt hook
 ;
 TIMIHook: MACRO
-	super: Hook H.TIMI, Entry, OldHook
+	super:
+		Hook H.TIMI, Entry, OldHook
 	Entry:
 		push af
 		xor a  ; disable part of the BIOS ISR

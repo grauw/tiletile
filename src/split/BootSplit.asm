@@ -4,7 +4,8 @@
 BootSplit_LINE: equ 228
 
 BootSplit: MACRO
-	super: Split
+	super:
+		Split
 		VDPRegister 16, 0
 	palette:
 		dw Palette_system
