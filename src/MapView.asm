@@ -9,10 +9,8 @@ MapView: MACRO
 		dw 0
 	camera:
 		dw 0
-	x:
-		dw MapView_OFFSET_X
-	y:
-		dw MapView_OFFSET_Y
+	position:
+		Vector2W MapView_OFFSET_X, MapView_OFFSET_Y
 	tileCopyCommand:
 		VDPCommand 0, Tile_PAGE << 8, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
 	ENDM
@@ -74,8 +72,8 @@ MapView_GetTileDataPointer:
 	call MapView_GetTileMap
 	pop de
 	call TileMap_GetTileDataPointer
-	ld e,(ix + TileMap.width)
-	ld d,(ix + TileMap.width + 1)
+	ld e,(ix + TileMap.size.x)
+	ld d,(ix + TileMap.size.x + 1)
 	sla e
 	rl d
 	pop ix
@@ -90,13 +88,13 @@ MapView_DrawBitmap:
 MapView_MoveHorizontal: PROC
 	push ix
 	call MapView_GetCamera
-	ld l,(ix + Camera.x)
-	ld h,(ix + Camera.x + 1)
+	ld l,(ix + Camera.position.x)
+	ld h,(ix + Camera.position.x + 1)
 	ld de,MapView_OFFSET_X
 	add hl,de
 	pop ix
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
+	ld c,(ix + MapView.position.x)
+	ld b,(ix + MapView.position.x + 1)
 	res 0,l
 	res 1,l
 	res 0,c
@@ -111,24 +109,24 @@ Left:
 	dec bc
 	dec bc
 Idle:
-	ld (ix + MapView.x),c
-	ld (ix + MapView.x + 1),b
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
+	ld (ix + MapView.position.x),c
+	ld (ix + MapView.position.x + 1),b
+	ld e,(ix + MapView.position.y)
+	ld d,(ix + MapView.position.y + 1)
 	jp MapView_DrawTileColumn
 Right:
 	inc bc
 	inc bc
 	inc bc
 	inc bc
-	ld (ix + MapView.x),c
-	ld (ix + MapView.x + 1),b
+	ld (ix + MapView.position.x),c
+	ld (ix + MapView.position.x + 1),b
 	ld hl,256 - 4
 	add hl,bc
 	ld c,l
 	ld b,h
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
+	ld e,(ix + MapView.position.y)
+	ld d,(ix + MapView.position.y + 1)
 	jp MapView_DrawTileColumn
 	ENDP
 
@@ -136,13 +134,13 @@ Right:
 MapView_MoveVertical: PROC
 	push ix
 	call MapView_GetCamera
-	ld l,(ix + Camera.y)
-	ld h,(ix + Camera.y + 1)
+	ld l,(ix + Camera.position.y)
+	ld h,(ix + Camera.position.y + 1)
 	ld de,MapView_OFFSET_Y
 	add hl,de
 	pop ix
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
+	ld e,(ix + MapView.position.y)
+	ld d,(ix + MapView.position.y + 1)
 	res 0,l
 	res 1,l
 	res 0,e
@@ -157,23 +155,23 @@ Up:
 	dec de
 	dec de
 Idle:
-	ld (ix + MapView.y),e
-	ld (ix + MapView.y + 1),d
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
+	ld (ix + MapView.position.y),e
+	ld (ix + MapView.position.y + 1),d
+	ld c,(ix + MapView.position.x)
+	ld b,(ix + MapView.position.x + 1)
 	jp MapView_DrawTileRow
 Down:
 	inc de
 	inc de
 	inc de
 	inc de
-	ld (ix + MapView.y),e
-	ld (ix + MapView.y + 1),d
+	ld (ix + MapView.position.y),e
+	ld (ix + MapView.position.y + 1),d
 	ld hl,256 - 4
 	add hl,de
 	ex de,hl
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
+	ld c,(ix + MapView.position.x)
+	ld b,(ix + MapView.position.x + 1)
 	jp MapView_DrawTileRow
 	ENDP
 
@@ -184,10 +182,10 @@ MapView_Start:
 
 ; ix = this
 MapView_Draw: PROC
-	ld c,(ix + MapView.x)
-	ld b,(ix + MapView.x + 1)
-	ld e,(ix + MapView.y)
-	ld d,(ix + MapView.y + 1)
+	ld c,(ix + MapView.position.x)
+	ld b,(ix + MapView.position.x + 1)
+	ld e,(ix + MapView.position.y)
+	ld d,(ix + MapView.position.y + 1)
 	ld a,256 / 4
 Loop:
 	push af
@@ -256,10 +254,10 @@ DrawTile:
 	ld d,(hl)
 	ld ixl,e
 	ld ixh,d
-	ld a,(ix + Tile.x)
+	ld a,(ix + Tile.source.x)
 	or c
 	ld (iy + VDPCommand.sx),a
-	ld a,(ix + Tile.y)
+	ld a,(ix + Tile.source.y)
 	or b
 	ld (iy + VDPCommand.sy),a
 	call VDPCommand_ExecuteS2IY
@@ -322,10 +320,10 @@ DrawTile:
 	ld d,(hl)
 	ld ixl,e
 	ld ixh,d
-	ld a,(ix + Tile.x)
+	ld a,(ix + Tile.source.x)
 	or c
 	ld (iy + VDPCommand.sx),a
-	ld a,(ix + Tile.y)
+	ld a,(ix + Tile.source.y)
 	or b
 	ld (iy + VDPCommand.sy),a
 	call VDPCommand_ExecuteS2IY
@@ -344,8 +342,8 @@ DrawTile:
 ; ix = tile
 ; iy = this
 MapView_DrawTileIY: PROC
-	ld l,(iy + MapView.x)
-	ld h,(iy + MapView.x + 1)
+	ld l,(iy + MapView.position.x)
+	ld h,(iy + MapView.position.x + 1)
 	and a
 	sbc hl,bc
 	jp m,ClampMaxX
@@ -370,15 +368,15 @@ ClampMaxX:
 	jr c,SetX
 	ld l,16
 SetX:
-	ld a,(ix + Tile.x)
+	ld a,(ix + Tile.source.x)
 	add a,h
 	ld (iy + MapView.tileCopyCommand.sx),a
 	ld a,c
 	add a,h
 	ld (iy + MapView.tileCopyCommand.dx),a
 	ld (iy + MapView.tileCopyCommand.nx),l
-	ld l,(iy + MapView.y)
-	ld h,(iy + MapView.y + 1)
+	ld l,(iy + MapView.position.y)
+	ld h,(iy + MapView.position.y + 1)
 	and a
 	sbc hl,de
 	jp m,ClampMaxY
@@ -403,7 +401,7 @@ ClampMaxY:
 	jr c,SetY
 	ld l,16
 SetY:
-	ld a,(ix + Tile.y)
+	ld a,(ix + Tile.source.y)
 	add a,h
 	ld (iy + MapView.tileCopyCommand.sy),a
 	ld a,e

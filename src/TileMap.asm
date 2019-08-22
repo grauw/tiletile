@@ -2,10 +2,8 @@
 ; A tile map
 ;
 TileMap: MACRO ?width, ?height, ?data
-	width:
-		dw ?width
-	height:
-		dw ?height
+	size:
+		Vector2W ?width, ?height
 	widthStride:
 		dw ?width * 2
 	data:
@@ -57,14 +55,14 @@ TileMap_GetTile:
 TileMap_GetTileDataPointer: PROC
 	bit 7,d
 	jr nz,Negative
-	ld h,(ix + TileMap.width)
+	ld h,(ix + TileMap.size.x)
 	call Math_Multiply8x8
 	jr Continue
 Negative:
 	ld a,e
 	neg
 	ld e,a
-	ld h,(ix + TileMap.width)
+	ld h,(ix + TileMap.size.x)
 	call Math_Multiply8x8
 	ex de,hl
 	ld hl,0

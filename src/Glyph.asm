@@ -10,10 +10,8 @@ Glyph_ASCENDER_HEIGHT: equ 2
 Glyph_DESCENDER_HEIGHT: equ 2
 
 Glyph: MACRO ?x, ?y, ?nx, ?metrics = 0
-	x:
-		db ?x
-	y:
-		db ?y
+	source:
+		Vector2 ?x, ?y
 	nx:
 		db ?nx
 	metrics:

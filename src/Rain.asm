@@ -4,10 +4,8 @@
 Rain_SPRITES: equ 8
 
 Rain: MACRO
-	x:
-		db 0
-	y:
-		db 0
+	position:
+		Vector2 0, 0
 	dropOffset:
 		dw 2B20H
 	patternBase:
@@ -36,12 +34,12 @@ NoOne:
 ; ix = this
 ; iy = engine
 Rain_Tick:
-	ld a,(ix + Rain.x)
+	ld a,(ix + Rain.position.x)
 	add a,128 - 2
-	ld (ix + Rain.x),a
-	ld a,(ix + Rain.y)
+	ld (ix + Rain.position.x),a
+	ld a,(ix + Rain.position.y)
 	add a,8
-	ld (ix + Rain.y),a
+	ld (ix + Rain.position.y),a
 	ret
 
 ; b = sprites remaining
@@ -51,11 +49,11 @@ Rain_Tick:
 ; b <- sprites remaining
 ; c <- write port
 Rain_DrawSpriteAttributes:
-	ld a,(ix + Rain.x)
-	add a,(iy + SpriteAttributeTable.cameraOffsetX)
+	ld a,(ix + Rain.position.x)
+	add a,(iy + SpriteAttributeTable.cameraOffset.x)
 	ld h,a
-	ld a,(ix + Rain.y)
-	add a,(iy + SpriteAttributeTable.cameraOffsetY)
+	ld a,(ix + Rain.position.y)
+	add a,(iy + SpriteAttributeTable.cameraOffset.y)
 	ld l,a
 	ld a,(ix + Rain.patternBase)
 	ld e,(ix + Rain.dropOffset)

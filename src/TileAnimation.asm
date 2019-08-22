@@ -2,10 +2,8 @@
 ;
 ;
 TileAnimation: MACRO
-	x:
-		dw 256
-	y:
-		dw 80
+	position:
+		Vector2W 256, 80
 	index:
 		db 0
 	ENDM
@@ -17,10 +15,10 @@ TileAnimation_Tick:
 ; ix = this
 ; iy = map view
 TileAnimation_DrawBitmap:
-	ld c,(ix + TileAnimation.x)
-	ld b,(ix + TileAnimation.x + 1)
-	ld e,(ix + TileAnimation.y)
-	ld d,(ix + TileAnimation.y + 1)
+	ld c,(ix + TileAnimation.position.x)
+	ld b,(ix + TileAnimation.position.x + 1)
+	ld e,(ix + TileAnimation.position.y)
+	ld d,(ix + TileAnimation.position.y + 1)
 	ld a,(ix + TileAnimation.index)
 	rrca
 	rrca

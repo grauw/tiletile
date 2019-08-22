@@ -6,10 +6,8 @@ PlayerView_PATTERNS: equ 8
 PlayerView: MACRO
 	player:
 		dw 0
-	x:
-		db 0
-	y:
-		db 0
+	position:
+		Vector2
 	frame:
 		db 0
 	direction:
@@ -33,10 +31,10 @@ PlayerView_Construct:
 	ld (ix + PlayerView.player + 1),d
 	push iy
 	call PlayerView_GetPlayer_IY
-	ld a,(iy + Player.x)
-	ld (ix + PlayerView.x),a
-	ld a,(iy + Player.y)
-	ld (ix + PlayerView.y),a
+	ld a,(iy + Player.position.x)
+	ld (ix + PlayerView.position.x),a
+	ld a,(iy + Player.position.y)
+	ld (ix + PlayerView.position.y),a
 	pop iy
 	call PlayerView_LoadSourceSpritePatterns
 	ret
@@ -64,25 +62,25 @@ PlayerView_TickPrimary:
 ; ix = this
 ; iy = player
 PlayerView_TickInterpolatePosition:
-	ld b,(ix + PlayerView.x)
-	ld a,(iy + Player.x)
+	ld b,(ix + PlayerView.position.x)
+	ld a,(iy + Player.position.x)
 	sub b
 	sra a
 	add a,b
-	ld (ix + PlayerView.x),a
-	ld b,(ix + PlayerView.y)
-	ld a,(iy + Player.y)
+	ld (ix + PlayerView.position.x),a
+	ld b,(ix + PlayerView.position.y)
+	ld a,(iy + Player.position.y)
 	sub b
 	sra a
 	add a,b
-	ld (ix + PlayerView.y),a
+	ld (ix + PlayerView.position.y),a
 	ret
 
 ; ix = this
 ; iy = player
 PlayerView_TickMovingDirection:
-	ld a,(iy + Player.velocityX)
-	or (iy + Player.velocityY)
+	ld a,(iy + Player.velocity.x)
+	or (iy + Player.velocity.y)
 	add a,-1
 	sbc a,a
 	ld (ix + PlayerView.moving),a
@@ -101,10 +99,10 @@ PlayerView_TickMovingDirection:
 PlayerView_TickSecondary:
 	push iy
 	call PlayerView_GetPlayer_IY
-	ld a,(iy + Player.x)
-	ld (ix + PlayerView.x),a
-	ld a,(iy + Player.y)
-	ld (ix + PlayerView.y),a
+	ld a,(iy + Player.position.x)
+	ld (ix + PlayerView.position.x),a
+	ld a,(iy + Player.position.y)
+	ld (ix + PlayerView.position.y),a
 	pop iy
 	inc (ix + PlayerView.frame)
 	ret
@@ -119,12 +117,12 @@ PlayerView_DrawSpriteAttributes: PROC
 	ld a,b
 	cp PlayerView_PATTERNS + 1
 	ret c
-	ld a,(ix + PlayerView.x)
-	add a,(iy + SpriteAttributeTable.worldOffsetX)
+	ld a,(ix + PlayerView.position.x)
+	add a,(iy + SpriteAttributeTable.worldOffset.x)
 	add a,-8
 	ld h,a
-	ld a,(ix + PlayerView.y)
-	add a,(iy + SpriteAttributeTable.worldOffsetY)
+	ld a,(ix + PlayerView.position.y)
+	add a,(iy + SpriteAttributeTable.worldOffset.y)
 	add a,-30
 	ld l,a
 	add a,16

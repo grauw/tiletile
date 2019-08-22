@@ -8,10 +8,8 @@ Tile: MACRO ?imageindex, ?tilesbank, ?collision
 		db ?tilesbank + (?imageindex >> 6)
 	image:
 		dw 0A000H + (?imageindex << 7 & 1FFFH)
-	x:
-		db (?imageindex & 0FH) << 4
-	y:
-		db ?imageindex & 0F0H
+	source:
+		Vector2 (?imageindex & 0FH) << 4, ?imageindex & 0F0H
 	collision:
 		db ?collision
 	_size:
@@ -39,10 +37,10 @@ Tile_Load:
 	ld de,16
 	ld a,4
 	call VDPCommand_PrepareCommandS2
-	ld a,(ix + Tile.x)
+	ld a,(ix + Tile.source.x)
 	out (c),a
 	out (c),d
-	ld a,(ix + Tile.y)
+	ld a,(ix + Tile.source.y)
 	out (c),a
 	ld a,Tile_PAGE
 	out (c),a

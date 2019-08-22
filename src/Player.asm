@@ -6,16 +6,12 @@ Player_COLLIDER_WIDTH: equ 16
 Player_COLLIDER_HEIGHT: equ 8
 
 Player: MACRO
-	x:
-		dw 124
-	y:
-		dw 120
+	position:
+		Vector2W 124, 120
 	control:
 		dw Player_controlLUT + 15 * PlayerControl._size
-	velocityX:
-		db 0
-	velocityY:
-		db 0
+	velocity:
+		Vector2
 	tileMap:
 		dw 0
 	tileMapWidthStride:
@@ -27,10 +23,8 @@ Player: MACRO
 PlayerControl: MACRO ?rldu
 	x: equ (?rldu >> 3 & 1) - (?rldu >> 2 & 1)
 	y: equ (?rldu >> 1 & 1) - (?rldu >> 0 & 1)
-	velocityX:
-		db x * Player_SPEED
-	velocityY:
-		db y * Player_SPEED
+	velocity:
+		Vector2 x * Player_SPEED, y * Player_SPEED
 	direction:
 		db x < 0 ? 15 : x > 0 ? 5 : y < 0 ? 10 : y > 0 ? 0 : -1
 	_size:
@@ -66,20 +60,20 @@ Player_GetTileMap:
 ; bc <- x
 ; de <- y
 Player_GetPosition:
-	ld c,(ix + Player.x)
-	ld b,(ix + Player.x + 1)
-	ld e,(ix + Player.y)
-	ld d,(ix + Player.y + 1)
+	ld c,(ix + Player.position.x)
+	ld b,(ix + Player.position.x + 1)
+	ld e,(ix + Player.position.y)
+	ld d,(ix + Player.position.y + 1)
 	ret
 
 ; bc <- x
 ; de <- y
 ; ix = this
 Player_SetPosition:
-	ld (ix + Player.x),c
-	ld (ix + Player.x + 1),b
-	ld (ix + Player.y),e
-	ld (ix + Player.y + 1),d
+	ld (ix + Player.position.x),c
+	ld (ix + Player.position.x + 1),b
+	ld (ix + Player.position.y),e
+	ld (ix + Player.position.y + 1),d
 	push ix
 	ex de,hl
 	call Player_GetTileMap
@@ -123,7 +117,7 @@ Player_GetTileWithOffset:
 Player_GetTileDataPointerWithOffset: PROC
 	ld l,(ix + Player.currentTile)
 	ld h,(ix + Player.currentTile + 1)
-	ld a,(ix + Player.x)
+	ld a,(ix + Player.position.x)
 	and 0FH
 	add a,c
 	and 0F0H
@@ -137,7 +131,7 @@ IncreaseX:
 	inc hl
 	inc hl
 ContinueX:
-	ld a,(ix + Player.y)
+	ld a,(ix + Player.position.y)
 	and 0FH
 	add a,e
 	and 0F0H
@@ -177,31 +171,31 @@ Player_TickPrimary:
 
 ; ix = this
 Player_TickPosition:
-	ld c,(ix + Player.velocityX)
-	ld e,(ix + Player.velocityY)
+	ld c,(ix + Player.velocity.x)
+	ld e,(ix + Player.velocity.y)
 	call Player_GetTileDataPointerWithOffset
 	ld (ix + Player.currentTile),l
 	ld (ix + Player.currentTile + 1),h
-	ld l,(ix + Player.x)
-	ld h,(ix + Player.x + 1)
-	ld c,(ix + Player.velocityX)
+	ld l,(ix + Player.position.x)
+	ld h,(ix + Player.position.x + 1)
+	ld c,(ix + Player.velocity.x)
 	ld a,c
 	add a,a
 	sbc a,a  ; sign extend
 	ld b,a
 	add hl,bc
-	ld (ix + Player.x),l
-	ld (ix + Player.x + 1),h
-	ld l,(ix + Player.y)
-	ld h,(ix + Player.y + 1)
-	ld c,(ix + Player.velocityY)
+	ld (ix + Player.position.x),l
+	ld (ix + Player.position.x + 1),h
+	ld l,(ix + Player.position.y)
+	ld h,(ix + Player.position.y + 1)
+	ld c,(ix + Player.velocity.y)
 	ld a,c
 	add a,a
 	sbc a,a  ; sign extend
 	ld b,a
 	add hl,bc
-	ld (ix + Player.y),l
-	ld (ix + Player.y + 1),h
+	ld (ix + Player.position.y),l
+	ld (ix + Player.position.y + 1),h
 	ret
 
 ; ix = this
@@ -212,15 +206,15 @@ Player_TickVelocity:
 	ld d,(ix + Player.control + 1)
 	ld iyl,e
 	ld iyh,d
-	ld c,(iy + PlayerControl.velocityX)
-	ld e,(iy + PlayerControl.velocityY)
+	ld c,(iy + PlayerControl.velocity.x)
+	ld e,(iy + PlayerControl.velocity.y)
 	pop iy
-	ld (ix + Player.velocityX),c
-	ld (ix + Player.velocityY),e
+	ld (ix + Player.velocity.x),c
+	ld (ix + Player.velocity.y),e
 	call Player_CanMove16x16
 	ret c
-	ld (ix + Player.velocityX),0
-	ld (ix + Player.velocityY),0
+	ld (ix + Player.velocity.x),0
+	ld (ix + Player.velocity.y),0
 	ret
 
 ; c = x

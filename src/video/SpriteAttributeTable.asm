@@ -11,14 +11,10 @@ SpriteAttributeTable: MACRO ?address
 		db 0
 	baseRegister11:
 		db 0
-	worldOffsetX:
-		db 8
-	worldOffsetY:
-		db -1
-	cameraOffsetX:
-		db 8
-	cameraOffsetY:
-		db -1
+	worldOffset:
+		Vector2 8, -1
+	cameraOffset:
+		Vector2 8, -1
 	ENDM
 
 ; ix = this
@@ -50,10 +46,10 @@ SpriteAttributeTable_Construct:
 SpriteAttributeTable_SetDisplayPositionIY:
 	ld a,8
 	sub h
-	ld (iy + SpriteAttributeTable.worldOffsetX),a
+	ld (iy + SpriteAttributeTable.worldOffset.x),a
 	ld a,-1
 	add a,l
-	ld (iy + SpriteAttributeTable.cameraOffsetY),a
+	ld (iy + SpriteAttributeTable.cameraOffset.y),a
 	ret
 
 ; a = sprite number
