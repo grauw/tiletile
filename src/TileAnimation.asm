@@ -3,7 +3,7 @@
 ;
 TileAnimation: MACRO
 	position:
-		Vector2W 256, 80
+		Vector2W 144, 160
 	index:
 		db 0
 	ENDM

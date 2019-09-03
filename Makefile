@@ -4,7 +4,7 @@ all:
 	mkdir -p gen bin
 	[ -d node_modules ] || npm install
 	node tools/buildres.js res/manifest.json > gen/Resources.asm
-	java -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/tiletile.rom bin/tiletile.sym
+	java -Xss160K -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/tiletile.rom bin/tiletile.sym
 
 copy: all
 	cp bin/tiletile.rom $(COPY_TARGET)/
