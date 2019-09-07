@@ -16,6 +16,13 @@ VDPCommand_ExecuteS2IY:
 	pop hl
 	jp VDPCommand_ExecuteS2HL
 
+; Modifies: af
+VDPCommand_WaitReadyS2:
+	in a,(VDP_PORT_1)
+	rra
+	jr c,VDPCommand_WaitReadyS2
+	ret
+
 ; hl = this
 ; Modifies: af, bc, hl
 VDPCommand_ExecuteS2HL: PROC
