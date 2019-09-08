@@ -1,7 +1,7 @@
 ;
 ; Mana shroud effect
 ;
-ManaShroud_DURATION: equ 64  ; max 128
+ManaShroud_DURATION: equ 64  ; power of two, max 128
 
 ManaShroud: MACRO
 	particle1:
@@ -45,15 +45,9 @@ ManaShroud_Tick:
 ; iy = engine
 ManaShroudParticle_Tick:
 	ld a,(ix + ManaShroudParticle.counter)
-	add a,2
+	add a,256 / ManaShroud_DURATION
 	ld (ix + ManaShroudParticle.counter),a
-	IF ManaShroud_DURATION < 128
-	cp ManaShroud_DURATION * 2
-	ret c
-	ld (ix + ManaShroudParticle.counter),0
-	ELSE
-	ret nc
-	ENDIF
+	ret nz
 	inc (ix + ManaShroudParticle.counter + 1)
 	ret
 
@@ -91,6 +85,7 @@ ManaShroudParticle_DrawSpriteAttributes: PROC
 	add a,(iy + SpriteAttributeTable.worldOffset.y)
 	ld d,a
 	ld a,(ix + ManaShroudParticle.counter)
+	rrca
 	add a,ManaShroud_steps
 	ld l,a
 	ld a,0
