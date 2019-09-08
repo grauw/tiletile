@@ -356,8 +356,6 @@ Scene_TickPrimary:
 	call Scene_GetTileAnimation
 	call TileAnimation_Tick
 	pop ix
-
-	call Scene_Tick
 	ret
 
 ; ix = this
@@ -371,17 +369,6 @@ Scene_TickSecondary:
 	push ix
 	call Scene_GetCamera
 	call Camera_TickSecondary
-	pop ix
-
-	call Scene_Tick
-	ret
-
-; ix = this
-; iy = engine
-Scene_Tick:
-	push ix
-	call Scene_GetDialog
-	call Dialog_Tick
 	pop ix
 	ret
 

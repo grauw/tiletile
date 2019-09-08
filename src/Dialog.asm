@@ -75,30 +75,28 @@ Dialog_Hide:
 	ret
 
 ; ix = this
-Dialog_Tick: PROC
+; iy = game frame
+Dialog_UpdateGameFrame: PROC
 	ld a,(ix + Dialog.active)
 	and a
 	ld a,(ix + Dialog.height)
 	jr nz,Show
 Hide:
 	sub Dialog_OPEN_SPEED
-	ret c
-	ld (ix + Dialog.height),a
-	ret
+	jr nc,Set
+	add a,Dialog_OPEN_SPEED
+	jr Set
 Show:
 	add a,Dialog_OPEN_SPEED
 	cp Dialog_MAX_HEIGHT + 1
-	ret nc
+	jr c,Set
+	sub Dialog_OPEN_SPEED
+Set:
 	ld (ix + Dialog.height),a
-	ret
-	ENDP
-
-; ix = this
-; iy = game frame
-Dialog_UpdateGameFrame:
-	ld b,(ix + Dialog.height)
+	ld b,a
 	GameFrame_SetDialogOffset_M iy, b
 	ret
+	ENDP
 
 ; ix = this
 ; iy = engine
