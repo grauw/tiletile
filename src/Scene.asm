@@ -373,11 +373,6 @@ Scene_TickSecondary:
 	call Camera_TickSecondary
 	pop ix
 
-	push ix
-	call Scene_GetWeather
-	call Weather_TickSecondary
-	pop ix
-
 	call Scene_Tick
 	ret
 

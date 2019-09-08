@@ -76,29 +76,12 @@ UpdateRain:
 Weather_TickPrimary: PROC
 	call Weather_TickFadePrimary
 	ld a,(ix + Weather.type)
-	cp Weather_RAIN
-	jr z,TickRain
 	cp Weather_LIGHTNING
 	jr z,TickLightning
 	ret
 TickLightning:
 	call Weather_GetLightning
 	jp Lightning_TickPrimary
-TickRain:
-	call Weather_GetRain
-	jp Rain_Tick
-	ENDP
-
-; ix = this
-; iy = engine
-Weather_TickSecondary: PROC
-	ld a,(ix + Weather.type)
-	cp Weather_RAIN
-	jr z,TickRain
-	ret
-TickRain:
-	call Weather_GetRain
-	jp Rain_Tick
 	ENDP
 
 ; a = collision ID

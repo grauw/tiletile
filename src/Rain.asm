@@ -31,17 +31,6 @@ NoOne:
 	ret
 	ENDP
 
-; ix = this
-; iy = engine
-Rain_Tick:
-	ld a,(ix + Rain.position.x)
-	add a,128 - 2
-	ld (ix + Rain.position.x),a
-	ld a,(ix + Rain.position.y)
-	add a,8
-	ld (ix + Rain.position.y),a
-	ret
-
 ; b = sprites remaining
 ; c = write port
 ; ix = this
@@ -50,9 +39,13 @@ Rain_Tick:
 ; c <- write port
 Rain_DrawSpriteAttributes:
 	ld a,(ix + Rain.position.x)
+	add a,128 - 2
+	ld (ix + Rain.position.x),a
 	add a,(iy + SpriteAttributeTable.cameraOffset.x)
 	ld h,a
 	ld a,(ix + Rain.position.y)
+	add a,8
+	ld (ix + Rain.position.y),a
 	add a,(iy + SpriteAttributeTable.cameraOffset.y)
 	ld l,a
 	ld a,(ix + Rain.patternBase)
