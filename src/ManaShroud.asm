@@ -4,18 +4,21 @@
 ManaShroud_DURATION: equ 64  ; max 128
 
 ManaShroud: MACRO
-	position1:
-		Vector2 1, 1
-	counter1:
-		db -2
-	position2:
-		Vector2 73, 224
-	counter2:
-		db ManaShroud_DURATION - 2
-	patternBase:
-		db 0
+	particle1:
+		ManaShroudParticle 1, 1, -2
+	particle2:
+		ManaShroudParticle 73, 224, ManaShroud_DURATION - 2
 	palette:
 		Palette
+	ENDM
+
+ManaShroudParticle: MACRO ?x, ?y, ?counter
+	position:
+		Vector2 ?x, ?y
+	counter:
+		db ?counter
+	patternBase:
+		db 0
 	ENDM
 
 ManaShroudStep: MACRO ?y, ?pattern
@@ -31,42 +34,35 @@ ManaShroud_Construct:
 
 ; ix = this
 ; iy = engine
-ManaShroud_Tick: PROC
-	ld a,(ix + ManaShroud.counter1)
+ManaShroud_Tick:
+	call ManaShroudParticle_Tick
+	ld de,ManaShroud.particle2
+	add ix,de
+	call ManaShroudParticle_Tick
+	ld de,-ManaShroud.particle2
+	add ix,de
+	ret
+
+; ix = this
+; iy = engine
+ManaShroudParticle_Tick:
+	ld a,(ix + ManaShroudParticle.counter)
 	add a,2
-	ld (ix + ManaShroud.counter1),a
-	IF ManaShroud_DURATION < 128
-	cp ManaShroud_DURATION * 2
-	jr c,Particle2
-	ld (ix + ManaShroud.counter1),0
-	ELSE
-	jr nc,Particle2
-	ENDIF
-	ld a,(ix + ManaShroud.position1.x)
-	Math_XorShift_M 3, 5, 7
-	ld (ix + ManaShroud.position1.x),a
-	ld a,(ix + ManaShroud.position1.y)
-	Math_XorShift_M 5, 3, 7
-	ld (ix + ManaShroud.position1.y),a
-Particle2:
-	ld a,(ix + ManaShroud.counter2)
-	add a,2
-	ld (ix + ManaShroud.counter2),a
+	ld (ix + ManaShroudParticle.counter),a
 	IF ManaShroud_DURATION < 128
 	cp ManaShroud_DURATION * 2
 	ret c
-	ld (ix + ManaShroud.counter2),0
+	ld (ix + ManaShroudParticle.counter),0
 	ELSE
 	ret nc
 	ENDIF
-	ld a,(ix + ManaShroud.position2.x)
-	Math_XorShift_M 7, 3, 5
-	ld (ix + ManaShroud.position2.x),a
-	ld a,(ix + ManaShroud.position2.y)
-	Math_XorShift_M 5, 1, 3
-	ld (ix + ManaShroud.position2.y),a
+	ld a,(ix + ManaShroudParticle.position.x)
+	Math_XorShift_M 3, 5, 7
+	ld (ix + ManaShroudParticle.position.x),a
+	ld a,(ix + ManaShroudParticle.position.y)
+	Math_XorShift_M 5, 3, 7
+	ld (ix + ManaShroudParticle.position.y),a
 	ret
-	ENDP
 
 ; b = sprites remaining
 ; c = write port
@@ -74,21 +70,28 @@ Particle2:
 ; iy = sprite attribute table
 ; b <- sprites remaining
 ; c <- write port
-ManaShroud_DrawSpriteAttributes: PROC
+ManaShroud_DrawSpriteAttributes:
+	call ManaShroudParticle_DrawSpriteAttributes
+	ld de,ManaShroud.particle2
+	add ix,de
+	call ManaShroudParticle_DrawSpriteAttributes
+	ld de,-ManaShroud.particle2
+	add ix,de
+	ret
+
+; b = sprites remaining
+; c = write port
+; ix = this
+; iy = sprite attribute table
+; b <- sprites remaining
+; c <- write port
+ManaShroudParticle_DrawSpriteAttributes: PROC
 	ld hl,ManaShroud_steps
-	ld e,(ix + ManaShroud.counter1)
+	ld e,(ix + ManaShroudParticle.counter)
 	ld d,0
 	add hl,de
-	ld e,(ix + ManaShroud.position1.x)
-	ld d,(ix + ManaShroud.position1.y)
-	call DrawSprite
-	ld hl,ManaShroud_steps
-	ld e,(ix + ManaShroud.counter2)
-	ld d,0
-	add hl,de
-	ld e,(ix + ManaShroud.position2.x)
-	ld d,(ix + ManaShroud.position2.y)
-DrawSprite:
+	ld e,(ix + ManaShroudParticle.position.x)
+	ld d,(ix + ManaShroudParticle.position.y)
 	ld a,e
 	add a,(iy + SpriteAttributeTable.worldOffset.x)
 	ld e,a
@@ -101,7 +104,7 @@ DrawSprite:
 Not216:
 	ld d,a
 	inc hl
-	ld a,(ix + ManaShroud.patternBase)
+	ld a,(ix + ManaShroudParticle.patternBase)
 	add a,(hl)
 	SpriteAttributeTable_WriteAttribute_M e, d, a
 	ret
@@ -129,7 +132,8 @@ ManaShroud_DrawSpriteColors:
 ManaShroud_InitializeSpritePatterns:
 	ld a,SpritePatternTable_COUNT
 	sub b
-	ld (ix + ManaShroud.patternBase),a
+	ld (ix + ManaShroud.particle1.patternBase),a
+	ld (ix + ManaShroud.particle2.patternBase),a
 	ld hl,SpritePattern_blank
 	call SpritePatternTable_WritePatternIY
 	ld hl,ManaShroud_pattern1
