@@ -5,19 +5,12 @@ ManaShroud_DURATION: equ 64  ; power of two, max 256
 ManaShroud_DURATION_LOG2: equ 6
 
 ManaShroud: MACRO
-	particle1:
-		ManaShroudParticle 0
-	particle2:
-		ManaShroudParticle 8080H
-	palette:
-		Palette
-	ENDM
-
-ManaShroudParticle: MACRO ?counter
 	counter:
-		dw ?counter
+		dw 0
 	patternBase:
 		db 0
+	palette:
+		Palette
 	ENDM
 
 ManaShroudStep: MACRO ?pattern
@@ -32,22 +25,11 @@ ManaShroud_Construct:
 ; ix = this
 ; iy = engine
 ManaShroud_Tick:
-	call ManaShroudParticle_Tick
-	ld de,ManaShroud.particle2
-	add ix,de
-	call ManaShroudParticle_Tick
-	ld de,-ManaShroud.particle2
-	add ix,de
-	ret
-
-; ix = this
-; iy = engine
-ManaShroudParticle_Tick:
-	ld a,(ix + ManaShroudParticle.counter)
+	ld a,(ix + ManaShroud.counter)
 	add a,256 / ManaShroud_DURATION
-	ld (ix + ManaShroudParticle.counter),a
+	ld (ix + ManaShroud.counter),a
 	ret nz
-	inc (ix + ManaShroudParticle.counter + 1)
+	inc (ix + ManaShroud.counter + 1)
 	ret
 
 ; b = sprites remaining
@@ -57,29 +39,30 @@ ManaShroudParticle_Tick:
 ; b <- sprites remaining
 ; c <- write port
 ManaShroud_DrawSpriteAttributes:
-	call ManaShroudParticle_DrawSpriteAttributes
-	ld de,ManaShroud.particle2
-	add ix,de
-	call ManaShroudParticle_DrawSpriteAttributes
-	ld de,-ManaShroud.particle2
-	add ix,de
-	ret
+	ld l,(ix + ManaShroud.counter)
+	ld h,(ix + ManaShroud.counter + 1)
+	call ManaShroud_DrawSpriteAttributesParticle
+	ld de,8080H
+	add hl,de
+	jp ManaShroud_DrawSpriteAttributesParticle
 
 ; b = sprites remaining
 ; c = write port
+; hl = counter
 ; ix = this
 ; iy = sprite attribute table
 ; b <- sprites remaining
 ; c <- write port
-ManaShroudParticle_DrawSpriteAttributes: PROC
+ManaShroud_DrawSpriteAttributesParticle: PROC
+	push hl
 	push bc
-	ld a,(ix + ManaShroudParticle.counter)
+	ld a,l
 	REPT 8 - ManaShroud_DURATION_LOG2
 	rrca
 	ENDM
 	ld c,a
+	ld l,h
 	ld h,Math_random8 >> 8
-	ld l,(ix + ManaShroudParticle.counter + 1)
 	ld a,(hl)
 	add a,(iy + SpriteAttributeTable.worldOffset.x)
 	ld e,a
@@ -100,10 +83,11 @@ Not216:
 	ld b,0
 	ld hl,ManaShroud_steps
 	add hl,bc
-	ld a,(ix + ManaShroudParticle.patternBase)
+	ld a,(ix + ManaShroud.patternBase)
 	add a,(hl)
 	pop bc
 	SpriteAttributeTable_WriteAttribute_M e, d, a
+	pop hl
 	ret
 	ENDP
 
@@ -129,8 +113,7 @@ ManaShroud_DrawSpriteColors:
 ManaShroud_InitializeSpritePatterns:
 	ld a,SpritePatternTable_COUNT
 	sub b
-	ld (ix + ManaShroud.particle1.patternBase),a
-	ld (ix + ManaShroud.particle2.patternBase),a
+	ld (ix + ManaShroud.patternBase),a
 	ld hl,SpritePattern_blank
 	call SpritePatternTable_WritePatternIY
 	ld hl,ManaShroud_pattern1
