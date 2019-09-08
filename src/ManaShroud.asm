@@ -1,7 +1,8 @@
 ;
 ; Mana shroud effect
 ;
-ManaShroud_DURATION: equ 64  ; power of two, max 128
+ManaShroud_DURATION: equ 64  ; power of two, max 256
+ManaShroud_DURATION_LOG2: equ 6
 
 ManaShroud: MACRO
 	particle1:
@@ -19,9 +20,7 @@ ManaShroudParticle: MACRO ?counter
 		db 0
 	ENDM
 
-ManaShroudStep: MACRO ?y, ?pattern
-	y:
-		db ?y
+ManaShroudStep: MACRO ?pattern
 	pattern:
 		db ?pattern
 	ENDM
@@ -73,6 +72,12 @@ ManaShroud_DrawSpriteAttributes:
 ; b <- sprites remaining
 ; c <- write port
 ManaShroudParticle_DrawSpriteAttributes: PROC
+	push bc
+	ld a,(ix + ManaShroudParticle.counter)
+	REPT 8 - ManaShroud_DURATION_LOG2
+	rrca
+	ENDM
+	ld c,a
 	ld h,Math_random8 >> 8
 	ld l,(ix + ManaShroudParticle.counter + 1)
 	ld a,(hl)
@@ -83,24 +88,21 @@ ManaShroudParticle_DrawSpriteAttributes: PROC
 	ld l,a
 	ld a,(hl)
 	add a,(iy + SpriteAttributeTable.worldOffset.y)
+	ld d,c
+	srl d
+	srl d  ; -1/4 velocity
+	sub d
 	ld d,a
-	ld a,(ix + ManaShroudParticle.counter)
-	rrca
-	add a,ManaShroud_steps
-	ld l,a
-	ld a,0
-	adc a,ManaShroud_steps >> 8
-	ld h,a
-	ld a,(hl)
-	add a,d
 	cp 216
 	jr nz,Not216
-	dec a
+	dec d
 Not216:
-	ld d,a
-	inc hl
+	ld b,0
+	ld hl,ManaShroud_steps
+	add hl,bc
 	ld a,(ix + ManaShroudParticle.patternBase)
 	add a,(hl)
+	pop bc
 	SpriteAttributeTable_WriteAttribute_M e, d, a
 	ret
 	ENDP
@@ -168,7 +170,7 @@ ManaShroud_color:
 	SpriteColor 7, 15, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ManaShroud_steps: REPT ManaShroud_DURATION, ?i
-	ManaShroudStep -(?i / 4), ((?i & 1) << 2) +
+	ManaShroudStep ((?i & 1) << 2) +
 		((?i >= 4 && ?i < 6) || (?i >= 8 && ?i < 40) || (?i >= 42 && ?i < 44) ||
 		(?i >= 64 && ?i < 76) || (?i >= 80 && ?i < 84) || (?i >= 88 && ?i < 92) ? 4 : 0)
 	ENDM
