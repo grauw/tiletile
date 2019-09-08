@@ -22,7 +22,6 @@ TileAnimation_DrawBitmap:
 	ld a,(ix + TileAnimation.index)
 	rrca
 	rrca
-	rrca
 	and 3
 	cp 0
 	ld ix,FieldSet_24

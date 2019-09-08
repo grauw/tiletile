@@ -352,6 +352,11 @@ Scene_TickPrimary:
 	call Weather_TickPrimary
 	pop ix
 
+	push ix
+	call Scene_GetTileAnimation
+	call TileAnimation_Tick
+	pop ix
+
 	call Scene_Tick
 	ret
 
@@ -379,11 +384,6 @@ Scene_TickSecondary:
 ; ix = this
 ; iy = engine
 Scene_Tick:
-	push ix
-	call Scene_GetTileAnimation
-	call TileAnimation_Tick
-	pop ix
-
 	push ix
 	call Scene_GetDialog
 	call Dialog_Tick
