@@ -22,16 +22,6 @@ ManaShroudStep: MACRO ?pattern
 ManaShroud_Construct:
 	ret
 
-; ix = this
-; iy = engine
-ManaShroud_Tick:
-	ld a,(ix + ManaShroud.counter)
-	add a,256 / ManaShroud_DURATION
-	ld (ix + ManaShroud.counter),a
-	ret nz
-	inc (ix + ManaShroud.counter + 1)
-	ret
-
 ; b = sprites remaining
 ; c = write port
 ; ix = this
@@ -44,7 +34,12 @@ ManaShroud_DrawSpriteAttributes:
 	call ManaShroud_DrawSpriteAttributesParticle
 	ld de,8080H
 	add hl,de
-	jp ManaShroud_DrawSpriteAttributesParticle
+	call ManaShroud_DrawSpriteAttributesParticle
+	ld de,-8080H + 256 / ManaShroud_DURATION
+	add hl,de
+	ld (ix + ManaShroud.counter),l
+	ld (ix + ManaShroud.counter + 1),h
+	ret
 
 ; b = sprites remaining
 ; c = write port

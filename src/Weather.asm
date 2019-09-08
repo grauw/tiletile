@@ -80,15 +80,10 @@ Weather_TickPrimary: PROC
 	jr z,TickRain
 	cp Weather_LIGHTNING
 	jr z,TickLightning
-	cp Weather_MANASHROUD
-	jr z,TickManaShroud
 	ret
 TickLightning:
 	call Weather_GetLightning
 	jp Lightning_TickPrimary
-TickManaShroud:
-	call Weather_GetManaShroud
-	jp ManaShroud_Tick
 TickRain:
 	call Weather_GetRain
 	jp Rain_Tick
@@ -100,12 +95,7 @@ Weather_TickSecondary: PROC
 	ld a,(ix + Weather.type)
 	cp Weather_RAIN
 	jr z,TickRain
-	cp Weather_MANASHROUD
-	jr z,TickManaShroud
 	ret
-TickManaShroud:
-	call Weather_GetManaShroud
-	jp ManaShroud_Tick
 TickRain:
 	call Weather_GetRain
 	jp Rain_Tick
