@@ -5,18 +5,16 @@ ManaShroud_DURATION: equ 64  ; max 128
 
 ManaShroud: MACRO
 	particle1:
-		ManaShroudParticle 1, 1, -2
+		ManaShroudParticle 0
 	particle2:
-		ManaShroudParticle 73, 224, ManaShroud_DURATION - 2
+		ManaShroudParticle 8080H
 	palette:
 		Palette
 	ENDM
 
-ManaShroudParticle: MACRO ?x, ?y, ?counter
-	position:
-		Vector2 ?x, ?y
+ManaShroudParticle: MACRO ?counter
 	counter:
-		db ?counter
+		dw ?counter
 	patternBase:
 		db 0
 	ENDM
@@ -56,12 +54,7 @@ ManaShroudParticle_Tick:
 	ELSE
 	ret nc
 	ENDIF
-	ld a,(ix + ManaShroudParticle.position.x)
-	Math_XorShift_M 3, 5, 7
-	ld (ix + ManaShroudParticle.position.x),a
-	ld a,(ix + ManaShroudParticle.position.y)
-	Math_XorShift_M 5, 3, 7
-	ld (ix + ManaShroudParticle.position.y),a
+	inc (ix + ManaShroudParticle.counter + 1)
 	ret
 
 ; b = sprites remaining
@@ -86,18 +79,25 @@ ManaShroud_DrawSpriteAttributes:
 ; b <- sprites remaining
 ; c <- write port
 ManaShroudParticle_DrawSpriteAttributes: PROC
-	ld hl,ManaShroud_steps
-	ld e,(ix + ManaShroudParticle.counter)
-	ld d,0
-	add hl,de
-	ld e,(ix + ManaShroudParticle.position.x)
-	ld d,(ix + ManaShroudParticle.position.y)
-	ld a,e
+	ld h,Math_random8 >> 8
+	ld l,(ix + ManaShroudParticle.counter + 1)
+	ld a,(hl)
 	add a,(iy + SpriteAttributeTable.worldOffset.x)
 	ld e,a
-	ld a,d
+	ld a,l
+	cpl
+	ld l,a
+	ld a,(hl)
 	add a,(iy + SpriteAttributeTable.worldOffset.y)
-	add a,(hl)
+	ld d,a
+	ld a,(ix + ManaShroudParticle.counter)
+	add a,ManaShroud_steps
+	ld l,a
+	ld a,0
+	adc a,ManaShroud_steps >> 8
+	ld h,a
+	ld a,(hl)
+	add a,d
 	cp 216
 	jr nz,Not216
 	dec a
