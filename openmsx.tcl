@@ -50,7 +50,7 @@ debug set_bp -once [symbol Scene_Run] {[my_slot_pc]} {
 	profile::section_irq_bp int
 	profile::section_vdp_bp vdp
 
-	profile::section_exclude int [profile::section_list {int frame}]
+	profile::section_exclude int [profile::section_list {int vdp frame}]
 	profile::section_exclude sync frame
 }
 
