@@ -3,6 +3,7 @@
 ;
 MapView_OFFSET_X: equ -4
 MapView_OFFSET_Y: equ -8
+MapView_PAGE: equ 0
 
 MapView: MACRO
 	tileMap:
@@ -12,7 +13,9 @@ MapView: MACRO
 	position:
 		Vector2W MapView_OFFSET_X, MapView_OFFSET_Y
 	tileCopyCommand:
-		VDPCommand 0, Tile_PAGE << 8, 0, 0, 4, 4, 0, 0, VDPCommand_HMMM
+		VDPCommand 0, Tile_PAGE << 8, 0, 0, 16, 16, 0, 0, VDPCommand_HMMM
+	verticalDrawCommand:
+		VDPCommand 0, 0, 0, MapView_PAGE << 8, 4, 100H, 0, 0, VDPCommand_HMMC
 	ENDM
 
 ; de = map
@@ -41,15 +44,6 @@ MapView_GetCamera:
 	ld d,(ix + MapView.camera + 1)
 	ld ixl,e
 	ld ixh,d
-	ret
-
-; ix = this
-; iy <- tile copy command
-MapView_GetTileCopyCommand_IY:
-	ld e,ixl
-	ld d,ixh
-	ld iy,MapView.tileCopyCommand
-	add iy,de
 	ret
 
 ; bc = x
@@ -208,134 +202,343 @@ Loop:
 ; de = y
 ; ix = this
 MapView_DrawTileColumn: PROC
-	ex de,hl
-	call MapView_GetTileCopyCommand_IY
-	ex de,hl
-	ld a,e
-	and 0FCH
-	ld e,a
-	ld (iy + VDPCommand.dy),e
-	and 0CH
-	ld h,a
-	ld a,c
-	and 0FCH
-	ld c,a
-	ld (iy + VDPCommand.dx),c
-	and 0CH
-	ld l,a
-	push hl
-	call MapView_GetTileDataPointer
-	pop bc
 	push ix
-	ld (iy + VDPCommand.nx),4
-	ld a,16
-	sub b
-	ld (iy + VDPCommand.ny),a
-	call DrawTile
-	ld a,b
-	push af
-	ld b,0
-	ld (iy + VDPCommand.ny),16
-	REPT 15
-	call DrawTile
-	ENDM
-	pop af
-	and a
-	ld (iy + VDPCommand.ny),a
-	call nz,DrawTile
-	pop ix
-	ret
-DrawTile:
+	ld hl,(ROM_bankA000)
+	push hl
 	push bc
 	push de
-	push hl
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	ld ixl,e
-	ld ixh,d
-	ld a,(ix + Tile.source.x)
-	or c
-	ld (iy + VDPCommand.sx),a
-	ld a,(ix + Tile.source.y)
-	or b
-	ld (iy + VDPCommand.sy),a
-	call VDPCommand_ExecuteS2IY
-	ld a,(iy + VDPCommand.dy)
-	add a,(iy + VDPCommand.ny)
-	ld (iy + VDPCommand.dy),a
-	pop hl
+	ld (ix + MapView.verticalDrawCommand.dx),c
+	ld e,ixl
+	ld d,ixh
+	ld hl,MapView.verticalDrawCommand
+	add hl,de
+	call VDPCommand_ExecuteS2HL
+	ld bc,VDP_PORT_1
+	ld de,(46 | VDP_REGISTER) << 8 | VDPCommand_HMMC
+	ld hl,(17 | VDP_REGISTER) << 8 | (44 | 128)
+	di
+	out (c),b  ; flush colour and restart
+	out (c),d
+	out (c),l
+	out (c),h
+	out (c),e
+	ei
+	out (c),d
 	pop de
 	pop bc
-	add hl,de
+	call Draw
+	pop hl
+	ld (hl),l
+	pop ix
+	ret
+Draw:
+	ld iyl,c
+	ld iyh,e
+	inc d
+	ld e,0
+	call MapView_GetTileDataPointer
+	push de
+	exx
+	pop de
+	ld hl,0
+	and a
+	sbc hl,de
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	ld c,l
+	ld b,h
+	exx
+	ex de,hl
+	ld ixl,e
+	ld ixh,d
+	ld a,iyl
+	and 0CH
+	rrca
+	ld iyl,a
+	ld bc,16 << 8 | VDP_PORT_3
+	ld de,8 - 2
+; c = VDP port 3
+; de = tile source stride
+; de' = tile pointer stride
+; bc' = tile pointer wrap stride
+; ix = tile pointer
+; iyl = x offset
+; iyh = y distance to split
+Loop:
+	ld a,iyh
+	sub 16
+	ld iyh,a
+	jp c,Split
+NoSplit:
+	MapView_GetTileSource_M iyl
+	MapView_DrawColumnTile_M 16
+Continue:
+	exx
+	add ix,de
+	exx
+	djnz Loop
+	ret
+Split:
+	add a,16
+	jr z,Split0
+	cp 8
+	jr c,Split4
+	jr z,Split8
+	jr Split12
+Split0:
+	exx
+	add ix,bc
+	exx
+	jp NoSplit
+Split4:
+	call GetTileSource
+	call DrawColumnTile4
+	exx
+	add ix,bc
+	exx
+	push iy
+	ld a,iyl
+	add a,4 * 8
+	ld iyl,a
+	call GetTileSource
+	call DrawColumnTile12
+	pop iy
+	jp Continue
+Split8:
+	call GetTileSource
+	call DrawColumnTile8
+	exx
+	add ix,bc
+	exx
+	push iy
+	ld a,iyl
+	add a,8 * 8
+	ld iyl,a
+	call GetTileSource
+	call DrawColumnTile8
+	pop iy
+	jp Continue
+Split12:
+	call GetTileSource
+	call DrawColumnTile12
+	exx
+	add ix,bc
+	exx
+	push iy
+	ld a,iyl
+	add a,12 * 8
+	ld iyl,a
+	call GetTileSource
+	call DrawColumnTile4
+	pop iy
+	jp Continue
+GetTileSource:
+	MapView_GetTileSource_M iyl
+	ret
+DrawColumnTile12:
+	MapView_DrawColumnTile_M 4
+DrawColumnTile8:
+	MapView_DrawColumnTile_M 4
+DrawColumnTile4:
+	MapView_DrawColumnTile_M 4
 	ret
 	ENDP
+
+; c = VDP port 3
+; de = tile source stride
+; hl = tile source
+MapView_DrawColumnTile_M: MACRO ?count
+	REPT ?count
+	outi
+	outi
+	add hl,de
+	ENDM
+	ENDM
 
 ; bc = x
 ; de = y
 ; ix = this
 MapView_DrawTileRow: PROC
-	ex de,hl
-	call MapView_GetTileCopyCommand_IY
-	ex de,hl
-	ld a,e
-	and 0FCH
-	ld e,a
-	ld (iy + VDPCommand.dy),e
-	and 0CH
-	ld h,a
-	ld a,c
-	and 0FCH
-	ld c,a
-	ld (iy + VDPCommand.dx),c
-	and 0CH
-	ld l,a
-	push hl
-	call MapView_GetTileDataPointer
-	pop bc
 	push ix
-	ld (iy + VDPCommand.ny),4
-	ld a,16
-	sub c
-	ld (iy + VDPCommand.nx),a
-	call DrawTile
-	ld a,c
-	push af
-	ld c,0
-	ld (iy + VDPCommand.nx),16
-	REPT 15
-	call DrawTile
-	ENDM
-	pop af
-	and a
-	ld (iy + VDPCommand.nx),a
-	call nz,DrawTile
+	ld hl,(ROM_bankA000)
+	push hl
+	ld a,e
+	and 80H
+	or MapView_PAGE
+	rlca
+	di
+	out (VDP_PORT_1),a
+	ld a,14 | VDP_REGISTER
+	ei
+	out (VDP_PORT_1),a
+	call Draw
+	pop hl
+	ld (hl),l
 	pop ix
 	ret
-DrawTile:
-	push bc
-	push hl
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
+Draw:
+	ld iyl,c
+	ld iyh,e
+	inc b
+	ld c,0
+	call MapView_GetTileDataPointer
+	exx
+	ld bc,-16 * 2
+	exx
+	ex de,hl
 	ld ixl,e
 	ld ixh,d
-	ld a,(ix + Tile.source.x)
-	or c
-	ld (iy + VDPCommand.sx),a
-	ld a,(ix + Tile.source.y)
-	or b
-	ld (iy + VDPCommand.sy),a
-	call VDPCommand_ExecuteS2IY
-	ld a,(iy + VDPCommand.dx)
-	add a,(iy + VDPCommand.nx)
-	ld (iy + VDPCommand.dx),a
-	pop hl
-	pop bc
-	inc hl
-	inc hl
+	ld d,iyh
+	ld a,d
+	and 0CH
+	add a,a
+	add a,a
+	add a,a
+	ld iyh,a
+	srl d
+	set 6,d
+	res 7,d
+	ld e,0
+	ld c,VDP_PORT_0
+; c = VDP port 0
+; de = VRAM address (14-bit | 4000H)
+; bc' = tile pointer wrap stride
+; ix = tile pointer
+; iyl = x distance to split
+; iyh = y offset
+Loop:
+	ld a,iyl
+	sub 16
+	ld iyl,a
+	jp c,Split
+NoSplit:
+	MapView_GetTileSource_M iyh
+	MapView_DrawRowTile_M 8
+Continue:
+	inc ix
+	inc ix
+	jp p,Loop
+	ret
+Split:
+	add a,16
+	jr z,Split0
+	cp 8
+	jr c,Split4
+	jr z,Split8
+	jr Split12
+Split0:
+	exx
+	add ix,bc
+	exx
+	jp NoSplit
+Split4:
+	call GetTileSource
+	call DrawRowTile4
+	exx
+	add ix,bc
+	exx
+	push iy
+	ld a,iyh
+	add a,2
+	ld iyh,a
+	call GetTileSource
+	call DrawRowTile12
+	pop iy
+	jr Continue
+Split8:
+	call GetTileSource
+	call DrawRowTile8
+	exx
+	add ix,bc
+	exx
+	push iy
+	ld a,iyh
+	add a,4
+	ld iyh,a
+	call GetTileSource
+	call DrawRowTile8
+	pop iy
+	jr Continue
+Split12:
+	call GetTileSource
+	call DrawRowTile12
+	exx
+	add ix,bc
+	exx
+	push iy
+	ld a,iyh
+	add a,6
+	ld iyh,a
+	call GetTileSource
+	call DrawRowTile4
+	pop iy
+	jr Continue
+GetTileSource:
+	MapView_GetTileSource_M iyh
+	ret
+DrawRowTile4:
+	MapView_DrawRowTile_M 2
+	ret
+DrawRowTile8:
+	MapView_DrawRowTile_M 4
+	ret
+DrawRowTile12:
+	MapView_DrawRowTile_M 6
 	ret
 	ENDP
+
+; ix = tile pointer
+; hl <- tile source
+MapView_GetTileSource_M: MACRO ?offset
+	ld l,(ix)
+	ld h,(ix + 1)
+	ld a,(hl)
+	ld (ROM_BANK_A000_CHANGE),a
+	inc hl
+	ld a,(hl)
+	inc hl
+	ld h,(hl)
+	add a,?offset
+	ld l,a
+	ENDM
+
+; c = VDP port 0
+; de = VRAM destination (14-bit | 4000H)
+; hl = tile source
+; f <- p: end of odd line reached
+MapView_DrawRowTile_M: MACRO ?count
+	ld a,e
+	MapView_DrawRowTileLine_M ?count, a, d
+	add a,80H
+	MapView_DrawRowTileLine_M ?count, a, d
+	add a,80H
+	inc d
+	MapView_DrawRowTileLine_M ?count, a, d
+	add a,80H
+	MapView_DrawRowTileLine_M ?count, a, d
+	dec d
+	add a,80H + ?count
+	ld e,a
+	ENDM
+
+; c = VDP port 0
+; hl = tile source
+MapView_DrawRowTileLine_M: MACRO ?count, ?vramLSB, ?vramMSB
+	inc c
+	di
+	out (c),?vramLSB
+	ei
+	out (c),?vramMSB
+	dec c
+	REPT ?count
+	outi
+	ENDM
+	REPT 8 - ?count
+	inc l
+	ENDM
+	ENDM
 
 ; bc = x
 ; de = y
