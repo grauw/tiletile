@@ -55,4 +55,5 @@ debug set_bp -once [symbol Scene_Run] {[my_slot_pc]} {
 }
 
 profile_osd
+set maxframeskip 100
 set throttle off
