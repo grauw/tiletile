@@ -43,10 +43,9 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 
 	SECTION ROM_BANK0
 
-	db "AB"
-	dw Application_Main
-	dw 0, 0, 0, 0, 0, 0
+	ROMRuntime Application_Main
 
+	INCLUDE "ROMRuntime.asm"
 	INCLUDE "Application.asm"
 	INCLUDE "BIOS.asm"
 	INCLUDE "System.asm"
