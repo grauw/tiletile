@@ -8,15 +8,17 @@ Project information
 
 Tile² game engine
 
-Author: Laurens Holst <laurens.nospam@grauw.nl>  
-Site: <https://bitbucket.org/grauw/tiletile>  
-License: Simplified BSD License (code), CC BY-NC-ND (art, music, story, etc.)
+  * Author: Laurens Holst <laurens@grauw.nl>
+  * Site: <http://www.grauw.nl/projects/tiletile/>
+  * Source: <https://hg.sr.ht/~grauw/tiletile>
+  * Support: <https://www.msx.org/forum/msx-talk/development/grauw%E2%80%99s-rpg-in-development>
+  * License: Simplified BSD License (code), CC BY-NC-ND (art, music, story, etc.)
 
 
-System Requirements
+System requirements
 -------------------
 
   * MSX2+, MSX turboR
-  * 128kB video RAM
-  * 64kB main RAM
-  * 128kB Konami 4/5 ROM
+  * 64K main RAM
+  * 128K video RAM
+  * 128K Konami 4/5 ROM

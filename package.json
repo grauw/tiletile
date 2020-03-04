@@ -6,7 +6,7 @@
   "license": "BSD-2-Clause",
   "repository": {
     "type": "hg",
-    "url": "https://bitbucket.org/grauw/tiletile"
+    "url": "https://hg.sr.ht/~grauw/tiletile"
   },
   "dependencies": {
     "png-js": "0.1.1",
