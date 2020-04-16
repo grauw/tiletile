@@ -26,8 +26,6 @@ Scene: MACRO ?tileset, ?tilemap, ?uiImage
 		Weather
 	paletteFader:
 		PaletteFader
-	tileAnimation:
-		TileAnimation
 	ENDM
 
 ; de = engine
@@ -182,13 +180,6 @@ Scene_GetWeather:
 ; ix <- palette fader
 Scene_GetPaletteFader:
 	ld de,Scene.paletteFader
-	add ix,de
-	ret
-
-; ix = this
-; ix <- tile animation
-Scene_GetTileAnimation:
-	ld de,Scene.tileAnimation
 	add ix,de
 	ret
 
@@ -351,11 +342,6 @@ Scene_TickPrimary:
 	call Scene_GetWeather
 	call Weather_TickPrimary
 	pop ix
-
-	push ix
-	call Scene_GetTileAnimation
-	call TileAnimation_Tick
-	pop ix
 	ret
 
 ; ix = this
@@ -506,14 +492,6 @@ Scene_DrawBitmapPrimary:
 ; ix = this
 ; iy = engine
 Scene_DrawBitmapSecondary:
-	push ix
-	push iy
-	call Scene_GetMapView_IY
-	call Scene_GetTileAnimation
-	call TileAnimation_DrawBitmap
-	pop iy
-	pop ix
-
 	push iy
 	push ix
 	call Scene_GetDialog
