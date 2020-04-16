@@ -120,8 +120,6 @@ class TileSet {
 
 	toAsm() {
 		var lines = [];
-		lines.push(`${this.name}_instance: TileSet ${this.name}_tiles, ${this.tiles.length}, ROM_${this.name}_BANK`);
-		lines.push("");
 		lines.push(`${this.name}_tiles:`);
 		for (let tile of this.tiles) {
 			lines.push(`${this.name}_${tile.getName()}: Tile ${tile.index}, ROM_${this.name}_BANK, ${tile.collision}`);

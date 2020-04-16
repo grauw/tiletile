@@ -7,7 +7,7 @@ Application: MACRO
 	engine:
 		Engine
 	scene:
-		Scene FieldSet_instance, FieldMap_instance, UIImage_instance
+		Scene FieldMap_instance, UIImage_instance
 	ENDM
 
 Application_Main:

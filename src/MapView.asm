@@ -12,8 +12,6 @@ MapView: MACRO
 		dw 0
 	position:
 		Vector2W MapView_OFFSET_X, MapView_OFFSET_Y
-	tileCopyCommand:
-		VDPCommand 0, Tile_PAGE << 8, 0, 0, 16, 16, 0, 0, VDPCommand_HMMM
 	verticalDrawCommand:
 		VDPCommand 0, 0, 0, MapView_PAGE << 8, 4, 100H, 0, 0, VDPCommand_HMMC
 	ENDM
@@ -539,81 +537,3 @@ MapView_DrawRowTileLine_M: MACRO ?count, ?vramLSB, ?vramMSB
 	inc l
 	ENDM
 	ENDM
-
-; bc = x
-; de = y
-; ix = tile
-; iy = this
-MapView_DrawTileIY: PROC
-	ld l,(iy + MapView.position.x)
-	ld h,(iy + MapView.position.x + 1)
-	and a
-	sbc hl,bc
-	jp m,ClampMaxX
-ClampMinX:
-	ld a,h
-	and a
-	ret nz
-	ld h,l
-	ld a,16
-	sub l
-	ret c
-	ret z
-	ld l,a
-	jr SetX
-ClampMaxX:
-	inc h
-	ret nz
-	ld a,l
-	and a
-	ret z
-	cp 16
-	jr c,SetX
-	ld l,16
-SetX:
-	ld a,(ix + Tile.source.x)
-	add a,h
-	ld (iy + MapView.tileCopyCommand.sx),a
-	ld a,c
-	add a,h
-	ld (iy + MapView.tileCopyCommand.dx),a
-	ld (iy + MapView.tileCopyCommand.nx),l
-	ld l,(iy + MapView.position.y)
-	ld h,(iy + MapView.position.y + 1)
-	and a
-	sbc hl,de
-	jp m,ClampMaxY
-ClampMinY:
-	ld a,h
-	and a
-	ret nz
-	ld h,l
-	ld a,16
-	sub l
-	ret c
-	ret z
-	ld l,a
-	jr SetY
-ClampMaxY:
-	inc h
-	ret nz
-	ld a,l
-	and a
-	ret z
-	cp 16
-	jr c,SetY
-	ld l,16
-SetY:
-	ld a,(ix + Tile.source.y)
-	add a,h
-	ld (iy + MapView.tileCopyCommand.sy),a
-	ld a,e
-	add a,h
-	ld (iy + MapView.tileCopyCommand.dy),a
-	ld (iy + MapView.tileCopyCommand.ny),l
-	ld e,iyl
-	ld d,iyh
-	ld hl,MapView.tileCopyCommand
-	add hl,de
-	jp VDPCommand_ExecuteS2HL
-	ENDP

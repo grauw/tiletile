@@ -8,8 +8,6 @@ Tile: MACRO ?imageindex, ?tilesbank, ?collision
 		db ?tilesbank + (?imageindex >> 6)
 	image:
 		dw 0A000H + (?imageindex << 7 & 1FFFH)
-	source:
-		Vector2 (?imageindex & 0FH) << 4, ?imageindex & 0F0H
 	collision:
 		db ?collision
 	_size:
@@ -25,41 +23,6 @@ Tile_GetCollision_M: MACRO ?this, ?register
 Tile_IsSolid_M: MACRO ?this
 	bit 7,(?this + Tile.collision)
 	ENDM
-
-; ix = this
-Tile_Load:
-	ld a,(ix + Tile.imageBank)
-	ld hl,(ROM_bankA000)
-	push hl
-	ld (hl),a
-	ld l,(ix + Tile.image)
-	ld h,(ix + Tile.image + 1)
-	ld de,16
-	ld a,4
-	call VDPCommand_PrepareCommandS2
-	ld a,(ix + Tile.source.x)
-	out (c),a
-	out (c),d
-	ld a,(ix + Tile.source.y)
-	out (c),a
-	ld a,Tile_PAGE
-	out (c),a
-	out (c),e
-	out (c),d
-	out (c),e
-	out (c),d
-	ld a,(hl)
-	inc hl
-	out (c),a
-	out (c),d
-	ld a,VDPCommand_HMMC
-	out (c),a
-	call VDPCommand_PrepareTransfer
-	ld b,16 * 16 / 2 - 1
-	otir
-	pop hl
-	ld (hl),l
-	ret
 
 ; ix = this
 ; iy = 4 patterns

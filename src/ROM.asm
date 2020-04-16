@@ -68,7 +68,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	SECTION ROM_BANK1
 
 	INCLUDE "Tile.asm"
-	INCLUDE "TileSet.asm"
 	INCLUDE "TileMap.asm"
 	INCLUDE "Image.asm"
 	INCLUDE "Glyph.asm"

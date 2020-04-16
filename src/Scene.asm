@@ -1,11 +1,9 @@
 ;
 ; A scene.
 ;
-Scene: MACRO ?tileset, ?tilemap, ?uiImage
+Scene: MACRO ?tilemap, ?uiImage
 	engine:
 		dw 0
-	tileSet:
-		dw ?tileset
 	tileMap:
 		dw ?tilemap
 	exiting:
@@ -101,15 +99,6 @@ Scene_GetEngine_IY:
 	ret
 
 ; ix = this
-; ix <- tile set
-Scene_GetTileSet:
-	ld e,(ix + Scene.tileSet)
-	ld d,(ix + Scene.tileSet + 1)
-	ld ixl,e
-	ld ixh,d
-	ret
-
-; ix = this
 ; ix <- tile map
 Scene_GetTileMap:
 	ld e,(ix + Scene.tileMap)
@@ -185,11 +174,6 @@ Scene_GetPaletteFader:
 
 ; ix = this
 Scene_Start:
-	push ix
-	call Scene_GetTileSet
-	call TileSet_Load
-	pop ix
-
 	push ix
 	call Scene_GetDialog
 	call Dialog_Load
