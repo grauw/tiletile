@@ -1,29 +1,19 @@
 ;
 ; A tile set
 ;
-TileSet: MACRO ?tiles, ?count, ?bank, ?palette
+TileSet: MACRO ?tiles, ?count, ?bank
 	tiles:
 		dw ?tiles
 	count:
 		db ?count
 	tilesBank:
 		db ?bank
-	palette:
-		dw ?palette
 	ENDM
 
 ; ix = this
 TileSet_GetTiles:
 	ld e,(ix + TileSet.tiles)
 	ld d,(ix + TileSet.tiles + 1)
-	ld ixl,e
-	ld ixh,d
-	ret
-
-; ix = this
-TileSet_GetPalette:
-	ld e,(ix + TileSet.palette)
-	ld d,(ix + TileSet.palette + 1)
 	ld ixl,e
 	ld ixh,d
 	ret

@@ -65,7 +65,7 @@ class TileMap {
 	toAsm() {
 		var lines = [];
 		lines.push(`${this.name}_instance:`)
-		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.name}_data`);
+		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.tileSet.name}_palette, ${this.name}_data`);
 		lines.push("");
 		lines.push(`\tSECTION ROM_${this.name}`);
 		lines.push(`${this.name}_data:`);
@@ -120,7 +120,7 @@ class TileSet {
 
 	toAsm() {
 		var lines = [];
-		lines.push(`${this.name}_instance: TileSet ${this.name}_tiles, ${this.tiles.length}, ROM_${this.name}_BANK, ${this.name}_palette`);
+		lines.push(`${this.name}_instance: TileSet ${this.name}_tiles, ${this.tiles.length}, ROM_${this.name}_BANK`);
 		lines.push("");
 		lines.push(`${this.name}_tiles:`);
 		for (let tile of this.tiles) {

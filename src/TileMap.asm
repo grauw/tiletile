@@ -1,14 +1,24 @@
 ;
 ; A tile map
 ;
-TileMap: MACRO ?width, ?height, ?data
+TileMap: MACRO ?width, ?height, ?palette, ?data
 	size:
 		Vector2W ?width, ?height
 	widthStride:
 		dw ?width * 2
+	palette:
+		dw ?palette
 	data:
 		dw ?data
 	ENDM
+
+; ix = this
+TileMap_GetPalette:
+	ld e,(ix + TileMap.palette)
+	ld d,(ix + TileMap.palette + 1)
+	ld ixl,e
+	ld ixh,d
+	ret
 
 ; bc = x (pixels)
 ; de = y (pixels)

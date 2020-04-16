@@ -79,8 +79,8 @@ Scene_Construct:
 	pop ix
 
 	push ix
-	call Scene_GetTileSet
-	call TileSet_GetPalette
+	call Scene_GetTileMap
+	call TileMap_GetPalette
 	pop ix
 	push ix
 	push de
