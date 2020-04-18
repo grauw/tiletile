@@ -15,10 +15,12 @@ Application_Main:
 	cp 2
 	ret c
 
-	call ROM_Init
-	call RAM_Init
-
-	call System_SetDirectBIOSHandlers
+	ld a,ROM_CodeBank2
+	ld (ROM_bank6000),a
+	ld (ROM_BANK_6000_CHANGE),a
+	ld a,ROM_FieldMapBank
+	ld (ROM_bank8000),a
+	ld (ROM_BANK_8000_CHANGE),a
 
 	call VDP_InitMirrorsOnVDPUpgrades
 

@@ -86,55 +86,6 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 
 	ENDS
 
-	SECTION ROM_BANK3
-
-RAM_sourceAddress:
-	org 0C000H
-RAM_startAddress:
-RAM: ds 1800H
-RAM_endAddress:
-
-	ENDS
-
-	SECTION ROM_BANK0
-
-ROM_Init:
-	ld h,40H
-	call Memory_GetSlot
-	ld h,80H
-	call Memory_SetSlot
-	ld a,ROM_CodeBank1
-	ld (ROM_BANK_4000_CHANGE),a
-	ld a,ROM_CodeBank2
-	ld (ROM_BANK_6000_CHANGE),a
-	ld a,ROM_FieldMapBank
-	ld (ROM_BANK_8000_CHANGE),a
-	ld a,ROM_RAMInitBank
-	ld (ROM_BANK_A000_CHANGE),a
-	ret
-
-;
-; Copy RAM initialisation data from ROM to RAM.
-; These values are defined in the RAM section and copied on boot.
-;
-RAM_Init:
-	and a
-	ld hl,(HIMEM)
-	ld bc,RAM_endAddress
-	sbc hl,bc
-	ld hl,RAM_insufficientTPA
-	call c,System_ThrowExceptionWithMessage
-	ld hl,RAM_sourceAddress
-	ld de,RAM_startAddress
-	ld bc,RAM_endAddress - RAM_startAddress
-	ldir
-	ret
-
-RAM_insufficientTPA:
-	db "Insufficient TPA memory.",0
-
-	ENDS
-
 	SECTION RAM
 
 ; The initial ROM banks
