@@ -201,7 +201,7 @@ Loop:
 ; ix = this
 MapView_DrawTileColumn: PROC
 	push ix
-	ld hl,(ROM_bankA000)
+	ld hl,(ROMMapper_instance.pageA000)
 	push hl
 	push bc
 	push de
@@ -360,7 +360,7 @@ MapView_DrawColumnTile_M: MACRO ?count
 ; ix = this
 MapView_DrawTileRow: PROC
 	push ix
-	ld hl,(ROM_bankA000)
+	ld hl,(ROMMapper_instance.pageA000)
 	push hl
 	ld a,e
 	and 80H
@@ -493,7 +493,7 @@ MapView_GetTileSource_M: MACRO ?offset
 	ld l,(ix)
 	ld h,(ix + 1)
 	ld a,(hl)
-	ld (ROM_BANK_A000_CHANGE),a
+	ld (ROMMapper_instance.pageA000.BANK_SELECT),a
 	inc hl
 	ld a,(hl)
 	inc hl

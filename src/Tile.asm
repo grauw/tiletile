@@ -29,7 +29,7 @@ Tile_IsSolid_M: MACRO ?this
 ; iy <- next pattern
 Tile_LoadToSpritePatterns:
 	ld a,(ix + Tile.imageBank)
-	ld hl,(ROM_bankA000)
+	ld hl,(ROMMapper_instance.pageA000)
 	push hl
 	ld (hl),a
 	ld l,(ix + Tile.image)

@@ -51,7 +51,7 @@ NoOverflow:
 	ret
 Write:
 	push hl
-	ld hl,(ROM_bankA000)
+	ld hl,(ROMMapper_instance.pageA000)
 	ex af,af'
 	ld (hl),a
 	inc a

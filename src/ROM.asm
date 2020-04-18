@@ -15,18 +15,18 @@ ROM_RAMInitBank: equ 3
 
 	org 4000H
 
-ROM_BANK0: ds 2000H
-ROM_BANK1: ds 2000H
-ROM_BANK2: ds 2000H
-ROM_BANK3: ds 2000H
+ROM_BANK0: ds ROMMapper_BANK_SIZE
+ROM_BANK1: ds ROMMapper_BANK_SIZE
+ROM_BANK2: ds ROMMapper_BANK_SIZE
+ROM_BANK3: ds ROMMapper_BANK_SIZE
 
 	org 4000H
 
-ROM_BANK4567: ds 8000H
+ROM_BANK4567: ds ROMMapper_BANK_SIZE * 4
 
 	org 8000H
 
-ROM_BANK89: ds 4000H
+ROM_BANK89: ds ROMMapper_BANK_SIZE * 2
 
 TPA_PAGE1: equ ROM_BANK1
 RAM_RESIDENT: equ RAM
@@ -36,16 +36,12 @@ ROM_FieldSet_BANK: equ 4
 ROM_UIImage: equ ROM_BANK89
 ROM_UIImage_BANK: equ 8
 
-ROM_BANK_4000_CHANGE: equ 5000H
-ROM_BANK_6000_CHANGE: equ 7000H
-ROM_BANK_8000_CHANGE: equ 9000H
-ROM_BANK_A000_CHANGE: equ 0B000H
-
 	SECTION ROM_BANK0
 
 	ROMRuntime Application_Main
 
 	INCLUDE "ROMRuntime.asm"
+	INCLUDE "ROMMapper.asm"
 	INCLUDE "Application.asm"
 	INCLUDE "BIOS.asm"
 	INCLUDE "System.asm"
@@ -83,21 +79,5 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "ManaShroud.asm"
 	INCLUDE "Lightning.asm"
 	INCLUDE "Resources.asm"
-
-	ENDS
-
-	SECTION RAM
-
-; The initial ROM banks
-; Stored as words that include the bank select register address
-; Example: ld hl,(ROM_bank6000) / ld (hl),l
-ROM_bank4000:
-	dw ROM_BANK_4000_CHANGE | ROM_CodeBank1
-ROM_bank6000:
-	dw ROM_BANK_6000_CHANGE | ROM_CodeBank2
-ROM_bank8000:
-	dw ROM_BANK_8000_CHANGE | ROM_FieldMapBank
-ROM_bankA000:
-	dw ROM_BANK_A000_CHANGE | ROM_RAMInitBank
 
 	ENDS

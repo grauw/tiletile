@@ -17,7 +17,7 @@ ROMRuntime: MACRO ?main
 		ld h,80H
 		call Memory_SetSlot
 		ld a,ROM_RAMInitBank
-		ld (ROM_BANK_A000_CHANGE),a
+		ld (ROMMapper_instance.pageA000.BANK_SELECT),a
 		ld hl,RAM_sourceAddress
 		ld de,RAM_startAddress
 		ld bc,RAM_endAddress - RAM_startAddress

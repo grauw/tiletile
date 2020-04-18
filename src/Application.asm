@@ -16,11 +16,11 @@ Application_Main:
 	ret c
 
 	ld a,ROM_CodeBank2
-	ld (ROM_bank6000),a
-	ld (ROM_BANK_6000_CHANGE),a
+	ld h,60H
+	call ROMMapper_SetBank
 	ld a,ROM_FieldMapBank
-	ld (ROM_bank8000),a
-	ld (ROM_BANK_8000_CHANGE),a
+	ld h,80H
+	call ROMMapper_SetBank
 
 	call VDP_InitMirrorsOnVDPUpgrades
 
