@@ -38,6 +38,11 @@ Scene_Construct:
 	pop ix
 
 	push ix
+	call Scene_GetTileMap
+	call TileMap_Select
+	pop ix
+
+	push ix
 	call Scene_GetTileMap_DE
 	push de
 	call Scene_GetCamera

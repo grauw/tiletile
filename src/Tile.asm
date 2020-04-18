@@ -3,11 +3,9 @@
 ;
 Tile_PAGE: equ 2
 
-Tile: MACRO ?imageindex, ?tilesbank, ?collision
-	imageBank:
-		db ?tilesbank + (?imageindex >> 6)
+Tile: MACRO ?pixelData, ?collision
 	image:
-		dw 0A000H + (?imageindex << 7 & 1FFFH)
+		ROMAddress ?pixelData, 0A000H
 	collision:
 		db ?collision
 	_size:
@@ -28,12 +26,12 @@ Tile_IsSolid_M: MACRO ?this
 ; iy = 4 patterns
 ; iy <- next pattern
 Tile_LoadToSpritePatterns:
-	ld a,(ix + Tile.imageBank)
+	ld a,(ix + Tile.image.bank)
 	ld hl,(ROMMapper_instance.pageA000)
 	push hl
 	ld (hl),a
-	ld l,(ix + Tile.image)
-	ld h,(ix + Tile.image + 1)
+	ld l,(ix + Tile.image.address)
+	ld h,(ix + Tile.image.address + 1)
 	push hl
 	call SpritePattern_LoadFromTileBit0_IY
 	ld de,SpritePattern._size

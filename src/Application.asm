@@ -18,9 +18,6 @@ Application_Main:
 	ld a,ROM_CodeBank2
 	ld h,60H
 	call ROMMapper_SetBank
-	ld a,ROM_FieldMapBank
-	ld h,80H
-	call ROMMapper_SetBank
 
 	call VDP_InitMirrorsOnVDPUpgrades
 

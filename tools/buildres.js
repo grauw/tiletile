@@ -67,7 +67,8 @@ class TileMap {
 		lines.push(`${this.name}_instance:`)
 		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.tileSet.name}_palette, ${this.name}_data`);
 		lines.push("");
-		lines.push(`\tSECTION ROM_${this.name}`);
+		lines.push("\tSECTION ROM_DATA");
+		lines.push("\tALIGN ROMMapper_BANK_SIZE");
 		lines.push(`${this.name}_data:`);
 		for (let tile of this.tiles) {
 			lines.push(`\tdw ${this.tileSet.name}_${tile.getName()}`);
@@ -122,12 +123,13 @@ class TileSet {
 		var lines = [];
 		lines.push(`${this.name}_tiles:`);
 		for (let tile of this.tiles) {
-			lines.push(`${this.name}_${tile.getName()}: Tile ${tile.index}, ROM_${this.name}_BANK, ${tile.collision}`);
+			lines.push(`${this.name}_${tile.getName()}: Tile ${this.name}_pixelData_${tile.getName()}, ${tile.collision}`);
 		}
 		lines.push("");
-		lines.push(`\tSECTION ROM_${this.name}`);
-		lines.push(`${this.name}_pixelData:`);
+		lines.push("\tSECTION ROM_DATA");
+		lines.push("\tALIGN 100H");
 		for (let tile of this.tiles) {
+			lines.push(`${this.name}_pixelData_${tile.getName()}:`);
 			lines.push(tile.toAsm());
 		}
 		lines.push("\tENDS");
@@ -206,9 +208,9 @@ class Image {
 	toAsm() {
 		let lines = [];
 		if (this.name) {
-			lines.push(`${this.name}_instance: Image ${this.width}, ${this.height}, ${this.name}_palette, ${this.name}_pixelData, ROM_${this.name}_BANK`);
+			lines.push(`${this.name}_instance: Image ${this.width}, ${this.height}, ${this.name}_palette, ${this.name}_pixelData`);
 			lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
-			lines.push(`\tSECTION ROM_${this.name}`);
+			lines.push("\tSECTION ROM_DATA");
 			lines.push(`${this.name}_pixelData:`);
 			let pixelData = this.to4Bpp();
 			for (let i = 0; i < pixelData.length; i += 16)

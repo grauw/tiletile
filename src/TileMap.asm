@@ -9,7 +9,7 @@ TileMap: MACRO ?width, ?height, ?palette, ?data
 	palette:
 		dw ?palette
 	data:
-		dw ?data
+		ROMAddress ?data, 8000H
 	ENDM
 
 ; ix = this
@@ -19,6 +19,12 @@ TileMap_GetPalette:
 	ld ixl,e
 	ld ixh,d
 	ret
+
+; ix = this
+TileMap_Select:
+	ld a,(ix + TileMap.data.bank)
+	ld h,(ix + TileMap.data.address + 1)
+	jp ROMMapper_SetBank
 
 ; bc = x (pixels)
 ; de = y (pixels)
@@ -81,8 +87,8 @@ Negative:
 Continue:
 	add hl,bc
 	add hl,hl
-	ld e,(ix + TileMap.data)
-	ld d,(ix + TileMap.data + 1)
+	ld e,(ix + TileMap.data.address)
+	ld d,(ix + TileMap.data.address + 1)
 	add hl,de
 	ret
 	ENDP
