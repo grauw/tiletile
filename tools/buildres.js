@@ -1,8 +1,8 @@
 "use strict"
-let fs = require('fs');
-let path = require('path');
-let xml2js = require('xml2js');
-let PNG = require('png-js');
+const fs = require('fs');
+const path = require('path');
+const xml2js = require('xml2js');
+const PNG = require('png-js');
 
 function main() {
 	if (process.argv.length < 3) {
@@ -10,7 +10,7 @@ function main() {
 		process.exit(1);
 	}
 
-	let path = process.argv[2];
+	const path = process.argv[2];
 
 	new ManifestLoader(path).parse(manifest => {
 		manifest.optimize();
@@ -26,17 +26,17 @@ class Manifest {
 	}
 
 	optimize() {
-		for (let tileMap of this.tileMaps) {
+		for (const tileMap of this.tileMaps) {
 			tileMap.optimize();
 		}
 	}
 
 	toAsm() {
-		var lines = [];
-		for (let tileMap of this.tileMaps) {
+		const lines = [];
+		for (const tileMap of this.tileMaps) {
 			lines.push(tileMap.toAsm());
 		}
-		for (let image of this.images) {
+		for (const image of this.images) {
 			lines.push(image.toAsm());
 		}
 		return lines.join("\n\n");
@@ -63,14 +63,14 @@ class TileMap {
 	}
 
 	toAsm() {
-		var lines = [];
+		const lines = [];
 		lines.push(`${this.name}_instance:`)
 		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.tileSet.name}_palette, ${this.name}_data`);
 		lines.push("");
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN ROMMapper_BANK_SIZE");
 		lines.push(`${this.name}_data:`);
-		for (let tile of this.tiles) {
+		for (const tile of this.tiles) {
 			lines.push(`\tdw ${this.tileSet.name}_${tile.getName()}`);
 		}
 		lines.push("\tENDS");
@@ -104,12 +104,12 @@ class TileSet {
 
 	optimize(tiles) {
 		checkTypes(arguments, Array);
-		let counts = new Array(this.tiles.length).fill(0);
-		for (let tile of tiles) {
+		const counts = new Array(this.tiles.length).fill(0);
+		for (const tile of tiles) {
 			counts[tile.index]++;
 		}
-		let newIndex = 0;
-		let newTiles = [];
+		const newIndex = 0;
+		const newTiles = [];
 		for (let i = 0; i < counts.length; i++) {
 			if (counts[i] > 0 || this.tiles[i].name) {
 				this.tiles[i].index = newTiles.length;
@@ -120,15 +120,15 @@ class TileSet {
 	}
 
 	toAsm() {
-		var lines = [];
+		const lines = [];
 		lines.push(`${this.name}_tiles:`);
-		for (let tile of this.tiles) {
+		for (const tile of this.tiles) {
 			lines.push(`${this.name}_${tile.getName()}: Tile ${this.name}_pixelData_${tile.getName()}, ${tile.collision}`);
 		}
 		lines.push("");
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN 100H");
-		for (let tile of this.tiles) {
+		for (const tile of this.tiles) {
 			lines.push(`${this.name}_pixelData_${tile.getName()}:`);
 			lines.push(tile.toAsm());
 		}
@@ -179,7 +179,7 @@ class Image {
 		if (this.pixels.length != this.width * this.height)
 			throw new Error("Image incomplete.");
 
-		let image = new Image(width, height, this.palette);
+		const image = new Image(width, height, this.palette);
 		for (let cy = y; cy < y + height; cy++)
 			for (let cx = x; cx < x + width; cx++)
 				image.addPixel(this.pixels[cy * this.width + cx].index);
@@ -187,10 +187,10 @@ class Image {
 	}
 
 	to4Bpp() {
-		let pixels4bpp = new Array(this.pixels.length / 2);
+		const pixels4bpp = new Array(this.pixels.length / 2);
 		for (let i = 0; i < this.pixels.length; i += 2) {
-			let left = this.pixels[i].index & 15;
-			let right = this.pixels[i + 1].index & 15;
+			const left = this.pixels[i].index & 15;
+			const right = this.pixels[i + 1].index & 15;
 			pixels4bpp[i >> 1] = left << 4 | right;
 		}
 		return pixels4bpp;
@@ -198,7 +198,7 @@ class Image {
 
 	toTiles(width, height) {
 		checkTypes(arguments, "number", "number");
-		var tiles = [];
+		const tiles = [];
 		for (let y = 0; y < this.height; y += height)
 			for (let x = 0; x < this.width; x += width)
 				tiles.push(this.getSlice(x, y, width, height));
@@ -206,13 +206,13 @@ class Image {
 	}
 
 	toAsm() {
-		let lines = [];
+		const lines = [];
 		if (this.name) {
 			lines.push(`${this.name}_instance: Image ${this.width}, ${this.height}, ${this.name}_palette, ${this.name}_pixelData`);
 			lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
 			lines.push("\tSECTION ROM_DATA");
 			lines.push(`${this.name}_pixelData:`);
-			let pixelData = this.to4Bpp();
+			const pixelData = this.to4Bpp();
 			for (let i = 0; i < pixelData.length; i += 16)
 				lines.push("\tdb " + pixelData.slice(i, i + 16).join(", "));
 			lines.push("\tENDS");
@@ -268,7 +268,7 @@ class ManifestLoader {
 	parse(callback) {
 		checkTypes(arguments, Function);
 		fs.readFile(this.path, (err, data) => {
-			let json = JSON.parse(data.toString());
+			const json = JSON.parse(data.toString());
 			this.parseTileMaps(json.tilemaps, tileMaps => {
 				this.parseImages(json.images, images => {
 					callback(new Manifest(tileMaps, images));
@@ -279,11 +279,11 @@ class ManifestLoader {
 
 	parseTileMaps(jsonTileMaps, callback) {
 		checkTypes(arguments, Array, Function);
-		let tileMaps = [];
-		let parseMap = index => {
+		const tileMaps = [];
+		const parseMap = index => {
 			if (index < jsonTileMaps.length) {
-				let jsonTileMap = jsonTileMaps[index];
-				let tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
+				const jsonTileMap = jsonTileMaps[index];
+				const tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
 				new Tmx(jsonTileMap.name, tileMapPath).parse(tileMap => {
 					tileMaps.push(tileMap);
 					parseMap(index + 1);
@@ -297,11 +297,11 @@ class ManifestLoader {
 
 	parseImages(jsonImages, callback) {
 		checkTypes(arguments, Array, Function);
-		let images = [];
-		let parseImage = index => {
+		const images = [];
+		const parseImage = index => {
 			if (index < jsonImages.length) {
-				let jsonImage = jsonImages[index];
-				let imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
+				const jsonImage = jsonImages[index];
+				const imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
 				new PNGLoader(imagePath).loadImage(image => {
 					image.name = jsonImage.name;
 					images.push(image);
@@ -325,7 +325,7 @@ class Tmx {
 	parse(callback) {
 		checkTypes(arguments, Function);
 		fs.readFile(this.path, (err, data) => {
-			let xmlString = data.toString();
+			const xmlString = data.toString();
 			new xml2js.Parser().parseString(xmlString, (err, result) => {
 				this.parseMap(result.map, callback);
 			});
@@ -335,9 +335,9 @@ class Tmx {
 	parseMap(mapXml, callback) {
 		checkTypes(arguments, Object, Function);
 		this.parseSet(mapXml.tileset[0], tileSet => {
-			var tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height, tileSet);
-			let indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
-			for (let index of indices) {
+			const tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height, tileSet);
+			const indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
+			for (const index of indices) {
 				tileMap.addTileByIndex(index);
 			}
 			callback(tileMap);
@@ -346,12 +346,12 @@ class Tmx {
 
 	parseSet(setXml, callback) {
 		checkTypes(arguments, Object, Function);
-		let imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
+		const imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
 		new PNGLoader(imagepath).loadImage(image => {
-			let tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
-			let tileImages = image.toTiles(tileSet.width, tileSet.height);
+			const tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
+			const tileImages = image.toTiles(tileSet.width, tileSet.height);
 			for (let i = 0; i < tileImages.length; i++) {
-				let tileXml = (setXml.tile || []).find(t => t.$.id == i) || { $: { id: i } };
+				const tileXml = (setXml.tile || []).find(t => t.$.id == i) || { $: { id: i } };
 				tileSet.addTile(this.parseTile(tileXml, tileImages[i]));
 			}
 			callback(tileSet);
@@ -360,15 +360,15 @@ class Tmx {
 
 	parseTile(tileXml, image) {
 		checkTypes(arguments, Object, Image);
-		let name = this.parseProperty(tileXml, "name", null);
-		let collision = ~~this.parseProperty(tileXml, "collision", 0);
+		const name = this.parseProperty(tileXml, "name", null);
+		const collision = ~~this.parseProperty(tileXml, "collision", 0);
 		return new Tile(~~tileXml.$.id, name, image, collision);
 	}
 
 	parseProperty(xml, name, default_) {
 		checkTypes(arguments, Object, "string");
-		let properties = (xml.properties || [])[0] || {};
-		let property = (properties.property || []).find(p => p.$.name == name);
+		const properties = (xml.properties || [])[0] || {};
+		const property = (properties.property || []).find(p => p.$.name == name);
 		return property !== undefined ? property.$.value : default_;
 	}
 }
@@ -381,15 +381,15 @@ class PNGLoader {
 
 	loadImage(callback) {
 		checkTypes(arguments, Function);
-		let png = PNG.load(this.path);
+		const png = PNG.load(this.path);
 
 		if (png.colorType != 3)
 			throw new Error("Not indexed RGB.");
 
-		let image = new Image(png.width, png.height, this.toPalette(png.palette));
+		const image = new Image(png.width, png.height, this.toPalette(png.palette));
 
 		png.decodePixels(pixels => {
-			for (let index of pixels)
+			for (const index of pixels)
 				image.addPixel(index);
 
 			callback(image);
@@ -398,12 +398,12 @@ class PNGLoader {
 
 	toPalette(palette8bit) {
 		checkTypes(arguments, Array);
-		let palette = new Palette();
-		let palette3bit = palette8bit.map(c => Math.round(c / 255 * 7));
+		const palette = new Palette();
+		const palette3bit = palette8bit.map(c => Math.round(c / 255 * 7));
 		for (let i = 0; i < palette3bit.length / 3; i++) {
-			let r = palette3bit[i * 3] || 0;
-			let g = palette3bit[i * 3 + 1] || 0;
-			let b = palette3bit[i * 3 + 2] || 0;
+			const r = palette3bit[i * 3] || 0;
+			const g = palette3bit[i * 3 + 1] || 0;
+			const b = palette3bit[i * 3 + 2] || 0;
 			palette.addColor(new PaletteColor(i, r, g, b));
 		}
 		return palette;
@@ -423,8 +423,8 @@ class PNGLoader {
  * @param {string|Function|Array} types... The types to check against.
  */
 function checkTypes(args) {
-	for (var i = 1; i < arguments.length; i++) {
-		var type = arguments[i], arg = args[i - 1];
+	for (let i = 1; i < arguments.length; i++) {
+		let type = arguments[i], arg = args[i - 1];
 		if (!(type instanceof Array && (type = type[0]) && arg == null) &&
 				!(typeof type == "string" && typeof arg == type && arg == arg) &&
 				!(type instanceof Function && arg instanceof type)) {
