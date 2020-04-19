@@ -6,7 +6,7 @@ const PNG = require('png-js');
 
 function main() {
 	if (process.argv.length < 3) {
-		console.log("Usage: node " + process.argv[1] + " manifest.json");
+		console.log(`Usage: node ${process.argv[1]} manifest.json`);
 		process.exit(1);
 	}
 
@@ -153,7 +153,7 @@ class Tile {
 	}
 
 	toAsm() {
-		return "\tdb " + this.image.to4Bpp().join(", ");
+		return `\tdb ${this.image.to4Bpp().join(", ")}`;
 	}
 }
 
@@ -214,7 +214,7 @@ class Image {
 			lines.push(`${this.name}_pixelData:`);
 			const pixelData = this.to4Bpp();
 			for (let i = 0; i < pixelData.length; i += 16)
-				lines.push("\tdb " + pixelData.slice(i, i + 16).join(", "));
+				lines.push(`\tdb ${pixelData.slice(i, i + 16).join(", ")}`);
 			lines.push("\tENDS");
 		}
 		return lines.join("\n");
@@ -236,12 +236,8 @@ class Palette {
 		return this.colors[index];
 	}
 
-	getWords() {
-		return this.colors.map(color => color.getWord());
-	}
-
 	toAsm() {
-		return "Palette " + this.getWords().slice(0, 16).map(word => `00${word.toString(16)}H`.substr(-4)).join(", ");
+		return `Palette ${this.colors.slice(0, 16).map(color => color.toAsm()).join(", ")}`;
 	}
 }
 
@@ -256,6 +252,10 @@ class PaletteColor {
 
 	getWord() {
 		return this.r << 8 | this.g << 4 | this.b;
+	}
+
+	toAsm() {
+		return `00${this.getWord().toString(16)}H`.substr(-4);
 	}
 }
 
@@ -429,9 +429,9 @@ function checkTypes(args) {
 				!(typeof type == "string" && typeof arg == type && arg == arg) &&
 				!(type instanceof Function && arg instanceof type)) {
 			if (typeof type != "string" && !(type instanceof Function))
-				throw new Error("Unsupported type " + type + ".");
-			throw new Error("Argument of type " + (typeof type != "string" && type.constructor.name || type) + " expected at index " + (i - 1) + ". " +
-					"Was: " + (arg && typeof arg != "string" && arg.constructor && arg.constructor.name || arg) + ".");
+				throw new Error(`Unsupported type ${type}.`);
+			throw new Error(`Argument of type ${typeof type != "string" && type.constructor.name || type} expected at index ${i - 1}. ` +
+					`Was: ${arg && typeof arg != "string" && arg.constructor && arg.constructor.name || arg}.`);
 		}
 	}
 }
