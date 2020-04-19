@@ -7,7 +7,7 @@ Image: MACRO ?width, ?height, ?palette, ?pixelData
 	height:
 		dw ?height
 	size:
-		dw ?width * ?height / 2
+		dw ?width * ?height / Video_X_BYTE
 	palette:
 		dw ?palette
 	pixelData:

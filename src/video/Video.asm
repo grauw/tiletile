@@ -16,6 +16,10 @@
 	INCLUDE "PaletteFader.asm"
 	INCLUDE "VDPCommandEx.asm"
 
+Video_MODE: equ 5
+Video_X_BYTE: equ Video_MODE < 7 ? 2 : 1
+Video_X_SCALE: equ Video_MODE = 6 || Video_MODE = 7 ? 2 : 1
+
 Video_VERTICAL_ADJUST: equ -2
 
 Video: MACRO
@@ -80,11 +84,11 @@ Video_DisableLineInterrupt:
 ; iy = this
 Video_StartIY:
 	call Video_StartFadeOutIY
-	ld a,5
+	ld a,Video_MODE > 8 ? 8 : Video_MODE
 	call VDP_InitScreen
 	call VDP_Enable212Lines
 	call VDP_EnableSprites
-	ld a,0F1H
+	ld a,Video_MODE = 8 ? 0 : 0F1H
 	call VDP_SetColor
 	ld a,(VDP_MIRROR_0 + 1)
 	res 0,a  ; MAG
@@ -99,6 +103,12 @@ Video_StartIY:
 	call VDP_SetRegister
 	ld a,(VDP_MIRROR_25 + 25)
 	set 1,a  ; MSK
+	IF Video_MODE >= 10
+	set 3,a  ; YJK
+	IF Video_MODE < 12
+	set 4,a  ; YAE
+	ENDIF
+	ENDIF
 	ld (VDP_MIRROR_25 + 25),a
 	ld b,25
 	call VDP_SetRegister
@@ -134,7 +144,7 @@ Video_FuzzTheV9958:
 	ld b,9
 	call VDP_SetRegister
 	ld a,(VDP_MIRROR_25 + 25)
-	or 11010100B  ; undocumented + CMD + WTE
+	or 11000100B  ; undocumented + CMD + WTE
 	ld (VDP_MIRROR_25 + 25),a
 	ld b,25
 	call VDP_SetRegister

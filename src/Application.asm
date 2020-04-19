@@ -40,16 +40,6 @@ Application_Construct:
 	call Application_GetEngine
 	call Engine_Construct
 	pop ix
-
-	push ix
-	push ix
-	call Application_GetScene
-	ex (sp),ix
-	call Application_GetEngine
-	ex (sp),ix
-	pop de
-	call Scene_Construct
-	pop ix
 	ret
 
 ; ix = this
@@ -95,7 +85,13 @@ Application_EnterMainLoop:
 	pop ix
 
 	push ix
+	push ix
 	call Application_GetScene
+	ex (sp),ix
+	call Application_GetEngine
+	ex (sp),ix
+	pop de
+	call Scene_Construct
 	call Scene_Start
 	call Scene_Run
 	call Scene_Stop

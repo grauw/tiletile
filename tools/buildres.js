@@ -4,6 +4,8 @@ const path = require('path');
 const xml2js = require('xml2js');
 const PNG = require('png-js');
 
+const screenMode = 5;
+
 function main() {
 	if (process.argv.length < 3) {
 		console.log(`Usage: node ${process.argv[1]} manifest.json`);
@@ -157,7 +159,7 @@ class Tile {
 	}
 
 	toAsm() {
-		return `\tdb ${this.image.getPixelData().join(", ")}`;
+		return `\tdb ${this.image.getPixelData(screenMode).join(", ")}`;
 	}
 }
 
@@ -173,14 +175,37 @@ class Image {
 		throw new Error("Not implemented.");
 	}
 
-	getPixelData() {
+	getPixelData(screenMode) {
 		if (this.width & 1)
 			throw new Error("Image width is not even.");
 
 		const pixelData = [];
-		for (let y = 0; y < this.height; y++) {
-			for (let x = 0; x < this.width; x += 2) {
-				pixelData.push((this.getPixel(x, y).index & 15) << 4 | (this.getPixel(x + 1, y).index & 15));
+		if (screenMode >= 5 && screenMode <= 6) {
+			for (let y = 0; y < this.height; y++) {
+				for (let x = 0; x < this.width; x += 2) {
+					pixelData.push((this.getPixel(x, y).index & 15) << 4 | (this.getPixel(x + 1, y).index & 15));
+				}
+			}
+		} else if (screenMode == 7) {
+			for (let y = 0; y < this.height; y++) {
+				for (let x = 0; x < this.width; x++) {
+					const pixel = this.getPixel(x, y);
+					pixelData.push((pixel.index & 15) << 4 | (pixel.index & 15));
+				}
+			}
+		} else if (screenMode == 8) {
+			for (let y = 0; y < this.height; y++) {
+				for (let x = 0; x < this.width; x++) {
+					const pixel = this.getPixel(x, y);
+					pixelData.push(pixel.g << 5 | pixel.r << 2 | pixel.b >> 1);
+				}
+			}
+		} else if (screenMode >= 10 && screenMode <= 11) {
+			for (let y = 0; y < this.height; y++) {
+				for (let x = 0; x < this.width; x++) {
+					const pixel = this.getPixel(x, y);
+					pixelData.push((pixel.index & 15) << 4 | 8);
+				}
 			}
 		}
 		return pixelData;
@@ -202,7 +227,7 @@ class Image {
 			lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
 			lines.push("\tSECTION ROM_DATA");
 			lines.push(`${this.name}_pixelData:`);
-			const pixelData = this.getPixelData();
+			const pixelData = this.getPixelData(screenMode);
 			for (let i = 0; i < pixelData.length; i += 16)
 				lines.push(`\tdb ${pixelData.slice(i, i + 16).join(", ")}`);
 			lines.push("\tENDS");

@@ -25,9 +25,9 @@ Dialog: MACRO ?uiImage
 	uiImage:
 		dw ?uiImage
 	patternName:
-		PatternNameTable 18000H
+		PatternNameTable 10000H
 	drawCommand:
-		VDPCommand 0, 300H, Dialog_START_X, 300H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_LMMM | VDPCommand_TIMP
+		VDPCommand 0, Video_X_BYTE * 100H, Dialog_START_X, Video_X_BYTE * 100H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_LMMM | VDPCommand_TIMP
 	ENDM
 
 ; ix = this
@@ -118,12 +118,21 @@ Clear:
 	ld d,ixh
 	ld iy,Dialog.drawCommand
 	add iy,de
-	ld (iy + VDPCommand.dx),Dialog_START_X
+	ld (iy + VDPCommand.dx),Dialog_START_X * Video_X_SCALE
+	IF Video_X_SCALE > 1
+	ld (iy + VDPCommand.dx + 1),Dialog_START_X * Video_X_SCALE >> 8
+	ENDIF
 	ld (iy + VDPCommand.dy),Dialog_START_Y
-	ld (iy + VDPCommand.nx),Dialog_LINE_WIDTH
+	ld (iy + VDPCommand.nx),Dialog_LINE_WIDTH * Video_X_SCALE
+	IF Video_X_SCALE > 1
+	ld (iy + VDPCommand.nx + 1),Dialog_LINE_WIDTH * Video_X_SCALE >> 8
+	ENDIF
 	ld (iy + VDPCommand.ny),Dialog_LINE_HEIGHT * Dialog_LINE_COUNT
 	ld (iy + VDPCommand.command),VDPCommand_HMMV
 	call VDPCommand_ExecuteS2IY
+	IF Video_X_SCALE > 1
+	ld (iy + VDPCommand.nx + 1),0
+	ENDIF
 	ld (iy + VDPCommand.command),VDPCommand_LMMM | VDPCommand_TIMP
 	ret
 	ENDP
@@ -145,7 +154,10 @@ Loop:
 	ld (ix + Dialog.text + 1),d
 	cp 10
 	jr nz,NoNewline
-	ld (iy + VDPCommand.dx),Dialog_START_X
+	ld (iy + VDPCommand.dx),Dialog_START_X * Video_X_SCALE
+	IF Video_X_SCALE > 1
+	ld (iy + VDPCommand.dx + 1),Dialog_START_X * Video_X_SCALE >> 8
+	ENDIF
 	ld a,(iy + VDPCommand.dy)
 	add a,Dialog_LINE_HEIGHT
 	ld (iy + VDPCommand.dy),a
@@ -171,6 +183,11 @@ NoKerning:
 	ld a,(iy + VDPCommand.dx)
 	add a,(iy + VDPCommand.nx)
 	ld (iy + VDPCommand.dx),a
+	IF Video_X_SCALE > 1
+	ld a,(iy + VDPCommand.dx + 1)
+	adc a,0
+	ld (iy + VDPCommand.dx + 1),a
+	ENDIF
 	pop af
 	cp "f"
 	jr z,Kerning1

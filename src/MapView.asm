@@ -13,7 +13,7 @@ MapView: MACRO
 	position:
 		Vector2W MapView_OFFSET_X, MapView_OFFSET_Y
 	verticalDrawCommand:
-		VDPCommand 0, 0, 0, MapView_PAGE << 8, 4, 100H, 0, 0, VDPCommand_HMMC
+		VDPCommand 0, 0, 0, MapView_PAGE << 8, 4 * Video_X_SCALE, 100H, 0, 0, VDPCommand_HMMC
 	ENDM
 
 ; de = map
@@ -205,7 +205,17 @@ MapView_DrawTileColumn: PROC
 	push hl
 	push bc
 	push de
+	IF Video_X_SCALE = 2
+	xor a
+	sla c
+	rla
 	ld (ix + MapView.verticalDrawCommand.dx),c
+	ld (ix + MapView.verticalDrawCommand.dx + 1),a
+	rra
+	srl c
+	ELSE
+	ld (ix + MapView.verticalDrawCommand.dx),c
+	ENDIF
 	ld e,ixl
 	ld d,ixh
 	ld hl,MapView.verticalDrawCommand
@@ -253,10 +263,12 @@ Draw:
 	ld ixh,d
 	ld a,iyl
 	and 0CH
+	IF Video_X_BYTE = 2
 	rrca
+	ENDIF
 	ld iyl,a
 	ld bc,16 << 8 | VDP_PORT_3
-	ld de,8 - 2
+	ld de,(16 - 4) / Video_X_BYTE
 ; c = VDP port 3
 ; de = tile source stride
 ; de' = tile pointer stride
@@ -276,7 +288,12 @@ Continue:
 	exx
 	add ix,de
 	exx
+	IF Video_X_BYTE = 2
 	djnz Loop
+	ELSE
+	dec b
+	jp nz,Loop
+	ENDIF
 	ret
 Split:
 	add a,16
@@ -298,7 +315,7 @@ Split4:
 	exx
 	push iy
 	ld a,iyl
-	add a,4 * 8
+	add a,4 * 16 / Video_X_BYTE
 	ld iyl,a
 	call GetTileSource
 	call DrawColumnTile12
@@ -312,7 +329,7 @@ Split8:
 	exx
 	push iy
 	ld a,iyl
-	add a,8 * 8
+	add a,8 * 16 / Video_X_BYTE
 	ld iyl,a
 	call GetTileSource
 	call DrawColumnTile8
@@ -326,7 +343,7 @@ Split12:
 	exx
 	push iy
 	ld a,iyl
-	add a,12 * 8
+	add a,12 * 16 / Video_X_BYTE
 	ld iyl,a
 	call GetTileSource
 	call DrawColumnTile4
@@ -347,10 +364,11 @@ DrawColumnTile4:
 ; c = VDP port 3
 ; de = tile source stride
 ; hl = tile source
-MapView_DrawColumnTile_M: MACRO ?count
-	REPT ?count
+MapView_DrawColumnTile_M: MACRO ?lines
+	REPT ?lines
+	REPT 4 / Video_X_BYTE
 	outi
-	outi
+	ENDM
 	add hl,de
 	ENDM
 	ENDM
@@ -363,9 +381,12 @@ MapView_DrawTileRow: PROC
 	ld hl,(ROMMapper_instance.pageA000)
 	push hl
 	ld a,e
-	and 80H
+	and Video_X_BYTE = 2 ? 80H : 0C0H
 	or MapView_PAGE
 	rlca
+	IF Video_X_BYTE = 1
+	rlca
+	ENDIF
 	di
 	out (VDP_PORT_1),a
 	ld a,14 | VDP_REGISTER
@@ -394,8 +415,13 @@ Draw:
 	add a,a
 	add a,a
 	add a,a
+	IF Video_X_BYTE = 1
+	add a,a
+	ENDIF
 	ld iyh,a
+	IF Video_X_BYTE = 2
 	srl d
+	ENDIF
 	set 6,d
 	res 7,d
 	ld e,0
@@ -413,11 +439,11 @@ Loop:
 	jp c,Split
 NoSplit:
 	MapView_GetTileSource_M iyh
-	MapView_DrawRowTile_M 8
+	MapView_DrawRowTile_M 16
 Continue:
 	inc ix
 	inc ix
-	jp p,Loop
+	jp (Video_X_BYTE = 2 ? p : nc),Loop
 	ret
 Split:
 	add a,16
@@ -439,7 +465,7 @@ Split4:
 	exx
 	push iy
 	ld a,iyh
-	add a,2
+	add a,4 / Video_X_BYTE
 	ld iyh,a
 	call GetTileSource
 	call DrawRowTile12
@@ -453,7 +479,7 @@ Split8:
 	exx
 	push iy
 	ld a,iyh
-	add a,4
+	add a,8 / Video_X_BYTE
 	ld iyh,a
 	call GetTileSource
 	call DrawRowTile8
@@ -467,7 +493,7 @@ Split12:
 	exx
 	push iy
 	ld a,iyh
-	add a,6
+	add a,12 / Video_X_BYTE
 	ld iyh,a
 	call GetTileSource
 	call DrawRowTile4
@@ -477,13 +503,13 @@ GetTileSource:
 	MapView_GetTileSource_M iyh
 	ret
 DrawRowTile4:
-	MapView_DrawRowTile_M 2
-	ret
-DrawRowTile8:
 	MapView_DrawRowTile_M 4
 	ret
+DrawRowTile8:
+	MapView_DrawRowTile_M 8
+	ret
 DrawRowTile12:
-	MapView_DrawRowTile_M 6
+	MapView_DrawRowTile_M 12
 	ret
 	ENDP
 
@@ -495,10 +521,16 @@ MapView_GetTileSource_M: MACRO ?offset
 	ld a,(hl)
 	ld (ROMMapper_instance.pageA000.BANK_SELECT),a
 	inc hl
+	IF Video_X_BYTE = 2
 	ld a,(hl)
+	ENDIF
 	inc hl
 	ld h,(hl)
-	add a,?offset
+	IF Video_X_BYTE = 2
+	or ?offset
+	ELSE
+	ld a,?offset
+	ENDIF
 	ld l,a
 	ENDM
 
@@ -506,34 +538,50 @@ MapView_GetTileSource_M: MACRO ?offset
 ; de = VRAM destination (14-bit | 4000H)
 ; hl = tile source
 ; f <- p: end of odd line reached
-MapView_DrawRowTile_M: MACRO ?count
+MapView_DrawRowTile_M: MACRO ?pixels
 	ld a,e
-	MapView_DrawRowTileLine_M ?count, a, d
+	MapView_DrawRowTileLine_M ?pixels, a, d
+	IF Video_X_BYTE = 2
 	add a,80H
-	MapView_DrawRowTileLine_M ?count, a, d
-	add a,80H
+	ELSE
 	inc d
-	MapView_DrawRowTileLine_M ?count, a, d
+	ENDIF
+	MapView_DrawRowTileLine_M ?pixels, a, d
+	IF Video_X_BYTE = 2
 	add a,80H
-	MapView_DrawRowTileLine_M ?count, a, d
+	ENDIF
+	inc d
+	MapView_DrawRowTileLine_M ?pixels, a, d
+	IF Video_X_BYTE = 2
+	add a,80H
+	ELSE
+	inc d
+	ENDIF
+	MapView_DrawRowTileLine_M ?pixels, a, d
 	dec d
-	add a,80H + ?count
+	IF Video_X_BYTE = 2
+	add a,80H + ?pixels / Video_X_BYTE
+	ELSE
+	dec d
+	dec d
+	add a,?pixels / Video_X_BYTE
+	ENDIF
 	ld e,a
 	ENDM
 
 ; c = VDP port 0
 ; hl = tile source
-MapView_DrawRowTileLine_M: MACRO ?count, ?vramLSB, ?vramMSB
+MapView_DrawRowTileLine_M: MACRO ?pixels, ?vramLSB, ?vramMSB
 	inc c
 	di
 	out (c),?vramLSB
 	ei
 	out (c),?vramMSB
 	dec c
-	REPT ?count
+	REPT ?pixels / Video_X_BYTE
 	outi
 	ENDM
-	REPT 8 - ?count
+	REPT (16 - ?pixels) / Video_X_BYTE
 	inc l
 	ENDM
 	ENDM

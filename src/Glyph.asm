@@ -30,6 +30,9 @@ Glyph_SetCopyHL:
 	ld (iy + VDPCommand.sy),a
 	inc hl
 	ld a,(hl)
+	IF Video_X_SCALE = 2
+	add a,a
+	ENDIF
 	ld (iy + VDPCommand.nx),a
 	inc hl
 	ld a,(hl)
