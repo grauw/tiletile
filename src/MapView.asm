@@ -73,8 +73,8 @@ MapView_GetTileDataPointer:
 
 ; ix = this
 MapView_DrawBitmap:
-	call MapView_MoveHorizontal
-	jp MapView_MoveVertical
+	call MapView_MoveVertical
+	jp MapView_MoveHorizontal
 
 ; ix = this
 MapView_MoveHorizontal: PROC
