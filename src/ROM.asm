@@ -58,6 +58,7 @@ RAM_RESIDENT: equ RAM
 	INCLUDE "Tile.asm"
 	INCLUDE "TileMap.asm"
 	INCLUDE "Image.asm"
+	INCLUDE "SpriteFrame.asm"
 	INCLUDE "Glyph.asm"
 	INCLUDE "Dialog.asm"
 	INCLUDE "Camera.asm"

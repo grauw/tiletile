@@ -19,10 +19,11 @@ function main() {
 }
 
 class Manifest {
-	constructor(tileMaps, images) {
-		checkTypes(arguments, Array, Array);
+	constructor(tileMaps, images, sprites) {
+		checkTypes(arguments, Array, Array, Array);
 		this.tileMaps = tileMaps;
 		this.images = images;
+		this.sprites = sprites;
 	}
 
 	optimize() {
@@ -38,6 +39,9 @@ class Manifest {
 		}
 		for (const image of this.images) {
 			lines.push(image.toAsm());
+		}
+		for (const sprite of this.sprites) {
+			lines.push(sprite.toAsm());
 		}
 		return lines.join("\n\n");
 	}
@@ -282,6 +286,95 @@ class PaletteColor {
 	}
 }
 
+class Sprite {
+	constructor(name, sheet) {
+		checkTypes(arguments, "string", Image);
+		this.name = name;
+		this.sheet = sheet;
+		this.frames = [];
+	}
+
+	addFrame(frame) {
+		checkTypes(arguments, SpriteFrame);
+		this.frames.push(frame);
+	}
+
+	toAsm() {
+		const lines = [];
+		lines.push(`${this.name}_frames:`);
+		for (const frame of this.frames) {
+			lines.push(frame.toAsm());
+		}
+		lines.push("");
+		lines.push("\tSECTION ROM_DATA");
+		lines.push("\tALIGN 80H");
+		for (const frame of this.frames) {
+			lines.push(frame.toAsmData());
+		}
+		lines.push("\tENDS");
+		return lines.join("\n");
+	}
+}
+
+class SpriteFrame {
+	constructor(name, image, duration) {
+		checkTypes(arguments, "string", Image, "number");
+		if (image.width % 16 != 0 || image.height % 16 != 0)
+			throw new Error(`Unsupported sprite dimensions .`);
+		this.name = name;
+		this.image = image;
+		this.duration = Math.round(duration / 1000 * 60);
+		this.patterns = [];
+
+		for (const tile of image.toTiles(16, 16)) {
+			this.patterns.push(new SpritePattern(tile, 1));
+			this.patterns.push(new SpritePattern(tile, 2));
+			this.patterns.push(new SpritePattern(tile, 4));
+			this.patterns.push(new SpritePattern(tile, 8));
+		}
+	}
+
+	toAsm() {
+		return `${this.name}: SpriteFrame ${this.duration}, ${this.patterns.length}, ${this.name}_patterns`;
+	}
+
+	toAsmData() {
+		const lines = [];
+		lines.push(`${this.name}_patterns:`);
+		for (const pattern of this.patterns) {
+			lines.push(pattern.toAsm());
+		}
+		return lines.join("\n");
+	}
+}
+
+class SpritePattern {
+	constructor(image, mask) {
+		checkTypes(arguments, Image, "number");
+		this.data = [];
+
+		const addPatternData = image => {
+			for (let y = 0; y < 8; y++) {
+				let byte = 0;
+				for (let x = 0; x < 8; x++) {
+					if (image.getPixel(x, y).index & mask)
+						byte |= 128 >> x;
+				}
+				this.data.push(byte);
+			}
+		}
+
+		addPatternData(new ImageSlice(image, 0, 0, 8, 8));
+		addPatternData(new ImageSlice(image, 0, 8, 8, 8));
+		addPatternData(new ImageSlice(image, 8, 0, 8, 8));
+		addPatternData(new ImageSlice(image, 8, 8, 8, 8));
+	}
+
+	toAsm() {
+		return `\tSpritePattern ${this.data.join(", ")}`;
+	}
+}
+
 class ManifestLoader {
 	constructor(path) {
 		checkTypes(arguments, "string");
@@ -294,7 +387,9 @@ class ManifestLoader {
 			const json = JSON.parse(data.toString());
 			this.parseTileMaps(json.tilemaps, tileMaps => {
 				this.parseImages(json.images, images => {
-					callback(new Manifest(tileMaps, images));
+					this.parseSprites(json.sprites, sprites => {
+						callback(new Manifest(tileMaps, images, sprites));
+					});
 				});
 			});
 		});
@@ -335,6 +430,24 @@ class ManifestLoader {
 			}
 		};
 		parseImage(0);
+	}
+
+	parseSprites(jsonSprites, callback) {
+		checkTypes(arguments, Array, Function);
+		const sprites = [];
+		const parseSprite = index => {
+			if (index < jsonSprites.length) {
+				const jsonSprite = jsonSprites[index];
+				const spritePath = path.resolve(path.dirname(this.path), jsonSprite.path);
+				new AsepriteSheet(jsonSprite.name, spritePath).parse(sprite => {
+					sprites.push(sprite);
+					parseSprite(index + 1);
+				});
+			} else {
+				callback(sprites);
+			}
+		};
+		parseSprite(0);
 	}
 }
 
@@ -393,6 +506,44 @@ class Tmx {
 		const properties = (xml.properties || [])[0] || {};
 		const property = (properties.property || []).find(p => p.$.name == name);
 		return property !== undefined ? property.$.value : default_;
+	}
+}
+
+class AsepriteSheet {
+	constructor(name, path) {
+		checkTypes(arguments, "string", "string");
+		this.name = name;
+		this.path = path;
+	}
+
+	parse(callback) {
+		checkTypes(arguments, Function);
+		fs.readFile(this.path, (err, data) => {
+			const json = JSON.parse(data.toString());
+			this.parseSprite(json.meta, this.name, sprite => {
+				this.parseFrames(json.frames, sprite, () => {
+					callback(sprite);
+				});
+			});
+		});
+	}
+
+	parseSprite(jsonMeta, name, callback) {
+		checkTypes(arguments, Object, "string", Function);
+		const imagepath = path.resolve(path.dirname(this.path), jsonMeta.image);
+		new PNGLoader(imagepath).loadImage(image => {
+			callback(new Sprite(name, image));
+		});
+	}
+
+	parseFrames(jsonFrames, sprite, callback) {
+		checkTypes(arguments, Object, Sprite, Function);
+		for (const jsonFrameName in jsonFrames) {
+			const json = jsonFrames[jsonFrameName];
+			const image = new ImageSlice(sprite.sheet, json.frame.x, json.frame.y, json.frame.w, json.frame.h);
+			sprite.addFrame(new SpriteFrame(jsonFrameName, image, json.duration));
+		}
+		callback();
 	}
 }
 

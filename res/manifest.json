@@ -10,5 +10,11 @@
 			"name": "UIImage",
 			"path": "ui/ui.png"
 		}
+	],
+	"sprites": [
+		{
+			"name": "May",
+			"path": "sprites/may.json"
+		}
 	]
 }
