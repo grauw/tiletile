@@ -153,7 +153,7 @@ class Tile {
 	}
 
 	toAsm() {
-		return `\tdb ${this.image.to4Bpp().join(", ")}`;
+		return `\tdb ${this.image.getPixelData().join(", ")}`;
 	}
 }
 
@@ -163,37 +163,23 @@ class Image {
 		this.width = width;
 		this.height = height;
 		this.palette = palette;
-		this.pixels = [];
-		this.name = null;
 	}
 
-	addPixel(index) {
-		checkTypes(arguments, "number");
-		this.pixels.push(this.palette.getColor(index));
+	getPixel() {
+		throw new Error("Not implemented.");
 	}
 
-	getSlice(x, y, width, height) {
-		checkTypes(arguments, "number", "number", "number", "number");
-		if (x < 0 || (x + width) > this.width || y < 0 || (y + width) > this.width)
-			throw new Error("Slice coordinates out of range.");
-		if (this.pixels.length != this.width * this.height)
-			throw new Error("Image incomplete.");
+	getPixelData() {
+		if (this.width & 1)
+			throw new Error("Image width is not even.");
 
-		const image = new Image(width, height, this.palette);
-		for (let cy = y; cy < y + height; cy++)
-			for (let cx = x; cx < x + width; cx++)
-				image.addPixel(this.pixels[cy * this.width + cx].index);
-		return image;
-	}
-
-	to4Bpp() {
-		const pixels4bpp = new Array(this.pixels.length / 2);
-		for (let i = 0; i < this.pixels.length; i += 2) {
-			const left = this.pixels[i].index & 15;
-			const right = this.pixels[i + 1].index & 15;
-			pixels4bpp[i >> 1] = left << 4 | right;
+		const pixelData = [];
+		for (let y = 0; y < this.height; y++) {
+			for (let x = 0; x < this.width; x += 2) {
+				pixelData.push((this.getPixel(x, y).index & 15) << 4 | (this.getPixel(x + 1, y).index & 15));
+			}
 		}
-		return pixels4bpp;
+		return pixelData;
 	}
 
 	toTiles(width, height) {
@@ -201,7 +187,7 @@ class Image {
 		const tiles = [];
 		for (let y = 0; y < this.height; y += height)
 			for (let x = 0; x < this.width; x += width)
-				tiles.push(this.getSlice(x, y, width, height));
+				tiles.push(new ImageSlice(this, x, y, width, height));
 		return tiles;
 	}
 
@@ -212,12 +198,49 @@ class Image {
 			lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
 			lines.push("\tSECTION ROM_DATA");
 			lines.push(`${this.name}_pixelData:`);
-			const pixelData = this.to4Bpp();
+			const pixelData = this.getPixelData();
 			for (let i = 0; i < pixelData.length; i += 16)
 				lines.push(`\tdb ${pixelData.slice(i, i + 16).join(", ")}`);
 			lines.push("\tENDS");
 		}
 		return lines.join("\n");
+	}
+}
+
+class ImageData extends Image {
+	constructor(pixels, width, height, palette) {
+		checkTypes(arguments, Array, "number", "number", Palette);
+		if (pixels.length != width * height)
+			throw new Error("Pixel data incomplete.");
+		super(width, height, palette);
+		this.pixels = pixels;
+		this.name = null;
+	}
+
+	getPixel(x, y) {
+		checkTypes(arguments, "number", "number");
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height)
+			throw new Error("Coordinates out of range.");
+		return this.pixels[y * this.width + x];
+	}
+}
+
+class ImageSlice extends Image {
+	constructor(image, x, y, width, height) {
+		checkTypes(arguments, Image, "number", "number", "number", "number");
+		if (x < 0 || (x + width) > image.width || y < 0 || (y + height) > image.height)
+			throw new Error("Slice coordinates out of range.");
+		super(width, height, image.palette);
+		this.image = image;
+		this.x = x;
+		this.y = y;
+	}
+
+	getPixel(x, y) {
+		checkTypes(arguments, "number", "number");
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height)
+			throw new Error("Coordinates out of range.");
+		return this.image.getPixel(this.x + x, this.y + y);
 	}
 }
 
@@ -386,13 +409,14 @@ class PNGLoader {
 		if (png.colorType != 3)
 			throw new Error("Not indexed RGB.");
 
-		const image = new Image(png.width, png.height, this.toPalette(png.palette));
+		const palette = this.toPalette(png.palette);
+		const pixels = [];
 
-		png.decodePixels(pixels => {
-			for (const index of pixels)
-				image.addPixel(index);
+		png.decodePixels(pngPixels => {
+			for (const index of pngPixels)
+				pixels.push(palette.getColor(index));
 
-			callback(image);
+			callback(new ImageData(pixels, png.width, png.height, palette));
 		});
 	}
 
