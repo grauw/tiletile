@@ -203,16 +203,16 @@ MapView_DrawTileColumn: PROC
 	push ix
 	ld hl,(ROMMapper_instance.pageA000)
 	push hl
-	push bc
-	push de
+	ld iyl,c
+	ld iyh,e
+	exx         ; set-up for output
+	ld c,iyl
 	IF Video_X_SCALE = 2
 	xor a
 	sla c
 	rla
 	ld (ix + MapView.verticalDrawCommand.dx),c
 	ld (ix + MapView.verticalDrawCommand.dx + 1),a
-	rra
-	srl c
 	ELSE
 	ld (ix + MapView.verticalDrawCommand.dx),c
 	ENDIF
@@ -232,22 +232,20 @@ MapView_DrawTileColumn: PROC
 	out (c),e
 	ei
 	out (c),d
-	pop de
-	pop bc
-	call Draw
-	pop hl
-	ld (hl),l
-	pop ix
-	ret
-Draw:
-	ld iyl,c
-	ld iyh,e
-	inc d
+	ld a,iyl
+	and 0CH
+	IF Video_X_BYTE = 2
+	rrca
+	ENDIF
+	ld iyl,a
+	ld c,VDP_PORT_3
+	ld de,(16 - 4) / Video_X_BYTE
+	exx
+	inc d       ; set-up tile iteration
 	ld e,0
 	call MapView_GetTileDataPointer
-	push de
-	exx
-	pop de
+	push hl
+	pop ix
 	ld hl,0
 	and a
 	sbc hl,de
@@ -257,43 +255,36 @@ Draw:
 	add hl,hl
 	ld c,l
 	ld b,h
-	exx
-	ex de,hl
-	ld ixl,e
-	ld ixh,d
-	ld a,iyl
-	and 0CH
-	IF Video_X_BYTE = 2
-	rrca
-	ENDIF
-	ld iyl,a
-	ld bc,16 << 8 | VDP_PORT_3
-	ld de,(16 - 4) / Video_X_BYTE
-; c = VDP port 3
-; de = tile source stride
-; de' = tile pointer stride
-; bc' = tile pointer wrap stride
+	ld l,16
+	ld a,iyh
+	ld h,a
+	call Loop
+	pop hl
+	ld (hl),l
+	pop ix
+	ret
+; bc = tile pointer wrap stride
+; de = tile pointer stride
+; l = tile count
+; h = distance to split
+; c' = VDP port 3
+; de' = tile source stride
 ; ix = tile pointer
 ; iyl = x offset
-; iyh = y distance to split
 Loop:
-	ld a,iyh
+	ld a,h
 	sub 16
-	ld iyh,a
+	ld h,a
 	jp c,Split
 NoSplit:
+	exx
 	MapView_GetTileSource_M iyl
 	MapView_DrawColumnTile_M 16
+	exx
 Continue:
-	exx
 	add ix,de
-	exx
-	IF Video_X_BYTE = 2
-	djnz Loop
-	ELSE
-	dec b
+	dec l
 	jp nz,Loop
-	ENDIF
 	ret
 Split:
 	add a,16
@@ -303,51 +294,55 @@ Split:
 	jr z,Split8
 	jr Split12
 Split0:
-	exx
 	add ix,bc
-	exx
 	jp NoSplit
 Split4:
+	exx
 	call GetTileSource
 	call DrawColumnTile4
 	exx
 	add ix,bc
-	exx
-	push iy
 	ld a,iyl
+	ld c,a
 	add a,4 * 16 / Video_X_BYTE
 	ld iyl,a
+	exx
 	call GetTileSource
 	call DrawColumnTile12
-	pop iy
+	exx
+	ld iyl,c
 	jp Continue
 Split8:
+	exx
 	call GetTileSource
 	call DrawColumnTile8
 	exx
 	add ix,bc
-	exx
-	push iy
 	ld a,iyl
+	ld c,a
 	add a,8 * 16 / Video_X_BYTE
 	ld iyl,a
+	exx
 	call GetTileSource
 	call DrawColumnTile8
-	pop iy
+	exx
+	ld iyl,c
 	jp Continue
 Split12:
+	exx
 	call GetTileSource
 	call DrawColumnTile12
 	exx
 	add ix,bc
-	exx
-	push iy
 	ld a,iyl
+	ld c,a
 	add a,12 * 16 / Video_X_BYTE
 	ld iyl,a
+	exx
 	call GetTileSource
 	call DrawColumnTile4
-	pop iy
+	exx
+	ld iyl,c
 	jp Continue
 GetTileSource:
 	MapView_GetTileSource_M iyl
@@ -380,7 +375,10 @@ MapView_DrawTileRow: PROC
 	push ix
 	ld hl,(ROMMapper_instance.pageA000)
 	push hl
-	ld a,e
+	ld iyl,c
+	ld iyh,e
+	exx         ; set-up for output
+	ld a,iyh
 	and Video_X_BYTE = 2 ? 80H : 0C0H
 	or MapView_PAGE
 	rlca
@@ -392,23 +390,6 @@ MapView_DrawTileRow: PROC
 	ld a,14 | VDP_REGISTER
 	ei
 	out (VDP_PORT_1),a
-	call Draw
-	pop hl
-	ld (hl),l
-	pop ix
-	ret
-Draw:
-	ld iyl,c
-	ld iyh,e
-	inc b
-	ld c,0
-	call MapView_GetTileDataPointer
-	exx
-	ld bc,-16 * 2
-	exx
-	ex de,hl
-	ld ixl,e
-	ld ixh,d
 	ld d,iyh
 	ld a,d
 	and 0CH
@@ -426,24 +407,44 @@ Draw:
 	res 7,d
 	ld e,0
 	ld c,VDP_PORT_0
-; c = VDP port 0
-; de = VRAM address (14-bit | 4000H)
-; bc' = tile pointer wrap stride
+	exx
+	inc b       ; set-up tile iteration
+	ld c,0
+	call MapView_GetTileDataPointer
+	push hl
+	pop ix
+	ld de,2
+	ld bc,-16 * 2
+	ld l,16
+	ld a,iyl
+	ld h,a
+	call Loop
+	pop hl
+	ld (hl),l
+	pop ix
+	ret
+; bc = tile pointer wrap stride
+; de = tile pointer stride
+; l = tile count
+; h = distance to split
+; c' = VDP port 0
+; de' = VRAM address (14-bit | 4000H)
 ; ix = tile pointer
-; iyl = x distance to split
 ; iyh = y offset
 Loop:
-	ld a,iyl
+	ld a,h
 	sub 16
-	ld iyl,a
+	ld h,a
 	jp c,Split
 NoSplit:
+	exx
 	MapView_GetTileSource_M iyh
 	MapView_DrawRowTile_M 16
+	exx
 Continue:
-	inc ix
-	inc ix
-	jp (Video_X_BYTE = 2 ? p : nc),Loop
+	add ix,de
+	dec l
+	jp nz,Loop
 	ret
 Split:
 	add a,16
@@ -453,51 +454,55 @@ Split:
 	jr z,Split8
 	jr Split12
 Split0:
-	exx
 	add ix,bc
-	exx
 	jp NoSplit
 Split4:
+	exx
 	call GetTileSource
 	call DrawRowTile4
 	exx
 	add ix,bc
-	exx
-	push iy
 	ld a,iyh
+	ld c,a
 	add a,4 / Video_X_BYTE
 	ld iyh,a
+	exx
 	call GetTileSource
 	call DrawRowTile12
-	pop iy
+	exx
+	ld iyh,c
 	jr Continue
 Split8:
+	exx
 	call GetTileSource
 	call DrawRowTile8
 	exx
 	add ix,bc
-	exx
-	push iy
 	ld a,iyh
+	ld c,a
 	add a,8 / Video_X_BYTE
 	ld iyh,a
+	exx
 	call GetTileSource
 	call DrawRowTile8
-	pop iy
+	exx
+	ld iyh,c
 	jr Continue
 Split12:
+	exx
 	call GetTileSource
 	call DrawRowTile12
 	exx
 	add ix,bc
-	exx
-	push iy
 	ld a,iyh
+	ld c,a
 	add a,12 / Video_X_BYTE
 	ld iyh,a
+	exx
 	call GetTileSource
 	call DrawRowTile4
-	pop iy
+	exx
+	ld iyh,c
 	jr Continue
 GetTileSource:
 	MapView_GetTileSource_M iyh
@@ -537,7 +542,6 @@ MapView_GetTileSource_M: MACRO ?offset
 ; c = VDP port 0
 ; de = VRAM destination (14-bit | 4000H)
 ; hl = tile source
-; f <- p: end of odd line reached
 MapView_DrawRowTile_M: MACRO ?pixels
 	ld a,e
 	MapView_DrawRowTileLine_M ?pixels, a, d
