@@ -255,10 +255,21 @@ MapView_DrawTileColumn: PROC
 	add hl,hl
 	ld c,l
 	ld b,h
-	ld l,16
 	ld a,iyh
 	ld h,a
-	call Loop
+	rrca
+	rrca
+	rrca
+	rrca
+	and 0FH
+	ld l,a
+	push hl
+	call nz,Loop
+	pop hl
+	ld a,16
+	sub l
+	ld l,a
+	call SplitAndLoop
 	pop hl
 	ld (hl),l
 	pop ix
@@ -272,11 +283,6 @@ MapView_DrawTileColumn: PROC
 ; ix = tile pointer
 ; iyl = x offset
 Loop:
-	ld a,h
-	sub 16
-	ld h,a
-	jp c,Split
-NoSplit:
 	exx
 	MapView_GetTileSource_M iyl
 	MapView_DrawColumnTile_M 16
@@ -286,16 +292,14 @@ Continue:
 	dec l
 	jp nz,Loop
 	ret
-Split:
-	add a,16
-	jr z,Split0
-	cp 8
-	jr c,Split4
-	jr z,Split8
-	jr Split12
+SplitAndLoop:
+	bit 3,h
+	jr nz,Split8_12
+	bit 2,h
+	jr nz,Split4
 Split0:
 	add ix,bc
-	jp NoSplit
+	jp Loop
 Split4:
 	exx
 	call GetTileSource
@@ -312,6 +316,9 @@ Split4:
 	exx
 	ld iyl,c
 	jp Continue
+Split8_12:
+	bit 2,h
+	jr nz,Split12
 Split8:
 	exx
 	call GetTileSource
@@ -415,10 +422,21 @@ MapView_DrawTileRow: PROC
 	pop ix
 	ld de,2
 	ld bc,-16 * 2
-	ld l,16
 	ld a,iyl
 	ld h,a
-	call Loop
+	rrca
+	rrca
+	rrca
+	rrca
+	and 0FH
+	ld l,a
+	push hl
+	call nz,Loop
+	pop hl
+	ld a,16
+	sub l
+	ld l,a
+	call SplitAndLoop
 	pop hl
 	ld (hl),l
 	pop ix
@@ -432,11 +450,6 @@ MapView_DrawTileRow: PROC
 ; ix = tile pointer
 ; iyh = y offset
 Loop:
-	ld a,h
-	sub 16
-	ld h,a
-	jp c,Split
-NoSplit:
 	exx
 	MapView_GetTileSource_M iyh
 	MapView_DrawRowTile_M 16
@@ -446,16 +459,14 @@ Continue:
 	dec l
 	jp nz,Loop
 	ret
-Split:
-	add a,16
-	jr z,Split0
-	cp 8
-	jr c,Split4
-	jr z,Split8
-	jr Split12
+SplitAndLoop:
+	bit 3,h
+	jr nz,Split8_12
+	bit 2,h
+	jr nz,Split4
 Split0:
 	add ix,bc
-	jp NoSplit
+	jp Loop
 Split4:
 	exx
 	call GetTileSource
@@ -472,6 +483,9 @@ Split4:
 	exx
 	ld iyh,c
 	jr Continue
+Split8_12:
+	bit 2,h
+	jr nz,Split12
 Split8:
 	exx
 	call GetTileSource
