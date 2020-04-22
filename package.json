@@ -9,8 +9,8 @@
     "url": "https://hg.sr.ht/~grauw/tiletile"
   },
   "dependencies": {
-    "png-js": "0.1.1",
-    "xml2js": "0.4.16"
+    "png-js": "1.0.0",
+    "xml2js": "0.4.23"
   },
   "private": true
 }

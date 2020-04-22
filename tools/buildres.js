@@ -6,7 +6,7 @@ const PNG = require('png-js');
 
 const screenMode = 5;
 
-function main() {
+async function main() {
 	if (process.argv.length < 3) {
 		console.log(`Usage: node ${process.argv[1]} manifest.json`);
 		process.exit(1);
@@ -14,10 +14,9 @@ function main() {
 
 	const path = process.argv[2];
 
-	new ManifestLoader(path).parse(manifest => {
-		manifest.optimize();
-		console.log(manifest.toAsm());
-	});
+	const manifest = await new ManifestLoader(path).parse();
+	manifest.optimize();
+	console.log(manifest.toAsm());
 }
 
 class Manifest {
@@ -406,73 +405,39 @@ class ManifestLoader {
 		this.path = path;
 	}
 
-	parse(callback) {
-		checkTypes(arguments, Function);
-		fs.readFile(this.path, (err, data) => {
-			const json = JSON.parse(data.toString());
-			this.parseTileMaps(json.tilemaps, tileMaps => {
-				this.parseImages(json.images, images => {
-					this.parseSprites(json.sprites, sprites => {
-						callback(new Manifest(tileMaps, images, sprites));
-					});
-				});
-			});
-		});
+	async parse() {
+		const json = JSON.parse(await fs.promises.readFile(this.path));
+		return new Manifest(...await Promise.all([
+			this.parseTileMaps(json.tilemaps),
+			this.parseImages(json.images),
+			this.parseSprites(json.sprites)
+		]));
 	}
 
-	parseTileMaps(jsonTileMaps, callback) {
-		checkTypes(arguments, Array, Function);
-		const tileMaps = [];
-		const parseMap = index => {
-			if (index < jsonTileMaps.length) {
-				const jsonTileMap = jsonTileMaps[index];
-				const tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
-				new Tmx(jsonTileMap.name, tileMapPath).parse(tileMap => {
-					tileMaps.push(tileMap);
-					parseMap(index + 1);
-				});
-			} else {
-				callback(tileMaps);
-			}
-		};
-		parseMap(0);
+	async parseTileMaps(jsonTileMaps) {
+		checkTypes(arguments, Array);
+		return Promise.all(jsonTileMaps.map(async jsonTileMap => {
+			const tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
+			return new Tmx(jsonTileMap.name, tileMapPath).parse();
+		}));
 	}
 
-	parseImages(jsonImages, callback) {
-		checkTypes(arguments, Array, Function);
-		const images = [];
-		const parseImage = index => {
-			if (index < jsonImages.length) {
-				const jsonImage = jsonImages[index];
-				const imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
-				new PNGLoader(imagePath).loadImage(image => {
-					image.name = jsonImage.name;
-					images.push(image);
-					parseImage(index + 1);
-				});
-			} else {
-				callback(images);
-			}
-		};
-		parseImage(0);
+	async parseImages(jsonImages) {
+		checkTypes(arguments, Array);
+		return Promise.all(jsonImages.map(async jsonImage => {
+			const imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
+			const image = await new PNGLoader(imagePath).loadImage();
+			image.name = jsonImage.name;
+			return image;
+		}));
 	}
 
-	parseSprites(jsonSprites, callback) {
-		checkTypes(arguments, Array, Function);
-		const sprites = [];
-		const parseSprite = index => {
-			if (index < jsonSprites.length) {
-				const jsonSprite = jsonSprites[index];
-				const spritePath = path.resolve(path.dirname(this.path), jsonSprite.path);
-				new AsepriteSheet(jsonSprite.name, spritePath).parse(sprite => {
-					sprites.push(sprite);
-					parseSprite(index + 1);
-				});
-			} else {
-				callback(sprites);
-			}
-		};
-		parseSprite(0);
+	async parseSprites(jsonSprites) {
+		checkTypes(arguments, Array);
+		return Promise.all(jsonSprites.map(async jsonSprite => {
+			const spritePath = path.resolve(path.dirname(this.path), jsonSprite.path);
+			return new AsepriteSheet(jsonSprite.name, spritePath).parse();
+		}));
 	}
 }
 
@@ -483,40 +448,33 @@ class Tmx {
 		this.path = path;
 	}
 
-	parse(callback) {
-		checkTypes(arguments, Function);
-		fs.readFile(this.path, (err, data) => {
-			const xmlString = data.toString();
-			new xml2js.Parser().parseString(xmlString, (err, result) => {
-				this.parseMap(result.map, callback);
-			});
-		});
+	async parse() {
+		const xml = await xml2js.parseStringPromise(await fs.promises.readFile(this.path));
+		return this.parseMap(xml.map);
 	}
 
-	parseMap(mapXml, callback) {
-		checkTypes(arguments, Object, Function);
-		this.parseSet(mapXml.tileset[0], tileSet => {
-			const tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height, tileSet);
-			const indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
-			for (const index of indices) {
-				tileMap.addTileByIndex(index);
-			}
-			callback(tileMap);
-		});
+	async parseMap(mapXml) {
+		checkTypes(arguments, Object);
+		const tileSet = await this.parseSet(mapXml.tileset[0]);
+		const tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height, tileSet);
+		const indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
+		for (const index of indices) {
+			tileMap.addTileByIndex(index);
+		}
+		return tileMap;
 	}
 
-	parseSet(setXml, callback) {
-		checkTypes(arguments, Object, Function);
+	async parseSet(setXml) {
+		checkTypes(arguments, Object);
 		const imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
-		new PNGLoader(imagepath).loadImage(image => {
-			const tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
-			const tileImages = image.toTiles(tileSet.width, tileSet.height);
-			for (let i = 0; i < tileImages.length; i++) {
-				const tileXml = (setXml.tile || []).find(t => t.$.id == i) || { $: { id: i } };
-				tileSet.addTile(this.parseTile(tileXml, tileImages[i]));
-			}
-			callback(tileSet);
-		});
+		const image = await new PNGLoader(imagepath).loadImage();
+		const tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
+		const tileImages = image.toTiles(tileSet.width, tileSet.height);
+		for (let i = 0; i < tileImages.length; i++) {
+			const tileXml = (setXml.tile || []).find(t => t.$.id == i) || { $: { id: i } };
+			tileSet.addTile(this.parseTile(tileXml, tileImages[i]));
+		}
+		return tileSet;
 	}
 
 	parseTile(tileXml, image) {
@@ -541,34 +499,27 @@ class AsepriteSheet {
 		this.path = path;
 	}
 
-	parse(callback) {
-		checkTypes(arguments, Function);
-		fs.readFile(this.path, (err, data) => {
-			const json = JSON.parse(data.toString());
-			this.parseSprite(json.meta, this.name, sprite => {
-				this.parseFrames(json.frames, sprite, () => {
-					callback(sprite);
-				});
-			});
-		});
+	async parse() {
+		const json = JSON.parse(await fs.promises.readFile(this.path));
+		const sprite = await this.parseSprite(json.meta, this.name);
+		this.parseFrames(json.frames, sprite);
+		return sprite;
 	}
 
-	parseSprite(jsonMeta, name, callback) {
-		checkTypes(arguments, Object, "string", Function);
+	async parseSprite(jsonMeta, name) {
+		checkTypes(arguments, Object, "string");
 		const imagepath = path.resolve(path.dirname(this.path), jsonMeta.image);
-		new PNGLoader(imagepath).loadImage(image => {
-			callback(new Sprite(name, image));
-		});
+		const image = await new PNGLoader(imagepath).loadImage();
+		return new Sprite(name, image);
 	}
 
-	parseFrames(jsonFrames, sprite, callback) {
-		checkTypes(arguments, Object, Sprite, Function);
+	parseFrames(jsonFrames, sprite) {
+		checkTypes(arguments, Object, Sprite);
 		for (const jsonFrameName in jsonFrames) {
 			const json = jsonFrames[jsonFrameName];
 			const image = new ImageSlice(sprite.sheet, json.frame.x, json.frame.y, json.frame.w, json.frame.h);
 			sprite.addFrame(new SpriteFrame(jsonFrameName, image, json.duration));
 		}
-		callback();
 	}
 }
 
@@ -578,22 +529,21 @@ class PNGLoader {
 		this.path = path;
 	}
 
-	loadImage(callback) {
-		checkTypes(arguments, Function);
-		const png = PNG.load(this.path);
+	async loadImage() {
+		const png = new PNG(await fs.promises.readFile(this.path));
 
 		if (png.colorType != 3)
 			throw new Error("Not indexed RGB.");
 
 		const palette = this.toPalette(png.palette);
+
+		const pngPixels = await new Promise(resolve => png.decodePixels(pixels => resolve(pixels)));
+
 		const pixels = [];
+		for (const index of pngPixels)
+			pixels.push(palette.getColor(index));
 
-		png.decodePixels(pngPixels => {
-			for (const index of pngPixels)
-				pixels.push(palette.getColor(index));
-
-			callback(new ImageData(pixels, png.width, png.height, palette));
-		});
+		return new ImageData(pixels, png.width, png.height, palette);
 	}
 
 	toPalette(palette8bit) {
@@ -636,4 +586,4 @@ function checkTypes(args) {
 	}
 }
 
-main();
+main().catch(reason => { throw reason; });
