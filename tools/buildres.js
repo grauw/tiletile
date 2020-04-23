@@ -4,8 +4,6 @@ const path = require('path');
 const xml2js = require('xml2js');
 const PNG = require('png-js');
 
-const screenMode = 5;
-
 async function main() {
 	if (process.argv.length < 3) {
 		console.log(`Usage: node ${process.argv[1]} manifest.json`);
@@ -20,8 +18,10 @@ async function main() {
 }
 
 class Manifest {
-	constructor(tileMaps, images, sprites) {
-		checkTypes(arguments, Array, Array, Array);
+	constructor(screenMode, frameRate, tileMaps, images, sprites) {
+		checkTypes(arguments, "number", "number", Array, Array, Array);
+		this.screenMode = screenMode;
+		this.frameRate = frameRate;
 		this.tileMaps = tileMaps;
 		this.images = images;
 		this.sprites = sprites;
@@ -36,13 +36,13 @@ class Manifest {
 	toAsm() {
 		const lines = [];
 		for (const tileMap of this.tileMaps) {
-			lines.push(tileMap.toAsm());
+			lines.push(tileMap.toAsm(this.screenMode));
 		}
 		for (const image of this.images) {
-			lines.push(image.toAsm());
+			lines.push(image.toAsm(this.screenMode));
 		}
 		for (const sprite of this.sprites) {
-			lines.push(sprite.toAsm());
+			lines.push(sprite.toAsm(this.frameRate));
 		}
 		return lines.join("\n\n");
 	}
@@ -67,7 +67,8 @@ class TileMap {
 		this.tileSet.optimize(this.tiles);
 	}
 
-	toAsm() {
+	toAsm(screenMode) {
+		checkTypes(arguments, "number");
 		const lines = [];
 		lines.push(`${this.name}_instance:`)
 		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.tileSet.name}_palette, ${this.name}_data`);
@@ -80,7 +81,7 @@ class TileMap {
 		}
 		lines.push("\tENDS");
 		lines.push("");
-		lines.push(this.tileSet.toAsm());
+		lines.push(this.tileSet.toAsm(screenMode));
 		return lines.join("\n");
 	}
 }
@@ -124,7 +125,8 @@ class TileSet {
 		this.tiles = newTiles;
 	}
 
-	toAsm() {
+	toAsm(screenMode) {
+		checkTypes(arguments, "number");
 		const lines = [];
 		lines.push(`${this.name}_tiles:`);
 		for (const tile of this.tiles) {
@@ -135,7 +137,7 @@ class TileSet {
 		lines.push("\tALIGN 100H");
 		for (const tile of this.tiles) {
 			lines.push(`${this.name}_pixelData_${tile.getName()}:`);
-			lines.push(tile.toAsm());
+			lines.push(tile.toAsm(screenMode));
 		}
 		lines.push("\tENDS");
 		lines.push("");
@@ -157,7 +159,8 @@ class Tile {
 		return this.name || this.index.toString();
 	}
 
-	toAsm() {
+	toAsm(screenMode) {
+		checkTypes(arguments, "number");
 		return `\tdb ${this.image.getPixelData(screenMode).join(", ")}`;
 	}
 }
@@ -219,7 +222,8 @@ class Image {
 		return tiles;
 	}
 
-	toAsm() {
+	toAsm(screenMode) {
+		checkTypes(arguments, "number");
 		const lines = [];
 		if (this.name) {
 			lines.push(`${this.name}_instance: Image ${this.width}, ${this.height}, ${this.name}_palette, ${this.name}_pixelData`);
@@ -323,11 +327,12 @@ class Sprite {
 		this.frames.push(frame);
 	}
 
-	toAsm() {
+	toAsm(frameRate) {
+		checkTypes(arguments, "number");
 		const lines = [];
 		lines.push(`${this.name}_frames:`);
 		for (const frame of this.frames) {
-			lines.push(frame.toAsm());
+			lines.push(frame.toAsm(frameRate));
 		}
 		lines.push("");
 		lines.push("\tSECTION ROM_DATA");
@@ -347,7 +352,7 @@ class SpriteFrame {
 			throw new Error(`Unsupported sprite dimensions .`);
 		this.name = name;
 		this.image = image;
-		this.duration = Math.round(duration / 1000 * 60);
+		this.duration = duration;
 		this.patterns = [];
 
 		for (const tile of image.toTiles(16, 16)) {
@@ -358,8 +363,10 @@ class SpriteFrame {
 		}
 	}
 
-	toAsm() {
-		return `${this.name}: SpriteFrame ${this.duration}, ${this.patterns.length}, ${this.name}_patterns`;
+	toAsm(frameRate) {
+		checkTypes(arguments, "number");
+		const duration = Math.round(this.duration * frameRate);
+		return `${this.name}: SpriteFrame ${duration}, ${this.patterns.length}, ${this.name}_patterns`;
 	}
 
 	toAsmData() {
@@ -407,11 +414,15 @@ class ManifestLoader {
 
 	async parse() {
 		const json = JSON.parse(await fs.promises.readFile(this.path));
-		return new Manifest(...await Promise.all([
-			this.parseTileMaps(json.tilemaps),
-			this.parseImages(json.images),
-			this.parseSprites(json.sprites)
-		]));
+		return new Manifest(
+			json.screenMode,
+			json.frameRate,
+			...await Promise.all([
+				this.parseTileMaps(json.tilemaps),
+				this.parseImages(json.images),
+				this.parseSprites(json.sprites)
+			])
+		);
 	}
 
 	async parseTileMaps(jsonTileMaps) {
@@ -518,7 +529,7 @@ class AsepriteSheet {
 		for (const jsonFrameName in jsonFrames) {
 			const json = jsonFrames[jsonFrameName];
 			const image = new ImageSlice(sprite.sheet, json.frame.x, json.frame.y, json.frame.w, json.frame.h);
-			sprite.addFrame(new SpriteFrame(jsonFrameName, image, json.duration));
+			sprite.addFrame(new SpriteFrame(jsonFrameName, image, json.duration / 1000));
 		}
 	}
 }

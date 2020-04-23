@@ -1,4 +1,6 @@
 {
+	"screenMode": 5,
+	"frameRate": 59.922743404312307,
 	"tilemaps": [
 		{
 			"name": "FieldMap",
