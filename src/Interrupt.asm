@@ -18,20 +18,15 @@ Interrupt: MACRO
 		out (c),b  ; select s#1
 		in a,(c)
 		rra
-		jp c,Interrupt_Return
+		jp c,Return
 	handler: equ $ - 2
 		xor a
 		out (c),a
 		out (c),b  ; select s#0
 		rst 38H
 		di  ; small window for reentrant interrupt to occur
-		jp Interrupt_Return
-	ENDM
-
-	SECTION RAM
-
-; c = VDP port 1
-Interrupt_Return:
+	; c = VDP port 1
+	Return:
 		ld a,(VDP_MIRROR_8 + 15)
 		out (c),a
 		ld a,15 | VDP_REGISTER
@@ -40,8 +35,7 @@ Interrupt_Return:
 		pop af
 		ei
 		ret
-
-	ENDS
+	ENDM
 
 ; ix = this
 Interrupt_Construct:
@@ -96,12 +90,16 @@ Interrupt_Destruct:
 	ret
 
 ; iy = this
+; de <- return address
 ; hl <- handler pointer address
-Interrupt_GetLineInterruptHandlerPointerIY:
-	ld e,iyl
-	ld d,iyh
+Interrupt_GetLineInterruptAddressesIY:
+	ld c,iyl
+	ld b,iyh
+	ld hl,Interrupt.Return
+	add hl,bc
+	ex de,hl
 	ld hl,Interrupt.handler
-	add hl,de
+	add hl,bc
 	ret
 
 ; de = handler
@@ -115,7 +113,7 @@ Interrupt_SetLineInterruptHandlerIY:
 
 ; iy = this
 Interrupt_ResetLineInterruptHandlerIY:
-	ld de,Interrupt_Return
+	call Interrupt_GetLineInterruptAddressesIY
 	jp Interrupt_SetLineInterruptHandlerIY
 
 ;

@@ -31,7 +31,8 @@ SplitHandler: MACRO ?line, ?settings, ?next
 		call ?next
 	next: equ $ - 2
 		pop hl
-		jp Interrupt_Return
+		jp 0
+	return: equ $ - 2
 	; c = VDP port 1
 	; Modifies: af, bc
 	Entry:
@@ -43,9 +44,11 @@ SplitHandler: MACRO ?line, ?settings, ?next
 ; ix = this
 ; iy = interrupt
 SplitHandler_Construct:
-	call Interrupt_GetLineInterruptHandlerPointerIY
+	call Interrupt_GetLineInterruptAddressesIY
 	ld (ix + SplitHandler.handlerPointer),l
 	ld (ix + SplitHandler.handlerPointer + 1),h
+	ld (ix + SplitHandler.return),e
+	ld (ix + SplitHandler.return + 1),d
 	ret
 
 ; iy = this
