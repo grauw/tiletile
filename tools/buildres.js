@@ -114,7 +114,6 @@ class TileSet {
 		for (const tile of tiles) {
 			counts[tile.index]++;
 		}
-		const newIndex = 0;
 		const newTiles = [];
 		for (let i = 0; i < counts.length; i++) {
 			if (counts[i] > 0 || this.tiles[i].name) {
