@@ -16,8 +16,9 @@ Interrupt: MACRO
 		ld a,1
 		out (c),a
 		out (c),b  ; select s#1
-		in (c)
-		jp pe,Interrupt_Return  ; V9958 has no light pen bits, and VDP ID is 2
+		in a,(c)
+		rra
+		jp c,Interrupt_Return
 	handler: equ $ - 2
 		xor a
 		out (c),a
