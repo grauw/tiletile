@@ -24,19 +24,16 @@ SplitHandler: MACRO ?line, ?settings, ?next
 	pending:
 		db 0
 	; c = VDP port 1
-	; Modifies: af, bc
 	Return:
 		xor a
 		ld (pending),a
 		call ?next
 	next: equ $ - 2
-		pop hl
 		jp 0
 	return: equ $ - 2
 	; c = VDP port 1
-	; Modifies: af, bc
+	; Modifies: af, bc, de, hl
 	Entry:
-		push hl
 		ld hl,?settings
 	settings: equ $ - 2
 	ENDM

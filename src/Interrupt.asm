@@ -12,6 +12,8 @@ Interrupt: MACRO
 	Handler:
 		push af
 		push bc
+		push de
+		push hl
 		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
 		ld a,1
 		out (c),a
@@ -33,6 +35,8 @@ Interrupt: MACRO
 		out (c),a
 		ld a,15 | VDP_REGISTER
 		out (c),a
+		pop hl
+		pop de
 		pop bc
 		pop af
 		ei

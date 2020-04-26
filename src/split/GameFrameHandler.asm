@@ -10,7 +10,6 @@ GameFrameHandler: MACRO ?settings
 	; hl = game frame
 	; Modifies: af, bc, hl
 	Apply: PROC
-		push de
 		bit 0,(hl)
 		inc hl
 		jr nz,Dialog
@@ -40,7 +39,6 @@ GameFrameHandler: MACRO ?settings
 		ld de,GameFrame.overscanSplit - GameFrame.dialogEndSplit
 		add hl,de
 		ld (overscanSplitHandler + SplitHandler.settings),hl
-		pop de
 		jp super.Return
 		ENDP
 
