@@ -35,6 +35,7 @@ MapSplitHandler: MACRO ?settings, ?next
 ; iy = interrupt
 MapSplitHandler_Construct:
 	call SplitHandler_Construct
+	call SplitHandler_SetAsFrameReturn
 	ld a,(VDP_MIRROR_8 + 18)
 	sra a
 	sra a

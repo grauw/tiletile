@@ -29,6 +29,10 @@ Interrupt: MACRO
 		ld (SCNCNT),a
 		rst 38H
 		di  ; small window for reentrant interrupt to occur
+		jr Return
+	FrameReturn:
+		call FrameHandler
+	frameHandler: equ $ - 2
 	Return:
 		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
 		ld a,(VDP_MIRROR_8 + 15)
@@ -39,6 +43,7 @@ Interrupt: MACRO
 		pop bc
 		pop af
 		ei
+	FrameHandler:
 		ret
 	ENDM
 
@@ -95,16 +100,30 @@ Interrupt_Destruct:
 	ret
 
 ; iy = this
+; bc <- frame return address
 ; de <- return address
 ; hl <- line handler pointer address
 Interrupt_GetAddressesIY:
 	ld c,iyl
 	ld b,iyh
+	ld hl,Interrupt.FrameReturn
+	add hl,bc
+	push hl
 	ld hl,Interrupt.Return
 	add hl,bc
 	ex de,hl
 	ld hl,Interrupt.lineHandler
 	add hl,bc
+	pop bc
+	ret
+
+; hl = frame handler
+; iy = this
+Interrupt_SetFrameHandlerIY:
+	di
+	ld (iy + Interrupt.frameHandler),l
+	ei
+	ld (iy + Interrupt.frameHandler + 1),h
 	ret
 
 ; de = line handler

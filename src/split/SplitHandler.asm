@@ -48,6 +48,14 @@ SplitHandler_Construct:
 	ld (ix + SplitHandler.return + 1),d
 	ret
 
+; ix = this
+; iy = interrupt
+SplitHandler_SetAsFrameReturn:
+	call Interrupt_GetAddressesIY
+	ld (ix + SplitHandler.return),c
+	ld (ix + SplitHandler.return + 1),b
+	ret
+
 ; iy = this
 ; Modifies: hl
 SplitHandler_ActivateIY:

@@ -26,6 +26,7 @@ BootSplitHandler: MACRO ?settings, ?next
 ; iy = interrupt
 BootSplitHandler_Construct:
 	call SplitHandler_Construct
+	call SplitHandler_SetAsFrameReturn
 	ld a,(VDP_MIRROR_8 + 18)
 	sra a
 	sra a
