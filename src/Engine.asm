@@ -32,8 +32,6 @@ Engine: MACRO
 		Video
 	interrupt:
 		Interrupt
-	timiHook:
-		TIMIHook
 	spriteColorCopy:
 		VRAMTableCopy 1EC00H, 1E800H, SpriteColorTable_SIZE
 	ENDM
@@ -87,20 +85,10 @@ Engine_Construct:
 	call Engine_GetVideo
 	call Video_Construct
 	pop ix
-
-	push ix
-	call Engine_GetTIMIHook
-	call Hook_Install
-	pop ix
 	ret
 
 ; ix = this
 Engine_Destruct:
-	push ix
-	call Engine_GetTIMIHook
-	call Hook_Uninstall
-	pop ix
-
 	push ix
 	call Engine_GetInterrupt_IY
 	call Engine_GetVideo
@@ -232,13 +220,6 @@ Engine_GetVideo:
 Engine_GetVideoIY:
 	ld de,Engine.video
 	add iy,de
-	ret
-
-; ix = this
-; ix <- TIMI hook
-Engine_GetTIMIHook:
-	ld de,Engine.timiHook
-	add ix,de
 	ret
 
 ; iy = this

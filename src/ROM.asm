@@ -47,8 +47,6 @@ RAM_RESIDENT: equ RAM
 	INCLUDE "video/Video.asm"
 	INCLUDE "split/Split.asm"
 	INCLUDE "Interrupt.asm"
-	INCLUDE "Hook.asm"
-	INCLUDE "TIMIHook.asm"
 	INCLUDE "Input.asm"
 
 	ENDS

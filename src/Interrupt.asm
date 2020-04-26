@@ -23,6 +23,8 @@ Interrupt: MACRO
 		xor a
 		out (c),a
 		out (c),b  ; select s#0
+		ld (INTCNT),a  ; disable part of the BIOS ISR
+		ld (SCNCNT),a
 		rst 38H
 		di  ; small window for reentrant interrupt to occur
 	; c = VDP port 1
