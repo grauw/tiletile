@@ -34,6 +34,8 @@ Engine: MACRO
 		Interrupt
 	spriteColorCopy:
 		VRAMTableCopy 1EC00H, 1E800H, SpriteColorTable_SIZE
+	audio:
+		Audio
 	ENDM
 
 ; ix = this
@@ -42,6 +44,11 @@ Engine_Construct:
 	ld de,Engine.input
 	add ix,de
 	call Input_Construct
+	pop ix
+
+	push ix
+	call Engine_GetAudio
+	call Audio_Construct
 	pop ix
 
 	ld de,Engine.patternNameTable
@@ -85,6 +92,15 @@ Engine_Construct:
 	call Engine_GetVideo
 	call Video_Construct
 	pop ix
+
+	push ix
+	call Engine_GetInterrupt_IY
+	ld e,ixl
+	ld d,ixh
+	ld hl,Engine.audio.Tick
+	add hl,de
+	call Interrupt_SetFrameHandlerIY
+	pop ix
 	ret
 
 ; ix = this
@@ -98,6 +114,11 @@ Engine_Destruct:
 	push ix
 	call Engine_GetInterrupt
 	call Interrupt_Destruct
+	pop ix
+
+	push ix
+	call Engine_GetAudio
+	call Audio_Destruct
 	pop ix
 	ret
 
@@ -220,6 +241,13 @@ Engine_GetVideo:
 Engine_GetVideoIY:
 	ld de,Engine.video
 	add iy,de
+	ret
+
+; ix = this
+; ix <- audio
+Engine_GetAudio:
+	ld de,Engine.audio
+	add ix,de
 	ret
 
 ; iy = this

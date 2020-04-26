@@ -44,6 +44,7 @@ RAM_RESIDENT: equ RAM
 	INCLUDE "Math.asm"
 	INCLUDE "Vector.asm"
 	INCLUDE "Engine.asm"
+	INCLUDE "audio/Audio.asm"
 	INCLUDE "video/Video.asm"
 	INCLUDE "split/Split.asm"
 	INCLUDE "Interrupt.asm"

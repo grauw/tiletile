@@ -5,6 +5,7 @@ const { checkTypes } = require('./utils');
 const { Tmx } = require('./tilemaps');
 const { PNGLoader } = require('./images');
 const { AsepriteSheet } = require('./sprites');
+const { VGMLoader } = require('./audio');
 
 async function main() {
 	if (process.argv.length < 3) {
@@ -20,13 +21,14 @@ async function main() {
 }
 
 class Resources {
-	constructor(screenMode, frameRate, tileMaps, images, sprites) {
-		checkTypes(arguments, "number", "number", Array, Array, Array);
+	constructor(screenMode, frameRate, tileMaps, images, sprites, audio) {
+		checkTypes(arguments, "number", "number", Array, Array, Array, Array);
 		this.screenMode = screenMode;
 		this.frameRate = frameRate;
 		this.tileMaps = tileMaps;
 		this.images = images;
 		this.sprites = sprites;
+		this.audio = audio;
 	}
 
 	optimize() {
@@ -46,6 +48,9 @@ class Resources {
 		for (const sprite of this.sprites) {
 			lines.push(sprite.toAsm(this.frameRate));
 		}
+		for (const track of this.audio) {
+			lines.push(track.toAsm(this.frameRate));
+		}
 		return lines.join("\n\n");
 	}
 }
@@ -64,7 +69,8 @@ class ResourcesLoader {
 			...await Promise.all([
 				this.parseTileMaps(json.tilemaps),
 				this.parseImages(json.images),
-				this.parseSprites(json.sprites)
+				this.parseSprites(json.sprites),
+				this.parseAudio(json.audio)
 			])
 		);
 	}
@@ -92,6 +98,15 @@ class ResourcesLoader {
 		return Promise.all(jsonSprites.map(async jsonSprite => {
 			const spritePath = path.resolve(path.dirname(this.path), jsonSprite.path);
 			return new AsepriteSheet(jsonSprite.name, spritePath).parse();
+		}));
+	}
+
+	async parseAudio(jsonAudio) {
+		checkTypes(arguments, Array);
+		return Promise.all(jsonAudio.map(async jsonTrack => {
+			const trackPath = path.resolve(path.dirname(this.path), jsonTrack.path);
+			const track = await new VGMLoader(jsonTrack.name, trackPath).loadTrack();
+			return track;
 		}));
 	}
 }

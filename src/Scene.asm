@@ -1,11 +1,13 @@
 ;
 ; A scene.
 ;
-Scene: MACRO ?tilemap, ?uiImage
+Scene: MACRO ?tilemap, ?uiImage, ?track
 	engine:
 		dw 0
 	tileMap:
 		dw ?tilemap
+	track:
+		dw ?track
 	exiting:
 		db 0
 	exit:
@@ -92,6 +94,15 @@ Scene_Construct:
 	ld hl,Palette_black
 	call PaletteFader_Construct
 	pop ix
+	ret
+
+; ix = this
+; ix <- engine
+Scene_GetEngine:
+	ld e,(ix + Scene.engine)
+	ld d,(ix + Scene.engine + 1)
+	ld ixl,e
+	ld ixh,d
 	ret
 
 ; ix = this
@@ -200,6 +211,17 @@ Scene_Start:
 	call Scene_GetMapView
 	call MapView_Start
 	pop ix
+
+	push ix
+	ld e,(ix + Scene.track)
+	ld d,(ix + Scene.track + 1)
+	push de
+	call Scene_GetEngine
+	call Engine_GetAudio
+	pop de
+	call Audio_SetTrack
+	call Audio_Play
+	pop ix
 	ret
 
 ; ix = this
@@ -252,7 +274,6 @@ Scene_Update:
 	call Scene_DrawBitmapPrimary
 	call Engine_WaitDisplayedIY  ; avoid having to triple-buffer the SAT
 	call Engine_CopySpriteColorToSecondary
-	call Scene_UpdateMusic
 	call Scene_UpdateGameFrame
 	call Scene_DrawSpriteAttributes
 	call Engine_SubmitSecondaryIY
@@ -507,12 +528,4 @@ Scene_UpdateTriggers:
 	call Scene_GetDialog
 	call Dialog_UpdateTriggers
 	pop ix
-	ret
-
-; ix = this
-; iy = engine
-Scene_UpdateMusic:
-	ld b,0
-	djnz $
-	djnz $
 	ret

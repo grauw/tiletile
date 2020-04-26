@@ -7,7 +7,7 @@ Application: MACRO
 	engine:
 		Engine
 	scene:
-		Scene FieldMap_instance, UIImage_instance
+		Scene FieldMap_instance, UIImage_instance, Silence_track
 	ENDM
 
 Application_Main:

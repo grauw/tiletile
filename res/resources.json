@@ -18,5 +18,11 @@
 			"name": "May",
 			"path": "sprites/may.json"
 		}
+	],
+	"audio": [
+		{
+			"name": "Silence",
+			"path": "audio/silence.vgm"
+		}
 	]
 }

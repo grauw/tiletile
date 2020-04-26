@@ -1,5 +1,10 @@
 "use strict"
 
+function toAsmHex(value) {
+	const hex = value.toString(16).toUpperCase();
+	return hex.charCodeAt(0) > 64 ? `0${hex}H` : `${hex}H`;
+}
+
 /**
  * Type checker, intended for use at the start of any function.
  * Primitive types are checked by a string, objects by their constructor.
@@ -27,3 +32,4 @@ function checkTypes(args) {
 }
 
 exports.checkTypes = checkTypes;
+exports.toAsmHex = toAsmHex;
