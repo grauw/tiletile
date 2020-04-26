@@ -19,7 +19,7 @@ Interrupt: MACRO
 		in a,(c)
 		rra
 		jp c,Return
-	handler: equ $ - 2
+	lineHandler: equ $ - 2
 		xor a
 		out (c),a
 		out (c),b  ; select s#0
@@ -93,30 +93,30 @@ Interrupt_Destruct:
 
 ; iy = this
 ; de <- return address
-; hl <- handler pointer address
-Interrupt_GetLineInterruptAddressesIY:
+; hl <- line handler pointer address
+Interrupt_GetAddressesIY:
 	ld c,iyl
 	ld b,iyh
 	ld hl,Interrupt.Return
 	add hl,bc
 	ex de,hl
-	ld hl,Interrupt.handler
+	ld hl,Interrupt.lineHandler
 	add hl,bc
 	ret
 
-; de = handler
+; de = line handler
 ; iy = this
-Interrupt_SetLineInterruptHandlerIY:
+Interrupt_SetLineHandlerIY:
 	di
-	ld (iy + Interrupt.handler),e
+	ld (iy + Interrupt.lineHandler),e
 	ei
-	ld (iy + Interrupt.handler + 1),d
+	ld (iy + Interrupt.lineHandler + 1),d
 	ret
 
 ; iy = this
-Interrupt_ResetLineInterruptHandlerIY:
-	call Interrupt_GetLineInterruptAddressesIY
-	jp Interrupt_SetLineInterruptHandlerIY
+Interrupt_ResetLineHandlerIY:
+	call Interrupt_GetAddressesIY
+	jp Interrupt_SetLineHandlerIY
 
 ;
 	SECTION RAM

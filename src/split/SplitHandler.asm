@@ -19,7 +19,7 @@ SplitHandler: MACRO ?line, ?settings, ?next
 		in a,(c)   ; clear FH
 		ld hl,Entry
 		ld (0),hl
-	handlerPointer: equ $ - 2
+	lineHandlerPointer: equ $ - 2
 		ret
 	pending:
 		db 0
@@ -44,9 +44,9 @@ SplitHandler: MACRO ?line, ?settings, ?next
 ; ix = this
 ; iy = interrupt
 SplitHandler_Construct:
-	call Interrupt_GetLineInterruptAddressesIY
-	ld (ix + SplitHandler.handlerPointer),l
-	ld (ix + SplitHandler.handlerPointer + 1),h
+	call Interrupt_GetAddressesIY
+	ld (ix + SplitHandler.lineHandlerPointer),l
+	ld (ix + SplitHandler.lineHandlerPointer + 1),h
 	ld (ix + SplitHandler.return),e
 	ld (ix + SplitHandler.return + 1),d
 	ret

@@ -207,7 +207,7 @@ Loop:
 Video_StopIY:
 	push iy
 	call Video_GetInterruptIY
-	call Interrupt_ResetLineInterruptHandlerIY
+	call Interrupt_ResetLineHandlerIY
 	pop iy
 	call VDP_InitText
 	ret
