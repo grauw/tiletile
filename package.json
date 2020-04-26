@@ -8,6 +8,7 @@
     "type": "hg",
     "url": "https://hg.sr.ht/~grauw/tiletile"
   },
+  "type": "commonjs",
   "dependencies": {
     "png-js": "1.0.0",
     "xml2js": "0.4.23"
