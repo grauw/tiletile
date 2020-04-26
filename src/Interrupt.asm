@@ -29,12 +29,11 @@ Interrupt: MACRO
 		ld (SCNCNT),a
 		rst 38H
 		di  ; small window for reentrant interrupt to occur
-	; c = VDP port 1
 	Return:
+		ld bc,(15 | VDP_REGISTER) << 8 | VDP_PORT_1
 		ld a,(VDP_MIRROR_8 + 15)
 		out (c),a
-		ld a,15 | VDP_REGISTER
-		out (c),a
+		out (c),b
 		pop hl
 		pop de
 		pop bc
