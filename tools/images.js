@@ -36,7 +36,7 @@ class Image {
 		} else if (screenMode == 8) {
 			for (let y = 0; y < this.height; y++) {
 				for (let x = 0; x < this.width; x++) {
-					const pixel = this.getPixel(x, y);
+					const pixel = this.getPixel(x, y).project(7).round();
 					pixelData.push(pixel.g << 5 | pixel.r << 2 | pixel.b >> 1);
 				}
 			}
@@ -134,17 +134,52 @@ class Palette {
 	}
 }
 
-class PaletteColor {
-	constructor(index, r, g, b) {
+class Color {
+	constructor(r, g, b, w) {
 		checkTypes(arguments, "number", "number", "number", "number");
-		this.index = index;
 		this.r = r;
 		this.g = g;
 		this.b = b;
+		this.w = w;
+	}
+
+	multiply(other) {
+		return new Color(this.r * other.r, this.g * other.g, this.b * other.b, this.w * other.w);
+	}
+
+	power(exponent) {
+		return new Color(Math.pow(this.r, exponent.r), Math.pow(this.g, exponent.g), Math.pow(this.b, exponent.b), Math.pow(this.w, exponent.w));
+	}
+
+	dot(other) {
+		return this.r * other.r + this.g * other.g + this.b * other.b + this.w * other.w;
+	}
+
+	project(scale) {
+		return new Color(this.r * scale / this.w, this.g * scale / this.w, this.b * scale / this.w, scale);
+	}
+
+	round() {
+		return new Color(Math.round(this.r), Math.round(this.g), Math.round(this.b), Math.round(this.w));
+	}
+}
+
+class ScalarColor extends Color {
+	constructor(scalar) {
+		super(scalar, scalar, scalar, scalar);
+	}
+}
+
+class PaletteColor extends Color {
+	constructor(index, r, g, b, w) {
+		checkTypes(arguments, "number", "number", "number", "number", "number");
+		super(r, g, b, w);
+		this.index = index;
 	}
 
 	getWord() {
-		return this.r << 8 | this.g << 4 | this.b;
+		const color = this.project(7).round();
+		return color.r << 8 | color.g << 4 | color.b;
 	}
 
 	toAsm() {
@@ -156,10 +191,7 @@ class PNGLoader {
 	constructor(path, gamma) {
 		checkTypes(arguments, "string");
 		this.path = path;
-		this.valueMapping3Bit = new Array(256);
-		for (let i = 0; i < 256; i++) {
-			this.valueMapping3Bit[i] = Math.round(Math.pow(i / 255, gamma / 2.2) * 7);
-		}
+		this.gamma = gamma;
 	}
 
 	async loadImage() {
@@ -182,12 +214,10 @@ class PNGLoader {
 	toPalette(palette8bit) {
 		checkTypes(arguments, Array);
 		const palette = new Palette();
-		const palette3bit = palette8bit.map(c => this.valueMapping3Bit[c]);
-		for (let i = 0; i < palette3bit.length / 3; i++) {
-			const r = palette3bit[i * 3] || 0;
-			const g = palette3bit[i * 3 + 1] || 0;
-			const b = palette3bit[i * 3 + 2] || 0;
-			palette.addColor(new PaletteColor(i, r, g, b));
+		for (let i = 0; i < palette8bit.length / 3; i++) {
+			const color = new Color(palette8bit[i * 3] || 0, palette8bit[i * 3 + 1] || 0, palette8bit[i * 3 + 2] || 0, 255);
+			const gammaColor = color.power(new ScalarColor(this.gamma / 2.2));
+			palette.addColor(new PaletteColor(i, gammaColor.r, gammaColor.g, gammaColor.b, gammaColor.w));
 		}
 		return palette;
 	}
