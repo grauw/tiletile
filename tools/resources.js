@@ -2,10 +2,10 @@
 const fs = require('fs');
 const path = require('path');
 const { checkTypes } = require('./utils');
-const { Tmx } = require('./tilemaps');
-const { PNGLoader } = require('./images');
-const { AsepriteSheet } = require('./sprites');
-const { VGMLoader } = require('./audio');
+const { TileMap, Tmx } = require('./tilemaps');
+const { Image, PNGLoader } = require('./images');
+const { Sprite, AsepriteSheet } = require('./sprites');
+const { AudioTrack, VGMLoader } = require('./audio');
 
 async function main() {
 	if (process.argv.length < 3) {
@@ -21,14 +21,34 @@ async function main() {
 }
 
 class Resources {
-	constructor(screenMode, frameRate, tileMaps, images, sprites, audio) {
-		checkTypes(arguments, "number", "number", Array, Array, Array, Array);
+	constructor(screenMode, frameRate) {
+		checkTypes(arguments, "number", "number");
 		this.screenMode = screenMode;
 		this.frameRate = frameRate;
-		this.tileMaps = tileMaps;
-		this.images = images;
-		this.sprites = sprites;
-		this.audio = audio;
+		this.tileMaps = [];
+		this.images = [];
+		this.sprites = [];
+		this.audio = [];
+	}
+
+	addTileMap(tileMap) {
+		checkTypes(arguments, TileMap);
+		this.tileMaps.push(tileMap);
+	}
+
+	addImage(image) {
+		checkTypes(arguments, Image);
+		this.images.push(image);
+	}
+
+	addSprite(sprite) {
+		checkTypes(arguments, Sprite);
+		this.sprites.push(sprite);
+	}
+
+	addAudioTrack(track) {
+		checkTypes(arguments, AudioTrack);
+		this.audio.push(track);
 	}
 
 	optimize() {
@@ -63,51 +83,44 @@ class ResourcesLoader {
 
 	async parse() {
 		const json = JSON.parse(await fs.promises.readFile(this.path));
-		return new Resources(
-			json.screenMode,
-			json.frameRate,
-			...await Promise.all([
-				this.parseTileMaps(json.tilemaps),
-				this.parseImages(json.images),
-				this.parseSprites(json.sprites),
-				this.parseAudio(json.audio)
-			])
-		);
-	}
 
-	async parseTileMaps(jsonTileMaps) {
-		checkTypes(arguments, Array);
-		return Promise.all(jsonTileMaps.map(async jsonTileMap => {
+		const resources = new Resources(
+			json.screenMode,
+			json.frameRate
+		);
+
+		const tileMaps = Promise.all(json.tilemaps.map(async jsonTileMap => {
 			const tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
 			return new Tmx(jsonTileMap.name, tileMapPath).parse();
 		}));
-	}
 
-	async parseImages(jsonImages) {
-		checkTypes(arguments, Array);
-		return Promise.all(jsonImages.map(async jsonImage => {
+		const images = Promise.all(json.images.map(async jsonImage => {
 			const imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
 			const image = await new PNGLoader(imagePath).loadImage();
 			image.name = jsonImage.name;
 			return image;
 		}));
-	}
 
-	async parseSprites(jsonSprites) {
-		checkTypes(arguments, Array);
-		return Promise.all(jsonSprites.map(async jsonSprite => {
+		const sprites = Promise.all(json.sprites.map(async jsonSprite => {
 			const spritePath = path.resolve(path.dirname(this.path), jsonSprite.path);
 			return new AsepriteSheet(jsonSprite.name, spritePath).parse();
 		}));
-	}
 
-	async parseAudio(jsonAudio) {
-		checkTypes(arguments, Array);
-		return Promise.all(jsonAudio.map(async jsonTrack => {
+		const audio = Promise.all(json.audio.map(async jsonTrack => {
 			const trackPath = path.resolve(path.dirname(this.path), jsonTrack.path);
-			const track = await new VGMLoader(jsonTrack.name, trackPath).loadTrack();
-			return track;
+			return new VGMLoader(jsonTrack.name, trackPath).loadTrack();
 		}));
+
+		for (const tileMap of await tileMaps)
+			resources.addTileMap(tileMap);
+		for (const image of await images)
+			resources.addImage(image);
+		for (const sprite of await sprites)
+			resources.addSprite(sprite);
+		for (const track of await audio)
+			resources.addAudioTrack(track);
+
+		return resources;
 	}
 }
 
