@@ -153,9 +153,13 @@ class PaletteColor {
 }
 
 class PNGLoader {
-	constructor(path) {
+	constructor(path, gamma) {
 		checkTypes(arguments, "string");
 		this.path = path;
+		this.valueMapping3Bit = new Array(256);
+		for (let i = 0; i < 256; i++) {
+			this.valueMapping3Bit[i] = Math.round(Math.pow(i / 255, gamma / 2.2) * 7);
+		}
 	}
 
 	async loadImage() {
@@ -178,7 +182,7 @@ class PNGLoader {
 	toPalette(palette8bit) {
 		checkTypes(arguments, Array);
 		const palette = new Palette();
-		const palette3bit = palette8bit.map(c => Math.round(c / 255 * 7));
+		const palette3bit = palette8bit.map(c => this.valueMapping3Bit[c]);
 		for (let i = 0; i < palette3bit.length / 3; i++) {
 			const r = palette3bit[i * 3] || 0;
 			const g = palette3bit[i * 3 + 1] || 0;

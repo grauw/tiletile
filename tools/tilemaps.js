@@ -128,14 +128,15 @@ class Tmx {
 		this.path = path;
 	}
 
-	async parse() {
+	async parse(gamma) {
+		checkTypes(arguments, "number");
 		const xml = await xml2js.parseStringPromise(await fs.promises.readFile(this.path));
-		return this.parseMap(xml.map);
+		return this.parseMap(xml.map, gamma);
 	}
 
-	async parseMap(mapXml) {
-		checkTypes(arguments, Object);
-		const tileSet = await this.parseSet(mapXml.tileset[0]);
+	async parseMap(mapXml, gamma) {
+		checkTypes(arguments, Object, "number");
+		const tileSet = await this.parseSet(mapXml.tileset[0], gamma);
 		const tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height, tileSet);
 		const indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
 		for (const index of indices) {
@@ -144,10 +145,10 @@ class Tmx {
 		return tileMap;
 	}
 
-	async parseSet(setXml) {
-		checkTypes(arguments, Object);
+	async parseSet(setXml, gamma) {
+		checkTypes(arguments, Object, "number");
 		const imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
-		const image = await new PNGLoader(imagepath).loadImage();
+		const image = await new PNGLoader(imagepath, gamma).loadImage();
 		const tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
 		const tileImages = image.toTiles(tileSet.width, tileSet.height);
 		for (let i = 0; i < tileImages.length; i++) {

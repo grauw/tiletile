@@ -1,6 +1,7 @@
 {
 	"screenMode": 5,
 	"frameRate": 59.922743404312307,
+	"gamma": 2.42,
 	"tilemaps": [
 		{
 			"name": "FieldMap",

@@ -103,18 +103,19 @@ class AsepriteSheet {
 		this.path = path;
 	}
 
-	async parse() {
+	async parse(gamma) {
+		checkTypes(arguments, "number");
 		const json = JSON.parse(await fs.promises.readFile(this.path));
-		const sprite = await this.parseSprite(json.meta, this.name);
+		const sprite = await this.parseSprite(json.meta, gamma);
 		this.parseFrames(json.frames, sprite);
 		return sprite;
 	}
 
-	async parseSprite(jsonMeta, name) {
-		checkTypes(arguments, Object, "string");
+	async parseSprite(jsonMeta, gamma) {
+		checkTypes(arguments, Object, "number");
 		const imagepath = path.resolve(path.dirname(this.path), jsonMeta.image);
-		const image = await new PNGLoader(imagepath).loadImage();
-		return new Sprite(name, image);
+		const image = await new PNGLoader(imagepath, gamma).loadImage();
+		return new Sprite(this.name, image);
 	}
 
 	parseFrames(jsonFrames, sprite) {

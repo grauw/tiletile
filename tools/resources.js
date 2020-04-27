@@ -21,10 +21,11 @@ async function main() {
 }
 
 class Resources {
-	constructor(screenMode, frameRate) {
-		checkTypes(arguments, "number", "number");
+	constructor(screenMode, frameRate, gamma) {
+		checkTypes(arguments, "number", "number", "number");
 		this.screenMode = screenMode;
 		this.frameRate = frameRate;
+		this.gamma = gamma;
 		this.tileMaps = [];
 		this.images = [];
 		this.sprites = [];
@@ -86,24 +87,25 @@ class ResourcesLoader {
 
 		const resources = new Resources(
 			json.screenMode,
-			json.frameRate
+			json.frameRate,
+			json.gamma
 		);
 
 		const tileMaps = Promise.all(json.tilemaps.map(async jsonTileMap => {
 			const tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
-			return new Tmx(jsonTileMap.name, tileMapPath).parse();
+			return new Tmx(jsonTileMap.name, tileMapPath).parse(resources.gamma);
 		}));
 
 		const images = Promise.all(json.images.map(async jsonImage => {
 			const imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
-			const image = await new PNGLoader(imagePath).loadImage();
+			const image = await new PNGLoader(imagePath, resources.gamma).loadImage();
 			image.name = jsonImage.name;
 			return image;
 		}));
 
 		const sprites = Promise.all(json.sprites.map(async jsonSprite => {
 			const spritePath = path.resolve(path.dirname(this.path), jsonSprite.path);
-			return new AsepriteSheet(jsonSprite.name, spritePath).parse();
+			return new AsepriteSheet(jsonSprite.name, spritePath).parse(resources.gamma);
 		}));
 
 		const audio = Promise.all(json.audio.map(async jsonTrack => {
