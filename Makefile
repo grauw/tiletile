@@ -1,10 +1,13 @@
 COPY_TARGET = /Volumes/MSXDOS2
 
-all:
+all: node_modules
 	mkdir -p gen bin
-	[ -d node_modules ] || npm install
 	node tools/buildres.js res/manifest.json > gen/Resources.asm
 	java -Xss160K -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/tiletile.rom bin/tiletile.sym
+
+node_modules: package.json
+	npm install
+	touch -m node_modules
 
 copy: all
 	cp bin/tiletile.rom $(COPY_TARGET)/
