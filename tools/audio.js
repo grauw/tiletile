@@ -168,11 +168,4 @@ class VGMLoader {
 	}
 }
 
-exports.AudioTrack = AudioTrack;
-exports.AudioCommand = AudioCommand;
-exports.AudioCommandPSG = AudioCommandPSG;
-exports.AudioCommandOPLL = AudioCommandOPLL;
-exports.AudioCommandWait = AudioCommandWait;
-exports.AudioCommandLoop = AudioCommandLoop;
-exports.AudioCommandEnd = AudioCommandEnd;
-exports.VGMLoader = VGMLoader;
+module.exports = { AudioTrack, VGMLoader };

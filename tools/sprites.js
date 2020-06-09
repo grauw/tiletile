@@ -128,7 +128,4 @@ class AsepriteSheet {
 	}
 }
 
-exports.Sprite = Sprite;
-exports.SpriteFrame = SpriteFrame;
-exports.SpritePattern = SpritePattern;
-exports.AsepriteSheet = AsepriteSheet;
+module.exports = { Sprite, AsepriteSheet };

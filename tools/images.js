@@ -223,9 +223,4 @@ class PNGLoader {
 	}
 }
 
-exports.Image = Image;
-exports.ImageData = ImageData;
-exports.ImageSlice = ImageSlice;
-exports.Palette = Palette;
-exports.PaletteColor = PaletteColor;
-exports.PNGLoader = PNGLoader;
+module.exports = { Image, ImageData, ImageSlice, Palette, PaletteColor, PNGLoader };

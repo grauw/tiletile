@@ -173,7 +173,4 @@ class Tmx {
 	}
 }
 
-exports.TileMap = TileMap;
-exports.TileSet = TileSet;
-exports.Tile = Tile;
-exports.Tmx = Tmx;
+module.exports = { TileMap, TileSet, Tile, Tmx };

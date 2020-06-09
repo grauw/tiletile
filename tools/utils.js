@@ -31,5 +31,4 @@ function checkTypes(args) {
 	}
 }
 
-exports.checkTypes = checkTypes;
-exports.toAsmHex = toAsmHex;
+module.exports = { checkTypes, toAsmHex };

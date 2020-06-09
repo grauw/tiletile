@@ -126,7 +126,6 @@ class ResourcesLoader {
 	}
 }
 
-exports.Resources = Resources;
-exports.ResourcesLoader = ResourcesLoader;
+module.exports = { Resources, ResourcesLoader };
 
 main().catch(reason => { throw reason; });
