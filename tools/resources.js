@@ -1,11 +1,11 @@
 "use strict"
-const fs = require('fs');
-const path = require('path');
-const { checkTypes } = require('./utils');
-const { TileMap, Tmx } = require('./tilemaps');
-const { Image, PNGLoader } = require('./images');
-const { Sprite, AsepriteSheet } = require('./sprites');
-const { AudioTrack, VGMLoader } = require('./audio');
+const fs = require("fs");
+const path = require("path");
+const { checkTypes } = require("./utils");
+const { TileMap, Tmx } = require("./tilemaps");
+const { Image, PNGLoader } = require("./images");
+const { Sprite, AsepriteSheet } = require("./sprites");
+const { AudioTrack, VGMLoader } = require("./audio");
 
 async function main() {
 	if (process.argv.length < 3) {

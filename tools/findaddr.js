@@ -3,7 +3,7 @@ if (process.argv.length < 4) {
 	process.exit(1);
 }
 
-var fs = require('fs');
+var fs = require("fs");
 var filename = process.argv[2];
 
 fs.readFile(filename, "ascii", function(err, data) {

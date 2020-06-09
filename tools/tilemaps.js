@@ -1,9 +1,9 @@
 "use strict"
-const fs = require('fs');
-const path = require('path');
-const xml2js = require('xml2js');
-const { checkTypes } = require('./utils');
-const { Image, Palette, PNGLoader } = require('./images');
+const fs = require("fs");
+const path = require("path");
+const xml2js = require("xml2js");
+const { checkTypes } = require("./utils");
+const { Image, Palette, PNGLoader } = require("./images");
 
 class TileMap {
 	constructor(name, width, height, tileSet) {

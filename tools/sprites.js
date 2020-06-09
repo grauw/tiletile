@@ -1,8 +1,8 @@
 "use strict"
-const fs = require('fs');
-const path = require('path');
-const { checkTypes } = require('./utils');
-const { Image, ImageSlice, PNGLoader } = require('./images');
+const fs = require("fs");
+const path = require("path");
+const { checkTypes } = require("./utils");
+const { Image, ImageSlice, PNGLoader } = require("./images");
 
 class Sprite {
 	constructor(name, sheet) {

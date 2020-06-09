@@ -1,7 +1,7 @@
 "use strict"
-const fs = require('fs');
-const PNG = require('png-js');
-const { checkTypes } = require('./utils');
+const fs = require("fs");
+const PNG = require("png-js");
+const { checkTypes } = require("./utils");
 
 class Image {
 	constructor(width, height, palette) {

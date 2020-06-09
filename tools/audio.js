@@ -1,6 +1,6 @@
 "use strict"
-const fs = require('fs');
-const { checkTypes, toAsmHex } = require('./utils');
+const fs = require("fs");
+const { checkTypes, toAsmHex } = require("./utils");
 
 class AudioTrack {
 	constructor(name) {
