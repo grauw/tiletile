@@ -2,7 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const { checkTypes } = require("./utils");
-const { Image, ImageSlice, PNGLoader } = require("./images");
+const { Image, PNGLoader } = require("./images");
 
 class Sprite {
 	constructor(name, sheet) {
@@ -38,14 +38,12 @@ class Sprite {
 class SpriteFrame {
 	constructor(name, image, duration) {
 		checkTypes(arguments, "string", Image, "number");
-		if (image.width % 16 != 0 || image.height % 16 != 0)
-			throw new Error(`Unsupported sprite dimensions .`);
 		this.name = name;
 		this.image = image;
 		this.duration = duration;
 		this.patterns = [];
 
-		for (const tile of image.toTiles(16, 16)) {
+		for (const tile of image.tile(16, 16).toArray()) {
 			this.patterns.push(new SpritePattern(tile, 1));
 			this.patterns.push(new SpritePattern(tile, 2));
 			this.patterns.push(new SpritePattern(tile, 4));
@@ -74,7 +72,8 @@ class SpritePattern {
 		checkTypes(arguments, Image, "number");
 		this.data = [];
 
-		const addPatternData = image => {
+		const images = image.tile(8, 8);
+		for (const image of [images.get(0, 0), images.get(0, 1), images.get(1, 0), images.get(1, 1)]) {
 			for (let y = 0; y < 8; y++) {
 				let byte = 0;
 				for (let x = 0; x < 8; x++) {
@@ -84,11 +83,6 @@ class SpritePattern {
 				this.data.push(byte);
 			}
 		}
-
-		addPatternData(new ImageSlice(image, 0, 0, 8, 8));
-		addPatternData(new ImageSlice(image, 0, 8, 8, 8));
-		addPatternData(new ImageSlice(image, 8, 0, 8, 8));
-		addPatternData(new ImageSlice(image, 8, 8, 8, 8));
 	}
 
 	toAsm() {
@@ -122,7 +116,7 @@ class AsepriteSheet {
 		checkTypes(arguments, Object, Sprite);
 		for (const jsonFrameName in jsonFrames) {
 			const json = jsonFrames[jsonFrameName];
-			const image = new ImageSlice(sprite.sheet, json.frame.x, json.frame.y, json.frame.w, json.frame.h);
+			const image = sprite.sheet.slice(json.frame.x, json.frame.y, json.frame.w, json.frame.h);
 			sprite.addFrame(new SpriteFrame(jsonFrameName, image, json.duration / 1000));
 		}
 	}

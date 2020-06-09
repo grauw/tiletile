@@ -4,36 +4,30 @@ const path = require("path");
 const xml2js = require("xml2js");
 const { checkTypes } = require("./utils");
 const { Image, Palette, PNGLoader } = require("./images");
+const { Array2D } = require("./array2d");
 
 class TileMap {
-	constructor(name, width, height, tileSet) {
-		checkTypes(arguments, "string", "number", "number", TileSet);
+	constructor(name, tiles, tileSet) {
+		checkTypes(arguments, "string", Array2D, TileSet);
 		this.name = name;
-		this.width = width;
-		this.height = height;
+		this.tiles = tiles;
 		this.tileSet = tileSet;
-		this.tiles = [];
-	}
-
-	addTileByIndex(index) {
-		checkTypes(arguments, "number");
-		this.tiles.push(this.tileSet.getTileByIndex(index));
 	}
 
 	optimize() {
-		this.tileSet.optimize(this.tiles);
+		this.tileSet.optimize(this.tiles.toArray());
 	}
 
 	toAsm(screenMode) {
 		checkTypes(arguments, "number");
 		const lines = [];
 		lines.push(`${this.name}_instance:`)
-		lines.push(`\tTileMap ${this.width}, ${this.height}, ${this.tileSet.name}_palette, ${this.name}_data`);
+		lines.push(`\tTileMap ${this.tiles.width}, ${this.tiles.height}, ${this.tileSet.name}_palette, ${this.name}_data`);
 		lines.push("");
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN ROMMapper_BANK_SIZE");
 		lines.push(`${this.name}_data:`);
-		for (const tile of this.tiles) {
+		for (const tile of this.tiles.toArray()) {
 			lines.push(`\tdw ${this.tileSet.name}_${tile.getName()}`);
 		}
 		lines.push("\tENDS");
@@ -44,18 +38,11 @@ class TileMap {
 }
 
 class TileSet {
-	constructor(name, width, height, palette) {
-		checkTypes(arguments, "string", "number", "number", Palette);
+	constructor(name, tiles, palette) {
+		checkTypes(arguments, "string", Array, Palette);
 		this.name = name;
-		this.width = width;
-		this.height = height;
+		this.tiles = tiles;
 		this.palette = palette;
-		this.tiles = [];
-	}
-
-	addTile(tile) {
-		checkTypes(arguments, Tile);
-		this.tiles.push(tile);
 	}
 
 	getTileByIndex(index) {
@@ -137,25 +124,19 @@ class Tmx {
 	async parseMap(mapXml, gamma) {
 		checkTypes(arguments, Object, "number");
 		const tileSet = await this.parseSet(mapXml.tileset[0], gamma);
-		const tileMap = new TileMap(this.name, ~~mapXml.$.width, ~~mapXml.$.height, tileSet);
 		const indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
-		for (const index of indices) {
-			tileMap.addTileByIndex(index);
-		}
-		return tileMap;
+		const indexMap = Array2D.ofArray(indices, ~~mapXml.$.width, ~~mapXml.$.height);
+		return new TileMap(this.name, indexMap.map(index => tileSet.getTileByIndex(index)).apply(), tileSet);
 	}
 
 	async parseSet(setXml, gamma) {
 		checkTypes(arguments, Object, "number");
 		const imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
 		const image = await new PNGLoader(imagepath, gamma).loadImage();
-		const tileSet = new TileSet(setXml.$.name, ~~setXml.$.tilewidth, ~~setXml.$.tileheight, image.palette);
-		const tileImages = image.toTiles(tileSet.width, tileSet.height);
-		for (let i = 0; i < tileImages.length; i++) {
-			const tileXml = (setXml.tile || []).find(t => t.$.id == i) || { $: { id: i } };
-			tileSet.addTile(this.parseTile(tileXml, tileImages[i]));
-		}
-		return tileSet;
+		const tileImages = image.tile(~~setXml.$.tilewidth, ~~setXml.$.tileheight);
+		const tiles = tileImages.toArray().map((image, index) =>
+			this.parseTile((setXml.tile || []).find(t => t.$.id == index) || { $: { id: index } }, image));
+		return new TileSet(setXml.$.name, tiles, image.palette);
 	}
 
 	parseTile(tileXml, image) {
