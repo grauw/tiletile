@@ -21,14 +21,14 @@ class TileMap {
 	toAsm(screenMode) {
 		checkTypes(arguments, "number");
 		const lines = [];
-		lines.push(`${this.name}_instance:`)
-		lines.push(`\tTileMap ${this.tiles.width}, ${this.tiles.height}, ${this.tileSet.name}_palette, ${this.name}_data`);
+		lines.push(`${this.name}_instance:`);
+		lines.push(`\tTileMap ${this.tiles.width}, ${this.tiles.height}, ${this.tileSet.name}_palette, ${this.name}_tiles`);
 		lines.push("");
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN ROMMapper_BANK_SIZE");
-		lines.push(`${this.name}_data:`);
+		lines.push(`${this.name}_tiles:`);
 		for (const tile of this.tiles.toArray()) {
-			lines.push(`\tdw ${this.tileSet.name}_${tile.getName()}`);
+			lines.push(`\tTile ${this.tileSet.name}_${tile.getName()}_pixels, ${tile.collision}`);
 		}
 		lines.push("\tENDS");
 		lines.push("");
@@ -71,15 +71,10 @@ class TileSet {
 	toAsm(screenMode) {
 		checkTypes(arguments, "number");
 		const lines = [];
-		lines.push(`${this.name}_tiles:`);
-		for (const tile of this.tiles) {
-			lines.push(`${this.name}_${tile.getName()}: Tile ${this.name}_pixelData_${tile.getName()}, ${tile.collision}`);
-		}
-		lines.push("");
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN 100H");
 		for (const tile of this.tiles) {
-			lines.push(`${this.name}_pixelData_${tile.getName()}:`);
+			lines.push(`${this.name}_${tile.getName()}_pixels:`);
 			lines.push(tile.toAsm(screenMode));
 		}
 		lines.push("\tENDS");

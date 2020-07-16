@@ -5,7 +5,7 @@ TileMap: MACRO ?width, ?height, ?palette, ?data
 	size:
 		Vector2W ?width, ?height
 	widthStride:
-		dw ?width * 2
+		dw ?width * Tile._size
 	palette:
 		dw ?palette
 	data:
@@ -54,21 +54,18 @@ TileMap_PixelToTilePosition:
 ; ix = this
 ; ix <- tile
 ; Modifies: af, bc, de, hl
-TileMap_GetTile:
-	call TileMap_GetTileDataPointer
-	ld a,(hl)
-	ld ixl,a
-	inc l
-	ld a,(hl)
-	ld ixh,a
+TileMap_GetTile_IX:
+	call TileMap_GetTile
+	push hl
+	pop ix
 	ret
 
 ; bc = x
 ; de = y
 ; ix = this
-; hl <- tile data pointer
+; hl <- tile
 ; Modifies: af, bc, de
-TileMap_GetTileDataPointer: PROC
+TileMap_GetTile: PROC
 	bit 7,d
 	jr nz,Negative
 	ld h,(ix + TileMap.size.x)
@@ -87,6 +84,7 @@ Negative:
 Continue:
 	add hl,bc
 	add hl,hl
+	add hl,hl
 	ld e,(ix + TileMap.data.address)
 	ld d,(ix + TileMap.data.address + 1)
 	add hl,de
@@ -95,14 +93,16 @@ Continue:
 
 ; c = x offset
 ; e = y offset
-; hl = tile data pointer
+; hl = tile
 ; ix = this
-; hl <- tile data pointer
-TileMap_OffsetTileDataPointer: PROC
+; hl <- tile
+TileMap_OffsetTile: PROC
 	ld a,c
 	add a,a
 	sbc a,a  ; sign extend
 	ld b,a
+	add hl,bc
+	add hl,bc
 	add hl,bc
 	add hl,bc
 	ld a,e

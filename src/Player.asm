@@ -79,7 +79,7 @@ Player_SetPosition:
 	call Player_GetTileMap
 	ex de,hl
 	call TileMap_PixelToTilePosition
-	call TileMap_GetTileDataPointer
+	call TileMap_GetTile
 	pop ix
 	ld (ix + Player.currentTile),l
 	ld (ix + Player.currentTile + 1),h
@@ -88,33 +88,27 @@ Player_SetPosition:
 ; ix = this
 ; ix <- tile
 Player_GetTile:
-	ld l,(ix + Player.currentTile)
-	ld h,(ix + Player.currentTile + 1)
-	ld a,(hl)
-	ld ixl,a
-	inc l
-	ld a,(hl)
-	ld ixh,a
+	ld e,(ix + Player.currentTile)
+	ld d,(ix + Player.currentTile + 1)
+	ld ixl,e
+	ld ixh,d
 	ret
 
 ; c = x offset (range: -16 .. 16)
 ; e = y offset (range: -16 .. 16)
 ; ix = this
 ; ix <- tile
-Player_GetTileWithOffset:
-	call Player_GetTileDataPointerWithOffset
-	ld a,(hl)
-	ld ixl,a
-	inc l
-	ld a,(hl)
-	ld ixh,a
+Player_GetTileWithOffset_IX:
+	call Player_GetTileWithOffset
+	push hl
+	pop ix
 	ret
 
 ; c = x offset (range: -16 .. 16)
 ; e = y offset (range: -16 .. 16)
 ; ix = this
-; hl <- tile pointer
-Player_GetTileDataPointerWithOffset: PROC
+; hl <- tile
+Player_GetTileWithOffset: PROC
 	ld l,(ix + Player.currentTile)
 	ld h,(ix + Player.currentTile + 1)
 	ld a,(ix + Player.position.x)
@@ -126,8 +120,12 @@ Player_GetTileDataPointerWithOffset: PROC
 DecreaseX:
 	dec hl
 	dec hl
+	dec hl
+	dec hl
 	jr ContinueX
 IncreaseX:
+	inc hl
+	inc hl
 	inc hl
 	inc hl
 ContinueX:
@@ -173,7 +171,7 @@ Player_TickPrimary:
 Player_TickPosition:
 	ld c,(ix + Player.velocity.x)
 	ld e,(ix + Player.velocity.y)
-	call Player_GetTileDataPointerWithOffset
+	call Player_GetTileWithOffset
 	ld (ix + Player.currentTile),l
 	ld (ix + Player.currentTile + 1),h
 	ld l,(ix + Player.position.x)
@@ -262,7 +260,7 @@ Player_CanMove:
 	push bc
 	push de
 	push ix
-	call Player_GetTileWithOffset
+	call Player_GetTileWithOffset_IX
 	Tile_IsSolid_M ix
 	pop ix
 	pop de

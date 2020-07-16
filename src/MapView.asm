@@ -47,10 +47,10 @@ MapView_GetCamera:
 ; bc = x
 ; de = y
 ; ix = this
-; hl <- tile pointer pointer
+; hl <- tile
 ; de <- row stride
 ; Modifies: af, bc, de
-MapView_GetTileDataPointer:
+MapView_GetTile:
 	push ix
 	REPT 4
 	sra b
@@ -63,9 +63,11 @@ MapView_GetTileDataPointer:
 	push de
 	call MapView_GetTileMap
 	pop de
-	call TileMap_GetTileDataPointer
+	call TileMap_GetTile
 	ld e,(ix + TileMap.size.x)
 	ld d,(ix + TileMap.size.x + 1)
+	sla e
+	rl d
 	sla e
 	rl d
 	pop ix
@@ -243,7 +245,7 @@ MapView_DrawTileColumn: PROC
 	exx
 	inc d       ; set-up tile iteration
 	ld e,0
-	call MapView_GetTileDataPointer
+	call MapView_GetTile
 	push hl
 	pop ix
 	ld hl,0
@@ -274,13 +276,13 @@ MapView_DrawTileColumn: PROC
 	ld (hl),l
 	pop ix
 	ret
-; bc = tile pointer wrap stride
-; de = tile pointer stride
+; bc = tile wrap stride
+; de = tile stride
 ; l = tile count
 ; h = distance to split
 ; c' = VDP port 3
-; de' = tile source stride
-; ix = tile pointer
+; de' = tile pixels stride
+; ix = tile
 ; iyl = x offset
 Loop:
 	exx
@@ -364,8 +366,8 @@ DrawColumnTile4:
 	ENDP
 
 ; c = VDP port 3
-; de = tile source stride
-; hl = tile source
+; de = tile pixels stride
+; hl = tile pixels
 MapView_DrawColumnTile_M: MACRO ?lines
 	REPT ?lines
 	REPT 4 / Video_X_BYTE
@@ -417,11 +419,11 @@ MapView_DrawTileRow: PROC
 	exx
 	inc b       ; set-up tile iteration
 	ld c,0
-	call MapView_GetTileDataPointer
+	call MapView_GetTile
 	push hl
 	pop ix
-	ld de,2
-	ld bc,-16 * 2
+	ld de,Tile._size
+	ld bc,-16 * Tile._size
 	ld a,iyl
 	ld h,a
 	rrca
@@ -441,13 +443,13 @@ MapView_DrawTileRow: PROC
 	ld (hl),l
 	pop ix
 	ret
-; bc = tile pointer wrap stride
-; de = tile pointer stride
+; bc = tile wrap stride
+; de = tile stride
 ; l = tile count
 ; h = distance to split
 ; c' = VDP port 0
 ; de' = VRAM address (14-bit | 4000H)
-; ix = tile pointer
+; ix = tile
 ; iyh = y offset
 Loop:
 	exx
@@ -532,30 +534,25 @@ DrawRowTile12:
 	ret
 	ENDP
 
-; ix = tile pointer
-; hl <- tile source
+; ix = tile
+; hl <- tile pixels
 MapView_GetTileSource_M: MACRO ?offset
-	ld l,(ix)
-	ld h,(ix + 1)
-	ld a,(hl)
+	ld a,(ix + Tile.image.bank)
 	ld (ROMMapper_instance.pageA000.BANK_SELECT),a
-	inc hl
 	IF Video_X_BYTE = 2
-	ld a,(hl)
-	ENDIF
-	inc hl
-	ld h,(hl)
-	IF Video_X_BYTE = 2
+	ld a,(ix + Tile.image.address)
 	or ?offset
+	ld l,a
 	ELSE
 	ld a,?offset
-	ENDIF
 	ld l,a
+	ENDIF
+	ld h,(ix + Tile.image.address + 1)
 	ENDM
 
 ; c = VDP port 0
 ; de = VRAM destination (14-bit | 4000H)
-; hl = tile source
+; hl = tile pixels
 MapView_DrawRowTile_M: MACRO ?pixels
 	ld a,e
 	MapView_DrawRowTileLine_M ?pixels, a, d
@@ -588,7 +585,7 @@ MapView_DrawRowTile_M: MACRO ?pixels
 	ENDM
 
 ; c = VDP port 0
-; hl = tile source
+; hl = tile pixels
 MapView_DrawRowTileLine_M: MACRO ?pixels, ?vramLSB, ?vramMSB
 	inc c
 	di
