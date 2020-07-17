@@ -304,7 +304,6 @@ Split0:
 	jp Loop
 Split4:
 	exx
-	call GetTileSource
 	call DrawColumnTile4
 	exx
 	add ix,bc
@@ -313,7 +312,6 @@ Split4:
 	add a,4 * 16 / Video_X_BYTE
 	ld iyl,a
 	exx
-	call GetTileSource
 	call DrawColumnTile12
 	exx
 	ld iyl,c
@@ -323,7 +321,6 @@ Split8_12:
 	jr nz,Split12
 Split8:
 	exx
-	call GetTileSource
 	call DrawColumnTile8
 	exx
 	add ix,bc
@@ -332,14 +329,12 @@ Split8:
 	add a,8 * 16 / Video_X_BYTE
 	ld iyl,a
 	exx
-	call GetTileSource
 	call DrawColumnTile8
 	exx
 	ld iyl,c
 	jp Continue
 Split12:
 	exx
-	call GetTileSource
 	call DrawColumnTile12
 	exx
 	add ix,bc
@@ -348,20 +343,21 @@ Split12:
 	add a,12 * 16 / Video_X_BYTE
 	ld iyl,a
 	exx
-	call GetTileSource
 	call DrawColumnTile4
 	exx
 	ld iyl,c
 	jp Continue
-GetTileSource:
+DrawColumnTile4:
 	MapView_GetTileSource_M iyl
+	MapView_DrawColumnTile_M 4
+	ret
+DrawColumnTile8:
+	MapView_GetTileSource_M iyl
+	MapView_DrawColumnTile_M 8
 	ret
 DrawColumnTile12:
-	MapView_DrawColumnTile_M 4
-DrawColumnTile8:
-	MapView_DrawColumnTile_M 4
-DrawColumnTile4:
-	MapView_DrawColumnTile_M 4
+	MapView_GetTileSource_M iyl
+	MapView_DrawColumnTile_M 12
 	ret
 	ENDP
 
@@ -471,7 +467,6 @@ Split0:
 	jp Loop
 Split4:
 	exx
-	call GetTileSource
 	call DrawRowTile4
 	exx
 	add ix,bc
@@ -480,7 +475,6 @@ Split4:
 	add a,4 / Video_X_BYTE
 	ld iyh,a
 	exx
-	call GetTileSource
 	call DrawRowTile12
 	exx
 	ld iyh,c
@@ -490,7 +484,6 @@ Split8_12:
 	jr nz,Split12
 Split8:
 	exx
-	call GetTileSource
 	call DrawRowTile8
 	exx
 	add ix,bc
@@ -499,14 +492,12 @@ Split8:
 	add a,8 / Video_X_BYTE
 	ld iyh,a
 	exx
-	call GetTileSource
 	call DrawRowTile8
 	exx
 	ld iyh,c
 	jr Continue
 Split12:
 	exx
-	call GetTileSource
 	call DrawRowTile12
 	exx
 	add ix,bc
@@ -515,21 +506,20 @@ Split12:
 	add a,12 / Video_X_BYTE
 	ld iyh,a
 	exx
-	call GetTileSource
 	call DrawRowTile4
 	exx
 	ld iyh,c
 	jr Continue
-GetTileSource:
-	MapView_GetTileSource_M iyh
-	ret
 DrawRowTile4:
+	MapView_GetTileSource_M iyh
 	MapView_DrawRowTile_M 4
 	ret
 DrawRowTile8:
+	MapView_GetTileSource_M iyh
 	MapView_DrawRowTile_M 8
 	ret
 DrawRowTile12:
+	MapView_GetTileSource_M iyh
 	MapView_DrawRowTile_M 12
 	ret
 	ENDP
