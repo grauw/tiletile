@@ -239,7 +239,7 @@ MapView_DrawTileColumn: PROC
 	IF Video_X_BYTE = 2
 	rrca
 	ENDIF
-	ld iyl,a
+	ld l,a
 	ld c,VDP_PORT_3
 	ld de,(16 - 4) / Video_X_BYTE
 	exx
@@ -282,11 +282,11 @@ MapView_DrawTileColumn: PROC
 ; h = distance to split
 ; c' = VDP port 3
 ; de' = tile pixels stride
+; l' = tile offset
 ; ix = tile
-; iyl = x offset
 Loop:
 	exx
-	MapView_GetTileSource_M iyl
+	MapView_GetTileSource_M
 	MapView_DrawColumnTile_M 16
 	exx
 Continue:
@@ -307,14 +307,9 @@ Split4:
 	call DrawColumnTile4
 	exx
 	add ix,bc
-	ld a,iyl
-	ld c,a
-	add a,4 * 16 / Video_X_BYTE
-	ld iyl,a
 	exx
 	call DrawColumnTile12
 	exx
-	ld iyl,c
 	jp Continue
 Split8_12:
 	bit 2,h
@@ -324,39 +319,29 @@ Split8:
 	call DrawColumnTile8
 	exx
 	add ix,bc
-	ld a,iyl
-	ld c,a
-	add a,8 * 16 / Video_X_BYTE
-	ld iyl,a
 	exx
 	call DrawColumnTile8
 	exx
-	ld iyl,c
 	jp Continue
 Split12:
 	exx
 	call DrawColumnTile12
 	exx
 	add ix,bc
-	ld a,iyl
-	ld c,a
-	add a,12 * 16 / Video_X_BYTE
-	ld iyl,a
 	exx
 	call DrawColumnTile4
 	exx
-	ld iyl,c
 	jp Continue
 DrawColumnTile4:
-	MapView_GetTileSource_M iyl
+	MapView_GetTileSource_M
 	MapView_DrawColumnTile_M 4
 	ret
 DrawColumnTile8:
-	MapView_GetTileSource_M iyl
+	MapView_GetTileSource_M
 	MapView_DrawColumnTile_M 8
 	ret
 DrawColumnTile12:
-	MapView_GetTileSource_M iyl
+	MapView_GetTileSource_M
 	MapView_DrawColumnTile_M 12
 	ret
 	ENDP
@@ -404,7 +389,7 @@ MapView_DrawTileRow: PROC
 	IF Video_X_BYTE = 1
 	add a,a
 	ENDIF
-	ld iyh,a
+	ld l,a
 	IF Video_X_BYTE = 2
 	srl d
 	ENDIF
@@ -445,11 +430,11 @@ MapView_DrawTileRow: PROC
 ; h = distance to split
 ; c' = VDP port 0
 ; de' = VRAM address (14-bit | 4000H)
+; l' = tile offset
 ; ix = tile
-; iyh = y offset
 Loop:
 	exx
-	MapView_GetTileSource_M iyh
+	MapView_GetTileSource_M
 	MapView_DrawRowTile_M 16
 	exx
 Continue:
@@ -470,14 +455,9 @@ Split4:
 	call DrawRowTile4
 	exx
 	add ix,bc
-	ld a,iyh
-	ld c,a
-	add a,4 / Video_X_BYTE
-	ld iyh,a
 	exx
 	call DrawRowTile12
 	exx
-	ld iyh,c
 	jr Continue
 Split8_12:
 	bit 2,h
@@ -487,55 +467,43 @@ Split8:
 	call DrawRowTile8
 	exx
 	add ix,bc
-	ld a,iyh
-	ld c,a
-	add a,8 / Video_X_BYTE
-	ld iyh,a
 	exx
 	call DrawRowTile8
 	exx
-	ld iyh,c
 	jr Continue
 Split12:
 	exx
 	call DrawRowTile12
 	exx
 	add ix,bc
-	ld a,iyh
-	ld c,a
-	add a,12 / Video_X_BYTE
-	ld iyh,a
 	exx
 	call DrawRowTile4
 	exx
-	ld iyh,c
 	jr Continue
 DrawRowTile4:
-	MapView_GetTileSource_M iyh
+	MapView_GetTileSource_M
 	MapView_DrawRowTile_M 4
 	ret
 DrawRowTile8:
-	MapView_GetTileSource_M iyh
+	MapView_GetTileSource_M
 	MapView_DrawRowTile_M 8
 	ret
 DrawRowTile12:
-	MapView_GetTileSource_M iyh
+	MapView_GetTileSource_M
 	MapView_DrawRowTile_M 12
 	ret
 	ENDP
 
 ; ix = tile
+; l <- tile offset (msb ignored in 4bpp mode)
 ; hl <- tile pixels
-MapView_GetTileSource_M: MACRO ?offset
+MapView_GetTileSource_M: MACRO
 	ld a,(ix + Tile.image.bank)
 	ld (ROMMapper_instance.pageA000.BANK_SELECT),a
 	IF Video_X_BYTE = 2
-	ld a,(ix + Tile.image.address)
-	or ?offset
-	ld l,a
-	ELSE
-	ld a,?offset
-	ld l,a
+	ld h,(ix + Tile.image.address)
+	add hl,hl
+	rr l
 	ENDIF
 	ld h,(ix + Tile.image.address + 1)
 	ENDM
@@ -544,24 +512,42 @@ MapView_GetTileSource_M: MACRO ?offset
 ; de = VRAM destination (14-bit | 4000H)
 ; hl = tile pixels
 MapView_DrawRowTile_M: MACRO ?pixels
+	ld a,l
 	MapView_DrawRowTileLine_M ?pixels
+	IF ?pixels != 16
+	add a,16 / Video_X_BYTE
+	ld l,a
+	ENDIF
 	IF Video_X_BYTE = 2
 	set 7,e
 	ELSE
 	inc d
 	ENDIF
 	MapView_DrawRowTileLine_M ?pixels
+	IF ?pixels != 16
+	add a,16 / Video_X_BYTE
+	ld l,a
+	ENDIF
 	IF Video_X_BYTE = 2
 	res 7,e
 	ENDIF
 	inc d
 	MapView_DrawRowTileLine_M ?pixels
+	IF ?pixels != 16
+	add a,16 / Video_X_BYTE
+	ld l,a
+	ENDIF
 	IF Video_X_BYTE = 2
 	set 7,e
 	ELSE
 	inc d
 	ENDIF
 	MapView_DrawRowTileLine_M ?pixels
+	IF ?pixels != 16
+	add a,(-48 + ?pixels) / Video_X_BYTE
+	and ~(33H / Video_X_BYTE)
+	ENDIF
+	ld l,a
 	IF Video_X_BYTE = 1
 	dec d
 	dec d
@@ -584,9 +570,4 @@ MapView_DrawRowTileLine_M: MACRO ?pixels
 	REPT ?pixels / Video_X_BYTE
 	outi
 	ENDM
-	IF ?pixels != 16
-	ld a,l
-	add a,(16 - ?pixels) / Video_X_BYTE
-	ld l,a
-	ENDIF
 	ENDM
