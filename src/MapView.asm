@@ -544,49 +544,49 @@ MapView_GetTileSource_M: MACRO ?offset
 ; de = VRAM destination (14-bit | 4000H)
 ; hl = tile pixels
 MapView_DrawRowTile_M: MACRO ?pixels
+	MapView_DrawRowTileLine_M ?pixels
+	IF Video_X_BYTE = 2
+	set 7,e
+	ELSE
+	inc d
+	ENDIF
+	MapView_DrawRowTileLine_M ?pixels
+	IF Video_X_BYTE = 2
+	res 7,e
+	ENDIF
+	inc d
+	MapView_DrawRowTileLine_M ?pixels
+	IF Video_X_BYTE = 2
+	set 7,e
+	ELSE
+	inc d
+	ENDIF
+	MapView_DrawRowTileLine_M ?pixels
+	IF Video_X_BYTE = 1
+	dec d
+	dec d
+	ENDIF
+	dec d
 	ld a,e
-	MapView_DrawRowTileLine_M ?pixels, a, d
-	IF Video_X_BYTE = 2
-	add a,80H
-	ELSE
-	inc d
-	ENDIF
-	MapView_DrawRowTileLine_M ?pixels, a, d
-	IF Video_X_BYTE = 2
-	add a,80H
-	ENDIF
-	inc d
-	MapView_DrawRowTileLine_M ?pixels, a, d
-	IF Video_X_BYTE = 2
-	add a,80H
-	ELSE
-	inc d
-	ENDIF
-	MapView_DrawRowTileLine_M ?pixels, a, d
-	dec d
-	IF Video_X_BYTE = 2
-	add a,80H + ?pixels / Video_X_BYTE
-	ELSE
-	dec d
-	dec d
-	add a,?pixels / Video_X_BYTE
-	ENDIF
+	add a,(-100H + ?pixels) / Video_X_BYTE
 	ld e,a
 	ENDM
 
 ; c = VDP port 0
 ; hl = tile pixels
-MapView_DrawRowTileLine_M: MACRO ?pixels, ?vramLSB, ?vramMSB
+MapView_DrawRowTileLine_M: MACRO ?pixels
 	inc c
 	di
-	out (c),?vramLSB
+	out (c),e
 	ei
-	out (c),?vramMSB
+	out (c),d
 	dec c
 	REPT ?pixels / Video_X_BYTE
 	outi
 	ENDM
-	REPT (16 - ?pixels) / Video_X_BYTE
-	inc l
-	ENDM
+	IF ?pixels != 16
+	ld a,l
+	add a,(16 - ?pixels) / Video_X_BYTE
+	ld l,a
+	ENDIF
 	ENDM
