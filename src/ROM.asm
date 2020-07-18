@@ -77,6 +77,6 @@ RAM_RESIDENT: equ RAM
 	SECTION RAM
 
 ROM_mapper:
-	ROMMapper
+	ROMMapper ROMMapper_ASCII8
 
 	ENDS

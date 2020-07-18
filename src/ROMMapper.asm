@@ -1,18 +1,23 @@
 ;
-; Konami SCC ROM mapper
+; 8K ROM mapper
 ;
 ROMMapper_BANK_SIZE: equ 2000H
 ROMMapper_BANK_SIZE_LOG2: equ 13
+ROMMapper_ASCII8: equ 0
+ROMMapper_KONAMI: equ 1
+ROMMapper_KONAMISCC: equ 2
 
-ROMMapper: MACRO
+ROMMapper: MACRO ?type
+	BASE: equ ?type = ROMMapper_ASCII8 ? 6000H : ?type = ROMMapper_KONAMI ? 4000H : 5000H
+	OFFSET: equ ?type = ROMMapper_ASCII8 ? 800H : 2000H
 	page4000:
-		ROMPage 4000H, 5000H, 0
+		ROMPage 4000H, BASE + 0 * OFFSET, 0
 	page6000:
-		ROMPage 6000H, 7000H, 1
+		ROMPage 6000H, BASE + 1 * OFFSET, 1
 	page8000:
-		ROMPage 8000H, 9000H, 2
+		ROMPage 8000H, BASE + 2 * OFFSET, 2
 	pageA000:
-		ROMPage 0A000H, 0B000H, 3
+		ROMPage 0A000H, BASE + 3 * OFFSET, 3
 	ENDM
 
 ROMPage: MACRO ?base, ?bankSelect, ?initialValue = 0
