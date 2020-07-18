@@ -258,105 +258,87 @@ MapView_DrawTileColumn: PROC
 	ld c,l
 	ld b,h
 	ld a,iyh
+	rrca
+	rrca
 	ld h,a
-	rrca
-	rrca
-	rrca
-	rrca
-	and 0FH
-	ld l,a
-	push hl
-	call nz,Loop
-	pop hl
-	ld a,16
-	sub l
-	ld l,a
-	call SplitAndLoop
+	call DrawTilesBeforeSplit
+	add ix,bc
+	ld a,40H
+	sub h
+	ld h,a
+	call DrawTilesAfterSplit
 	pop hl
 	ld (hl),l
 	pop ix
 	ret
-; bc = tile wrap stride
+; a = h = distance to split / 4
 ; de = tile stride
-; l = tile count
-; h = distance to split
 ; c' = VDP port 3
 ; de' = tile pixels stride
 ; l' = tile offset
 ; ix = tile
+DrawTilesBeforeSplit:
+	and ~03H
+	call nz,DrawTiles16
+	ld a,h
+	and 03H
+	jp nz,DrawTileA
+	ret
+; a = h = distance from split / 4
+; de = tile stride
+; c' = VDP port 3
+; de' = tile pixels stride
+; l' = tile offset
+; ix = tile
+DrawTilesAfterSplit: PROC
+	and 03H
+	jr z,Continue
+	call DrawTileA
+	add ix,de
+Continue:
+	ld a,h
+	and ~03H
+	jp nz,DrawTiles16
+	ret
+	ENDP
+DrawTileA:
+	bit 0,a
+	jr z,DrawTile8
+	bit 1,a
+	jp nz,DrawTile12
+DrawTile4:
+	exx
+	MapView_GetTileSource_M
+	MapView_DrawColumnTile_M 4
+	exx
+	ret
+DrawTile8:
+	exx
+	MapView_GetTileSource_M
+	MapView_DrawColumnTile_M 8
+	exx
+	ret
+DrawTile12:
+	exx
+	MapView_GetTileSource_M
+	MapView_DrawColumnTile_M 12
+	exx
+	ret
+DrawTiles16: PROC
+	rrca
+	rrca
+	ld l,a
 Loop:
 	exx
 	MapView_GetTileSource_M
 	MapView_DrawColumnTile_M 16
 	exx
-Continue:
 	add ix,de
 	dec l
 	jp nz,Loop
 	ret
-SplitAndLoop:
-	bit 3,h
-	jr nz,Split8_12
-	bit 2,h
-	jr nz,Split4
-Split0:
-	add ix,bc
-	jp Loop
-Split4:
-	exx
-	call DrawColumnTile4
-	exx
-	add ix,bc
-	exx
-	call DrawColumnTile12
-	exx
-	jp Continue
-Split8_12:
-	bit 2,h
-	jr nz,Split12
-Split8:
-	exx
-	call DrawColumnTile8
-	exx
-	add ix,bc
-	exx
-	call DrawColumnTile8
-	exx
-	jp Continue
-Split12:
-	exx
-	call DrawColumnTile12
-	exx
-	add ix,bc
-	exx
-	call DrawColumnTile4
-	exx
-	jp Continue
-DrawColumnTile4:
-	MapView_GetTileSource_M
-	MapView_DrawColumnTile_M 4
-	ret
-DrawColumnTile8:
-	MapView_GetTileSource_M
-	MapView_DrawColumnTile_M 8
-	ret
-DrawColumnTile12:
-	MapView_GetTileSource_M
-	MapView_DrawColumnTile_M 12
-	ret
 	ENDP
-
-; c = VDP port 3
-; de = tile pixels stride
-; hl = tile pixels
-MapView_DrawColumnTile_M: MACRO ?lines
-	REPT ?lines
-	REPT 4 >> Video_4BPU
-	outi
-	ENDM
-	add hl,de
-	ENDM
-	ENDM
+	ENDP
 
 ; bc = x
 ; de = y
@@ -406,92 +388,86 @@ MapView_DrawTileRow: PROC
 	ld de,Tile._size
 	ld bc,-16 * Tile._size
 	ld a,iyl
+	rrca
+	rrca
 	ld h,a
-	rrca
-	rrca
-	rrca
-	rrca
-	and 0FH
-	ld l,a
-	push hl
-	call nz,Loop
-	pop hl
-	ld a,16
-	sub l
-	ld l,a
-	call SplitAndLoop
+	call DrawTilesBeforeSplit
+	add ix,bc
+	ld a,40H
+	sub h
+	ld h,a
+	call DrawTilesAfterSplit
 	pop hl
 	ld (hl),l
 	pop ix
 	ret
-; bc = tile wrap stride
+; a = h = distance to split / 4
 ; de = tile stride
-; l = tile count
-; h = distance to split
-; c' = VDP port 0
-; de' = VRAM address (14-bit | 4000H)
+; c' = VDP port 3
+; de' = tile pixels stride
 ; l' = tile offset
 ; ix = tile
+DrawTilesBeforeSplit:
+	and ~03H
+	call nz,DrawTiles16
+	ld a,h
+	and 03H
+	jp nz,DrawTileA
+	ret
+; a = h = distance from split / 4
+; de = tile stride
+; c' = VDP port 3
+; de' = tile pixels stride
+; l' = tile offset
+; ix = tile
+DrawTilesAfterSplit: PROC
+	and 03H
+	jr z,Continue
+	call DrawTileA
+	add ix,de
+Continue:
+	ld a,h
+	and ~03H
+	jp nz,DrawTiles16
+	ret
+	ENDP
+DrawTileA:
+	bit 0,a
+	jr z,DrawTile8
+	bit 1,a
+	jp nz,DrawTile12
+DrawTile4:
+	exx
+	MapView_GetTileSource_M
+	MapView_DrawRowTile_M 4
+	exx
+	ret
+DrawTile8:
+	exx
+	MapView_GetTileSource_M
+	MapView_DrawRowTile_M 8
+	exx
+	ret
+DrawTile12:
+	exx
+	MapView_GetTileSource_M
+	MapView_DrawRowTile_M 12
+	exx
+	ret
+DrawTiles16: PROC
+	rrca
+	rrca
+	ld l,a
 Loop:
 	exx
 	MapView_GetTileSource_M
 	MapView_DrawRowTile_M 16
 	exx
-Continue:
 	add ix,de
 	dec l
 	jp nz,Loop
 	ret
-SplitAndLoop:
-	bit 3,h
-	jr nz,Split8_12
-	bit 2,h
-	jr nz,Split4
-Split0:
-	add ix,bc
-	jp Loop
-Split4:
-	exx
-	call DrawRowTile4
-	exx
-	add ix,bc
-	exx
-	call DrawRowTile12
-	exx
-	jr Continue
-Split8_12:
-	bit 2,h
-	jr nz,Split12
-Split8:
-	exx
-	call DrawRowTile8
-	exx
-	add ix,bc
-	exx
-	call DrawRowTile8
-	exx
-	jr Continue
-Split12:
-	exx
-	call DrawRowTile12
-	exx
-	add ix,bc
-	exx
-	call DrawRowTile4
-	exx
-	jr Continue
-DrawRowTile4:
-	MapView_GetTileSource_M
-	MapView_DrawRowTile_M 4
-	ret
-DrawRowTile8:
-	MapView_GetTileSource_M
-	MapView_DrawRowTile_M 8
-	ret
-DrawRowTile12:
-	MapView_GetTileSource_M
-	MapView_DrawRowTile_M 12
-	ret
+	ENDP
 	ENDP
 
 ; ix = tile
@@ -506,6 +482,18 @@ MapView_GetTileSource_M: MACRO
 	rr l
 	ENDIF
 	ld h,(ix + Tile.image.address + 1)
+	ENDM
+
+; c = VDP port 3
+; de = tile pixels stride
+; hl = tile pixels
+MapView_DrawColumnTile_M: MACRO ?lines
+	REPT ?lines
+	REPT 4 >> Video_4BPU
+	outi
+	ENDM
+	add hl,de
+	ENDM
 	ENDM
 
 ; c = VDP port 0
