@@ -13,7 +13,7 @@ DialogSplit: MACRO
 		VDPRegister 1
 	mode8:
 		VDPRegister 8
-		VDPRegister 2, 1 * Video_X_BYTE << 5 | 00011111B
+		VDPRegister 2, 1 << Video_4BPU << 5 | 00011111B
 	verticalOffset1:
 		VDPRegister 23
 	color10:

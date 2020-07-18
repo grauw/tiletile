@@ -3,9 +3,9 @@
 ;
 VRAMTableCopy: MACRO ?source = 0, ?destination = 0, ?size = 0
 	super:
-		VDPCommand 0, ?source >> (Video_MODE < 7 ? 7 : 8),
-		           0, ?destination >> (Video_MODE < 7 ? 7 : 8),
-		           Video_X_SCALE = 2 ? 200H : 100H, ?size >> (Video_MODE < 7 ? 7 : 8),
+		VDPCommand 0, ?source << Video_4BPU >> 8,
+		           0, ?destination << Video_4BPU >> 8,
+		           100H << Video_HIRES, ?size << Video_4BPU >> 8,
 		           0, 0, VDPCommand_YMMM
 	ENDM
 
@@ -14,14 +14,14 @@ VRAMTableCopy: MACRO ?source = 0, ?destination = 0, ?size = 0
 ; iy = this
 VRAMTableCopy_SetSourceIY:
 	ld a,l
-	and Video_X_BYTE = 2 ? 7FH : a
+	and Video_4BPU ? 7FH : a
 	call nz,System_ThrowException
 	ld e,(ix + VRAMTable.address)
 	ld d,(ix + VRAMTable.address + 1)
 	add hl,de
 	ld a,(ix + VRAMTable.address + 2)
 	adc a,0
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	add hl,hl
 	adc a,a
 	ENDIF
@@ -34,14 +34,14 @@ VRAMTableCopy_SetSourceIY:
 ; iy = this
 VRAMTableCopy_SetDestinationIY:
 	ld a,l
-	and Video_X_BYTE = 2 ? 7FH : a
+	and Video_4BPU ? 7FH : a
 	call nz,System_ThrowException
 	ld e,(ix + VRAMTable.address)
 	ld d,(ix + VRAMTable.address + 1)
 	add hl,de
 	ld a,(ix + VRAMTable.address + 2)
 	adc a,0
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	add hl,hl
 	adc a,a
 	ENDIF
@@ -53,9 +53,9 @@ VRAMTableCopy_SetDestinationIY:
 ; iy = this
 VRAMTableCopy_SetSizeIY:
 	ld a,c
-	and Video_X_BYTE = 2 ? 7FH : a
+	and Video_4BPU ? 7FH : a
 	call nz,System_ThrowException
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	xor a
 	sla c
 	rl b

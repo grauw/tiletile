@@ -27,7 +27,7 @@ Dialog: MACRO ?uiImage
 	patternName:
 		PatternNameTable 10000H
 	drawCommand:
-		VDPCommand 0, Video_X_BYTE * 100H, Dialog_START_X, Video_X_BYTE * 100H + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_LMMM | VDPCommand_TIMP
+		VDPCommand 0, 100H << Video_4BPU, Dialog_START_X, (100H << Video_4BPU) + Dialog_START_Y, 0, 0, 0DDH, 0, VDPCommand_LMMM | VDPCommand_TIMP
 	ENDM
 
 ; ix = this
@@ -118,19 +118,19 @@ Clear:
 	ld d,ixh
 	ld iy,Dialog.drawCommand
 	add iy,de
-	ld (iy + VDPCommand.dx),Dialog_START_X * Video_X_SCALE
-	IF Video_X_SCALE > 1
-	ld (iy + VDPCommand.dx + 1),Dialog_START_X * Video_X_SCALE >> 8
+	ld (iy + VDPCommand.dx),Dialog_START_X << Video_HIRES
+	IF Video_HIRES
+	ld (iy + VDPCommand.dx + 1),Dialog_START_X << Video_HIRES >> 8
 	ENDIF
 	ld (iy + VDPCommand.dy),Dialog_START_Y
-	ld (iy + VDPCommand.nx),Dialog_LINE_WIDTH * Video_X_SCALE
-	IF Video_X_SCALE > 1
-	ld (iy + VDPCommand.nx + 1),Dialog_LINE_WIDTH * Video_X_SCALE >> 8
+	ld (iy + VDPCommand.nx),Dialog_LINE_WIDTH << Video_HIRES
+	IF Video_HIRES
+	ld (iy + VDPCommand.nx + 1),Dialog_LINE_WIDTH << Video_HIRES >> 8
 	ENDIF
 	ld (iy + VDPCommand.ny),Dialog_LINE_HEIGHT * Dialog_LINE_COUNT
 	ld (iy + VDPCommand.command),VDPCommand_HMMV
 	call VDPCommand_ExecuteS2IY
-	IF Video_X_SCALE > 1
+	IF Video_HIRES
 	ld (iy + VDPCommand.nx + 1),0
 	ENDIF
 	ld (iy + VDPCommand.command),VDPCommand_LMMM | VDPCommand_TIMP
@@ -154,9 +154,9 @@ Loop:
 	ld (ix + Dialog.text + 1),d
 	cp 10
 	jr nz,NoNewline
-	ld (iy + VDPCommand.dx),Dialog_START_X * Video_X_SCALE
-	IF Video_X_SCALE > 1
-	ld (iy + VDPCommand.dx + 1),Dialog_START_X * Video_X_SCALE >> 8
+	ld (iy + VDPCommand.dx),Dialog_START_X << Video_HIRES
+	IF Video_HIRES
+	ld (iy + VDPCommand.dx + 1),Dialog_START_X << Video_HIRES >> 8
 	ENDIF
 	ld a,(iy + VDPCommand.dy)
 	add a,Dialog_LINE_HEIGHT
@@ -183,7 +183,7 @@ NoKerning:
 	ld a,(iy + VDPCommand.dx)
 	add a,(iy + VDPCommand.nx)
 	ld (iy + VDPCommand.dx),a
-	IF Video_X_SCALE > 1
+	IF Video_HIRES
 	ld a,(iy + VDPCommand.dx + 1)
 	adc a,0
 	ld (iy + VDPCommand.dx + 1),a

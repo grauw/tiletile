@@ -13,7 +13,7 @@ MapView: MACRO
 	position:
 		Vector2W MapView_OFFSET_X, MapView_OFFSET_Y
 	verticalDrawCommand:
-		VDPCommand 0, 0, 0, MapView_PAGE << 8, 4 * Video_X_SCALE, 100H, 0, 0, VDPCommand_HMMC
+		VDPCommand 0, 0, 0, MapView_PAGE << 8, 4 << Video_HIRES, 100H, 0, 0, VDPCommand_HMMC
 	ENDM
 
 ; de = map
@@ -209,7 +209,7 @@ MapView_DrawTileColumn: PROC
 	ld iyh,e
 	exx         ; set-up for output
 	ld c,iyl
-	IF Video_X_SCALE = 2
+	IF Video_HIRES
 	xor a
 	sla c
 	rla
@@ -236,12 +236,12 @@ MapView_DrawTileColumn: PROC
 	out (c),d
 	ld a,iyl
 	and 0CH
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	rrca
 	ENDIF
 	ld l,a
 	ld c,VDP_PORT_3
-	ld de,(16 - 4) / Video_X_BYTE
+	ld de,16 - 4 >> Video_4BPU
 	exx
 	inc d       ; set-up tile iteration
 	ld e,0
@@ -351,7 +351,7 @@ DrawColumnTile12:
 ; hl = tile pixels
 MapView_DrawColumnTile_M: MACRO ?lines
 	REPT ?lines
-	REPT 4 / Video_X_BYTE
+	REPT 4 >> Video_4BPU
 	outi
 	ENDM
 	add hl,de
@@ -369,10 +369,10 @@ MapView_DrawTileRow: PROC
 	ld iyh,e
 	exx         ; set-up for output
 	ld a,iyh
-	and Video_X_BYTE = 2 ? 80H : 0C0H
+	and 0C0H << Video_4BPU
 	or MapView_PAGE
 	rlca
-	IF Video_X_BYTE = 1
+	IF !Video_4BPU
 	rlca
 	ENDIF
 	di
@@ -386,11 +386,11 @@ MapView_DrawTileRow: PROC
 	add a,a
 	add a,a
 	add a,a
-	IF Video_X_BYTE = 1
+	IF !Video_4BPU
 	add a,a
 	ENDIF
 	ld l,a
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	srl d
 	ENDIF
 	set 6,d
@@ -500,7 +500,7 @@ DrawRowTile12:
 MapView_GetTileSource_M: MACRO
 	ld a,(ix + Tile.image.bank)
 	ld (ROMMapper_instance.pageA000.BANK_SELECT),a
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	ld h,(ix + Tile.image.address)
 	add hl,hl
 	rr l
@@ -515,46 +515,46 @@ MapView_DrawRowTile_M: MACRO ?pixels
 	ld a,l
 	MapView_DrawRowTileLine_M ?pixels
 	IF ?pixels != 16
-	add a,16 / Video_X_BYTE
+	add a,16 >> Video_4BPU
 	ld l,a
 	ENDIF
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	set 7,e
 	ELSE
 	inc d
 	ENDIF
 	MapView_DrawRowTileLine_M ?pixels
 	IF ?pixels != 16
-	add a,16 / Video_X_BYTE
+	add a,16 >> Video_4BPU
 	ld l,a
 	ENDIF
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	res 7,e
 	ENDIF
 	inc d
 	MapView_DrawRowTileLine_M ?pixels
 	IF ?pixels != 16
-	add a,16 / Video_X_BYTE
+	add a,16 >> Video_4BPU
 	ld l,a
 	ENDIF
-	IF Video_X_BYTE = 2
+	IF Video_4BPU
 	set 7,e
 	ELSE
 	inc d
 	ENDIF
 	MapView_DrawRowTileLine_M ?pixels
 	IF ?pixels != 16
-	add a,(-48 + ?pixels) / Video_X_BYTE
-	and ~(33H / Video_X_BYTE)
+	add a,-48 + ?pixels >> Video_4BPU
+	and ~33H >> Video_4BPU
 	ENDIF
 	ld l,a
-	IF Video_X_BYTE = 1
+	IF !Video_4BPU
 	dec d
 	dec d
 	ENDIF
 	dec d
 	ld a,e
-	add a,(-100H + ?pixels) / Video_X_BYTE
+	add a,-100H + ?pixels >> Video_4BPU
 	ld e,a
 	ENDM
 
@@ -567,7 +567,7 @@ MapView_DrawRowTileLine_M: MACRO ?pixels
 	ei
 	out (c),d
 	dec c
-	REPT ?pixels / Video_X_BYTE
+	REPT ?pixels >> Video_4BPU
 	outi
 	ENDM
 	ENDM

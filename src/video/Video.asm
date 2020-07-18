@@ -17,8 +17,8 @@
 	INCLUDE "VDPCommandEx.asm"
 
 Video_MODE: equ 5
-Video_X_BYTE: equ Video_MODE < 7 ? 2 : 1
-Video_X_SCALE: equ Video_MODE = 6 || Video_MODE = 7 ? 2 : 1
+Video_4BPU: equ Video_MODE < 7 ? 1 : 0                     ; 8 or 4 bits per x-unit
+Video_HIRES: equ Video_MODE = 6 || Video_MODE = 7 ? 1 : 0  ; 1 or 2 pixels per x-unit
 
 Video_VERTICAL_ADJUST: equ -2
 
