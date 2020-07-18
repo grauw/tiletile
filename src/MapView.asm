@@ -203,7 +203,7 @@ Loop:
 ; ix = this
 MapView_DrawTileColumn: PROC
 	push ix
-	ld hl,(ROMMapper_instance.pageA000)
+	ld hl,(ROM_mapper.pageA000)
 	push hl
 	ld iyl,c
 	ld iyh,e
@@ -363,7 +363,7 @@ MapView_DrawColumnTile_M: MACRO ?lines
 ; ix = this
 MapView_DrawTileRow: PROC
 	push ix
-	ld hl,(ROMMapper_instance.pageA000)
+	ld hl,(ROM_mapper.pageA000)
 	push hl
 	ld iyl,c
 	ld iyh,e
@@ -499,7 +499,7 @@ DrawRowTile12:
 ; hl <- tile pixels
 MapView_GetTileSource_M: MACRO
 	ld a,(ix + Tile.image.bank)
-	ld (ROMMapper_instance.pageA000.BANK_SELECT),a
+	ld (ROM_mapper.pageA000.BANK_SELECT),a
 	IF Video_4BPU
 	ld h,(ix + Tile.image.address)
 	add hl,hl

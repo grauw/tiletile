@@ -11,7 +11,7 @@ Audio: MACRO
 	playing: ret
 		ld a,0
 	bank: equ $ - 1
-		ld (ROMMapper_instance.page8000.BANK_SELECT),a
+		ld (ROM_mapper.page8000.BANK_SELECT),a
 		ld hl,0
 	address: equ $ - 2
 		ld a,1
@@ -20,8 +20,8 @@ Audio: MACRO
 		call z,Audio_Process
 		ld (wait),a
 		ld (address),hl
-		ld a,(ROMMapper_instance.page8000.bank)
-		ld (ROMMapper_instance.page8000.BANK_SELECT),a
+		ld a,(ROM_mapper.page8000.bank)
+		ld (ROM_mapper.page8000.BANK_SELECT),a
 		ret
 
 	psg:

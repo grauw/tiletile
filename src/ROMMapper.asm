@@ -25,6 +25,18 @@ ROMPage: MACRO ?base, ?bankSelect, ?initialValue = 0
 		db ?base >> 8
 	ENDM
 
+; ix = this
+ROMMapper_Construct:
+	ld a,(ix + ROMMapper.page4000.bank)
+	ld (ROMMapper.page4000.BANK_SELECT),a
+	ld a,(ix + ROMMapper.page6000.bank)
+	ld (ROMMapper.page6000.BANK_SELECT),a
+	ld a,(ix + ROMMapper.page8000.bank)
+	ld (ROMMapper.page8000.BANK_SELECT),a
+	ld a,(ix + ROMMapper.pageA000.bank)
+	ld (ROMMapper.pageA000.BANK_SELECT),a
+	ret
+
 ; hl = page base
 ; a <- bank
 ROMMapper_GetBank:
@@ -53,10 +65,10 @@ ROMMapper_GetPage: PROC
 	bit 5,h
 	jr nz,Page6000
 Page4000:
-	ld hl,ROMMapper_instance.page4000
+	ld hl,ROM_mapper.page4000
 	ret
 Page6000:
-	ld hl,ROMMapper_instance.page6000
+	ld hl,ROM_mapper.page6000
 	ret
 UpperHalf:
 	bit 6,h
@@ -64,10 +76,10 @@ UpperHalf:
 	bit 5,h
 	jr nz,PageA000
 Page8000:
-	ld hl,ROMMapper_instance.page8000
+	ld hl,ROM_mapper.page8000
 	ret
 PageA000:
-	ld hl,ROMMapper_instance.pageA000
+	ld hl,ROM_mapper.pageA000
 	ret
 PageOutOfRange:
 	call System_ThrowException
@@ -88,11 +100,3 @@ ROMPage_SetBank:
 	ld h,(hl)
 	ld (hl),a
 	ret
-
-;
-	SECTION RAM
-
-ROMMapper_instance:
-	ROMMapper
-
-	ENDS

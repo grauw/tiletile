@@ -17,11 +17,13 @@ ROMRuntime: MACRO ?main
 		ld h,80H
 		call Memory_SetSlot
 		ld a,ROM_RAMInitBank
-		ld (ROMMapper_instance.pageA000.BANK_SELECT),a
+		ld (ROM_mapper.pageA000.BANK_SELECT),a
 		ld hl,RAM_sourceAddress
 		ld de,RAM_startAddress
 		ld bc,RAM_endAddress - RAM_startAddress
 		ldir
+		ld ix,ROM_mapper
+		call ROMMapper_Construct
 		call System_SetDirectBIOSHandlers
 		ld hl,?main
 		call System_TryCall

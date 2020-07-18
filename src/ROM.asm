@@ -73,3 +73,10 @@ RAM_RESIDENT: equ RAM
 	INCLUDE "Resources.asm"
 
 	ENDS
+
+	SECTION RAM
+
+ROM_mapper:
+	ROMMapper
+
+	ENDS
