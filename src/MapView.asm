@@ -247,7 +247,6 @@ MapView_DrawTileColumn: PROC
 	ld e,0
 	call MapView_GetTile
 	push hl
-	pop ix
 	ld hl,0
 	and a
 	sbc hl,de
@@ -258,11 +257,12 @@ MapView_DrawTileColumn: PROC
 	ld c,l
 	ld b,h
 	ld a,iyh
+	pop iy
 	rrca
 	rrca
 	ld h,a
 	call DrawTilesBeforeSplit
-	add ix,bc
+	add iy,bc
 	ld a,40H
 	sub h
 	ld h,a
@@ -276,7 +276,7 @@ MapView_DrawTileColumn: PROC
 ; c' = VDP port 3
 ; de' = tile pixels stride
 ; l' = tile offset
-; ix = tile
+; iy = tile
 DrawTilesBeforeSplit:
 	and ~03H
 	call nz,DrawTiles16
@@ -289,12 +289,12 @@ DrawTilesBeforeSplit:
 ; c' = VDP port 3
 ; de' = tile pixels stride
 ; l' = tile offset
-; ix = tile
+; iy = tile
 DrawTilesAfterSplit: PROC
 	and 03H
 	jr z,Continue
 	call DrawTileA
-	add ix,de
+	add iy,de
 Continue:
 	ld a,h
 	and ~03H
@@ -333,7 +333,7 @@ Loop:
 	MapView_GetTileSource_M
 	MapView_DrawColumnTile_M 16
 	exx
-	add ix,de
+	add iy,de
 	dec l
 	jp nz,Loop
 	ret
@@ -384,15 +384,15 @@ MapView_DrawTileRow: PROC
 	ld c,0
 	call MapView_GetTile
 	push hl
-	pop ix
 	ld de,Tile._size
 	ld bc,-16 * Tile._size
 	ld a,iyl
+	pop iy
 	rrca
 	rrca
 	ld h,a
 	call DrawTilesBeforeSplit
-	add ix,bc
+	add iy,bc
 	ld a,40H
 	sub h
 	ld h,a
@@ -406,7 +406,7 @@ MapView_DrawTileRow: PROC
 ; c' = VDP port 3
 ; de' = tile pixels stride
 ; l' = tile offset
-; ix = tile
+; iy = tile
 DrawTilesBeforeSplit:
 	and ~03H
 	call nz,DrawTiles16
@@ -419,12 +419,12 @@ DrawTilesBeforeSplit:
 ; c' = VDP port 3
 ; de' = tile pixels stride
 ; l' = tile offset
-; ix = tile
+; iy = tile
 DrawTilesAfterSplit: PROC
 	and 03H
 	jr z,Continue
 	call DrawTileA
-	add ix,de
+	add iy,de
 Continue:
 	ld a,h
 	and ~03H
@@ -463,25 +463,26 @@ Loop:
 	MapView_GetTileSource_M
 	MapView_DrawRowTile_M 16
 	exx
-	add ix,de
+	add iy,de
 	dec l
 	jp nz,Loop
 	ret
 	ENDP
 	ENDP
 
-; ix = tile
+; l = tile offset (msb ignored in 4bpp mode)
+; iy = tile
 ; l <- tile offset (msb ignored in 4bpp mode)
 ; hl <- tile pixels
 MapView_GetTileSource_M: MACRO
-	ld a,(ix + Tile.image.bank)
+	ld a,(iy + Tile.image.bank)
 	ld (ROM_mapper.pageA000.BANK_SELECT),a
 	IF Video_4BPU
-	ld h,(ix + Tile.image.address)
+	ld h,(iy + Tile.image.address)
 	add hl,hl
 	rr l
 	ENDIF
-	ld h,(ix + Tile.image.address + 1)
+	ld h,(iy + Tile.image.address + 1)
 	ENDM
 
 ; c = VDP port 3
