@@ -32,7 +32,7 @@ AudioCommandWait: MACRO ?time
 
 AudioCommandEnd: MACRO ?loop
 	command:
-		AudioCommand 0FFH
+		AudioCommand 80H
 	loop:
 		dw ?loop & 1FFFH | 8000H
 	ENDM

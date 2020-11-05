@@ -106,12 +106,12 @@ Audio_Process:
 	jr c,Audio_ProcessPSG
 	cp 80H
 	jr c,Audio_ProcessOPLL
-	cp 0FFH
-	jr c,Audio_ProcessWait
-	jr Audio_ProcessEnd
+	jr z,Audio_ProcessEnd
+	sub 80H
+	inc hl
+	ret
 
 ; hl = command list
-; a <- wait
 ; hl <- next command
 Audio_ProcessPSG:
 	ld c,PSG_DATA
@@ -121,7 +121,6 @@ Audio_ProcessPSG:
 	jr Audio_Process
 
 ; hl = command list
-; a <- wait
 ; hl <- next command
 Audio_ProcessOPLL:
 	sub 40H
@@ -132,15 +131,6 @@ Audio_ProcessOPLL:
 	jr Audio_Process
 
 ; hl = command list
-; a <- wait
-; hl <- next command
-Audio_ProcessWait:
-	sub 80H
-	inc hl
-	ret
-
-; hl = command list
-; a <- wait
 ; hl <- next command
 Audio_ProcessEnd:
 	inc hl
