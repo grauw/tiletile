@@ -34,5 +34,5 @@ AudioCommandJump: MACRO ?address
 	command:
 		AudioCommand 80H
 	address:
-		dw ?address & 1FFFH | 8000H
+		ROMAddress ?address, 8000H
 	ENDM

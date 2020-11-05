@@ -6,19 +6,19 @@
 	INCLUDE "MSXMusic.asm"
 
 Audio: MACRO
-	; Modifies: af, bc, hl
+	; Modifies: af, bc, de, hl
 	Tick:
 	playing: ret
-		ld a,0
-	bank: equ $ - 1
-		ld (ROM_mapper.page8000.BANK_SELECT),a
 		ld hl,0
 	address: equ $ - 2
-		ld a,1
+		ld de,1 >> 8
+	bank: equ $ - 2
 	wait: equ $ - 1
-		dec a
+		ld a,e
+		ld (ROM_mapper.page8000.BANK_SELECT),a
+		dec d
 		call z,Audio_Process
-		ld (wait),a
+		ld (bank),de
 		ld (address),hl
 		ld a,(ROM_mapper.page8000.bank)
 		ld (ROM_mapper.page8000.BANK_SELECT),a
@@ -97,9 +97,9 @@ Audio_Stop:
 Audio_Tick:
 	jp ix
 
-; hl = command list
-; a <- wait
-; hl <- next command
+; ehl = command list
+; d <- wait
+; ehl <- next command
 Audio_Process:
 	ld a,(hl)
 	cp 40H
@@ -108,11 +108,12 @@ Audio_Process:
 	jr c,Audio_ProcessOPLL
 	jr z,Audio_ProcessJump
 	sub 80H
+	ld d,a
 	inc hl
 	ret
 
-; hl = command list
-; hl <- next command
+; ehl = command list
+; ehl <- next command
 Audio_ProcessPSG:
 	ld c,PSG_DATA
 	inc hl
@@ -120,8 +121,8 @@ Audio_ProcessPSG:
 	outi
 	jr Audio_Process
 
-; hl = command list
-; hl <- next command
+; ehl = command list
+; ehl <- next command
 Audio_ProcessOPLL:
 	sub 40H
 	inc hl
@@ -130,12 +131,16 @@ Audio_ProcessOPLL:
 	outi                      ; wait 84 cycles
 	jr Audio_Process
 
-; hl = command list
-; hl <- next command
+; ehl = command list
+; ehl <- next command
 Audio_ProcessJump:
+	inc hl
+	ld e,(hl)
 	inc hl
 	ld a,(hl)
 	inc hl
 	ld h,(hl)
 	ld l,a
+	ld a,e
+	ld (ROM_mapper.page8000.BANK_SELECT),a
 	jr Audio_Process

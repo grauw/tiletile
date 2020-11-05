@@ -33,25 +33,43 @@ class AudioTrack {
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN 2000H");
 		lines.push(`${this.name}_commands:`);
+		let size = 0;
+		const increaseSize = amount => {
+			const space = 0x2000 - (size & 0x1FFF);
+			if (space - amount < 4) {
+				lines.push(`\tAudioCommandJump ${this.name}_commands_${(size + space).toString(16).toUpperCase()}`);
+				for (let i = 4; i < space; i++) {
+					lines.push(`\tAudioCommandWait 1`);
+				}
+				lines.push(`${this.name}_commands_${(size + space).toString(16).toUpperCase()}:`);
+				size += space;
+			}
+			size += amount;
+		}
 		let time = 0.5 / 44100 * frameRate;  // slight offset to avoid rounding errors
 		for (const command of this.commands) {
 			if (command instanceof AudioCommandPSG) {
+				increaseSize(2);
 				lines.push(`\tAudioCommandPSG ${toAsmHex(command.address)}, ${toAsmHex(command.value)}`);
 			} else if (command instanceof AudioCommandOPLL) {
+				increaseSize(2);
 				lines.push(`\tAudioCommandOPLL ${toAsmHex(command.address)}, ${toAsmHex(command.value)}`);
 			} else if (command instanceof AudioCommandWait) {
 				const lastTime = time;
 				time += command.time * frameRate;
 				for (let frames = Math.floor(time) - Math.floor(lastTime); frames > 0; frames -= 0x7F) {
+					increaseSize(1);
 					lines.push(`\tAudioCommandWait ${Math.min(frames, 0x7F)}`);
 				}
 			} else if (command instanceof AudioCommandLoop) {
 				lines.push(`${this.name}_commands_loop:`);
 			} else if (command instanceof AudioCommandEnd) {
 				if (this.loop < 0) {
+					increaseSize(1);
 					lines.push(`${this.name}_commands_loop:`);
 					lines.push(`\tAudioCommandWait 1`);
 				}
+				increaseSize(4);
 				lines.push(`\tAudioCommandJump ${this.name}_commands_loop`);
 			} else {
 				throw new Error("Unrecognised command.");
