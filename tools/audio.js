@@ -52,7 +52,7 @@ class AudioTrack {
 					lines.push(`${this.name}_commands_loop:`);
 					lines.push(`\tAudioCommandWait 1`);
 				}
-				lines.push(`\tAudioCommandEnd ${this.name}_commands_loop`);
+				lines.push(`\tAudioCommandJump ${this.name}_commands_loop`);
 			} else {
 				throw new Error("Unrecognised command.");
 			}

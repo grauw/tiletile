@@ -30,9 +30,9 @@ AudioCommandWait: MACRO ?time
 		AudioCommand 80H + ?time
 	ENDM
 
-AudioCommandEnd: MACRO ?loop
+AudioCommandJump: MACRO ?address
 	command:
 		AudioCommand 80H
-	loop:
-		dw ?loop & 1FFFH | 8000H
+	address:
+		dw ?address & 1FFFH | 8000H
 	ENDM

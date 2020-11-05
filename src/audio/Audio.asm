@@ -106,7 +106,7 @@ Audio_Process:
 	jr c,Audio_ProcessPSG
 	cp 80H
 	jr c,Audio_ProcessOPLL
-	jr z,Audio_ProcessEnd
+	jr z,Audio_ProcessJump
 	sub 80H
 	inc hl
 	ret
@@ -132,7 +132,7 @@ Audio_ProcessOPLL:
 
 ; hl = command list
 ; hl <- next command
-Audio_ProcessEnd:
+Audio_ProcessJump:
 	inc hl
 	ld a,(hl)
 	inc hl
