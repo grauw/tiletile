@@ -1,11 +1,10 @@
-"use strict"
-const fs = require("fs");
-const path = require("path");
-const { checkTypes } = require("./utils");
-const { TileMap, Tmx } = require("./tilemaps");
-const { Image, PNGLoader } = require("./images");
-const { Sprite, AsepriteSheet } = require("./sprites");
-const { AudioTrack, VGMLoader } = require("./audio");
+import fs from "fs";
+import path from "path";
+import { checkTypes } from "./utils.js";
+import { TileMap, Tmx } from "./tilemaps.js";
+import { Image, PNGLoader } from "./images.js";
+import { Sprite, AsepriteSheet } from "./sprites.js";
+import { AudioTrack, VGMLoader } from "./audio.js";
 
 async function main() {
 	if (process.argv.length < 3) {
@@ -20,7 +19,7 @@ async function main() {
 	console.log(resources.toAsm());
 }
 
-class Resources {
+export class Resources {
 	constructor(screenMode, frameRate, gamma) {
 		checkTypes(arguments, "number", "number", "number");
 		this.screenMode = screenMode;
@@ -76,7 +75,7 @@ class Resources {
 	}
 }
 
-class ResourcesLoader {
+export class ResourcesLoader {
 	constructor(path) {
 		checkTypes(arguments, "string");
 		this.path = path;
@@ -125,7 +124,5 @@ class ResourcesLoader {
 		return resources;
 	}
 }
-
-module.exports = { Resources, ResourcesLoader };
 
 main().catch(reason => { throw reason; });

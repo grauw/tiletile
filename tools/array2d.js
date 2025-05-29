@@ -1,6 +1,6 @@
-const { checkTypes } = require("./utils");
+import { checkTypes } from "./utils.js";
 
-class Array2D {
+export class Array2D {
 	constructor(width, height, getter) {
 		checkTypes(arguments, "number", "number", Function);
 		this.width = width;
@@ -61,5 +61,3 @@ class Array2D {
 		return new Array2D(width, height, (x, y) => this.get(xOffset + x, yOffset + y));
 	}
 }
-
-exports.Array2D = Array2D;

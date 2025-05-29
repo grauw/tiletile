@@ -1,12 +1,11 @@
-"use strict"
-const fs = require("fs");
-const path = require("path");
-const xml2js = require("xml2js");
-const { checkTypes } = require("./utils");
-const { Image, Palette, PNGLoader } = require("./images");
-const { Array2D } = require("./array2d");
+import fs from "fs";
+import path from "path";
+import xml2js from "xml2js";
+import { checkTypes } from "./utils.js";
+import { Image, Palette, PNGLoader } from "./images.js";
+import { Array2D } from "./array2d.js";
 
-class TileMap {
+export class TileMap {
 	constructor(name, tiles, tileSet) {
 		checkTypes(arguments, "string", Array2D, TileSet);
 		this.name = name;
@@ -37,7 +36,7 @@ class TileMap {
 	}
 }
 
-class TileSet {
+export class TileSet {
 	constructor(name, tiles, palette) {
 		checkTypes(arguments, "string", Array, Palette);
 		this.name = name;
@@ -84,7 +83,7 @@ class TileSet {
 	}
 }
 
-class Tile {
+export class Tile {
 	constructor(index, name, image, collision) {
 		checkTypes(arguments, "number", ["string"], Image, "number");
 		this.index = index;
@@ -103,7 +102,7 @@ class Tile {
 	}
 }
 
-class Tmx {
+export class Tmx {
 	constructor(name, path) {
 		checkTypes(arguments, "string", "string");
 		this.name = name;
@@ -148,5 +147,3 @@ class Tmx {
 		return property !== undefined ? property.$.value : default_;
 	}
 }
-
-module.exports = { TileMap, TileSet, Tile, Tmx };

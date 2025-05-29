@@ -1,10 +1,9 @@
-"use strict"
-const fs = require("fs");
-const PNG = require("png-js");
-const { checkTypes } = require("./utils");
-const { Array2D } = require("./array2d");
+import fs from "fs";
+import PNG from "png-js";
+import { checkTypes } from "./utils.js";
+import { Array2D } from "./array2d.js";
 
-class Image {
+export class Image {
 	constructor(pixels, palette) {
 		checkTypes(arguments, Array2D, Palette);
 		this.pixels = pixels;
@@ -76,7 +75,7 @@ class Image {
 	}
 }
 
-class Palette {
+export class Palette {
 	constructor() {
 		this.colors = [];
 	}
@@ -132,7 +131,7 @@ class ScalarColor extends Color {
 	}
 }
 
-class PaletteColor extends Color {
+export class PaletteColor extends Color {
 	constructor(index, r, g, b, w) {
 		checkTypes(arguments, "number", "number", "number", "number", "number");
 		super(r, g, b, w);
@@ -149,7 +148,7 @@ class PaletteColor extends Color {
 	}
 }
 
-class PNGLoader {
+export class PNGLoader {
 	constructor(path, gamma) {
 		checkTypes(arguments, "string");
 		this.path = path;
@@ -184,5 +183,3 @@ class PNGLoader {
 		return palette;
 	}
 }
-
-module.exports = { Image, Palette, PaletteColor, PNGLoader };

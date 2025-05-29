@@ -1,8 +1,7 @@
-"use strict"
-const fs = require("fs");
-const { checkTypes, toAsmHex } = require("./utils");
+import fs from "fs";
+import { checkTypes, toAsmHex } from "./utils.js";
 
-class AudioTrack {
+export class AudioTrack {
 	constructor(name) {
 		checkTypes(arguments, "string");
 		this.name = name;
@@ -127,7 +126,7 @@ class AudioCommandEnd extends AudioCommand {
 	}
 }
 
-class VGMLoader {
+export class VGMLoader {
 	constructor(name, path) {
 		checkTypes(arguments, "string", "string");
 		this.name = name;
@@ -185,5 +184,3 @@ class VGMLoader {
 		return track;
 	}
 }
-
-module.exports = { AudioTrack, VGMLoader };

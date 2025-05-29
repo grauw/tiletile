@@ -1,10 +1,9 @@
-"use strict"
-const fs = require("fs");
-const path = require("path");
-const { checkTypes } = require("./utils");
-const { Image, PNGLoader } = require("./images");
+import fs from "fs";
+import path from "path";
+import { checkTypes } from "./utils.js";
+import { Image, PNGLoader } from "./images.js";
 
-class Sprite {
+export class Sprite {
 	constructor(name, sheet) {
 		checkTypes(arguments, "string", Image);
 		this.name = name;
@@ -90,7 +89,7 @@ class SpritePattern {
 	}
 }
 
-class AsepriteSheet {
+export class AsepriteSheet {
 	constructor(name, path) {
 		checkTypes(arguments, "string", "string");
 		this.name = name;
@@ -121,5 +120,3 @@ class AsepriteSheet {
 		}
 	}
 }
-
-module.exports = { Sprite, AsepriteSheet };

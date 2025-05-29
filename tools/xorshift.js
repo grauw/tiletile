@@ -6,21 +6,21 @@ if (process.argv.length != 5) {
 	process.exit(1);
 }
 
-var a = process.argv[2];
-var b = process.argv[3];
-var c = process.argv[4];
+const a = process.argv[2];
+const b = process.argv[3];
+const c = process.argv[4];
 
-var seed = 1;
-var y = seed;
-var period = 0;
+const seed = 1;
+let y = seed;
+let period = 0;
 
 do {
 	y ^= (y << a) & 255;
 	y ^= (y >> b) & 255;
 	y ^= (y << c) & 255;
 	console.log(
-			("0000000" + y.toString(2)).substr(-8) + " " +
-			("0" + y.toString(16)).substr(-2) + " " +
+			("0000000" + y.toString(2)).slice(-8) + " " +
+			("0" + y.toString(16)).slice(-2) + " " +
 			y);
 	period++;
 } while (y != seed);
