@@ -15,14 +15,62 @@ Audio: MACRO
 	bank: equ $ - 2
 	wait: equ $ - 1
 		ld a,e
-		ld (ROM_mapper.page8000.BANK_SELECT),a
+		ld (ROM_mapper.page4000.BANK_SELECT),a
 		dec d
-		call z,Audio_Process
+		call z,Process
 		ld (bank),de
 		ld (address),hl
-		ld a,(ROM_mapper.page8000.bank)
-		ld (ROM_mapper.page8000.BANK_SELECT),a
+		ld a,(ROM_mapper.page4000.bank)
+		ld (ROM_mapper.page4000.BANK_SELECT),a
 		ret
+
+	; ehl = command list
+	; d <- wait
+	; ehl <- next command
+	Process:
+		ld a,(hl)
+		cp 40H
+		jr c,ProcessPSG
+		cp 80H
+		jr c,ProcessOPLL
+		jr z,ProcessJump
+		sub 80H
+		ld d,a
+		inc hl
+		ret
+
+	; ehl = command list
+	; ehl <- next command
+	ProcessPSG:
+		ld c,PSG_DATA
+		inc hl
+		out (PSG_ADDRESS),a
+		outi
+		jr Process
+
+	; ehl = command list
+	; ehl <- next command
+	ProcessOPLL:
+		sub 40H
+		inc hl
+		ld c,MSXMusic_DATA
+		out (MSXMusic_ADDRESS),a  ; wait 12 cycles
+		outi                      ; wait 84 cycles
+		jr Process
+
+	; ehl = command list
+	; ehl <- next command
+	ProcessJump:
+		inc hl
+		ld e,(hl)
+		inc hl
+		ld a,(hl)
+		inc hl
+		ld h,(hl)
+		ld l,a
+		ld a,e
+		ld (ROM_mapper.page4000.BANK_SELECT),a
+		jr Process
 
 	psg:
 		PSG
@@ -96,51 +144,3 @@ Audio_Stop:
 ; ix = this
 Audio_Tick:
 	jp ix
-
-; ehl = command list
-; d <- wait
-; ehl <- next command
-Audio_Process:
-	ld a,(hl)
-	cp 40H
-	jr c,Audio_ProcessPSG
-	cp 80H
-	jr c,Audio_ProcessOPLL
-	jr z,Audio_ProcessJump
-	sub 80H
-	ld d,a
-	inc hl
-	ret
-
-; ehl = command list
-; ehl <- next command
-Audio_ProcessPSG:
-	ld c,PSG_DATA
-	inc hl
-	out (PSG_ADDRESS),a
-	outi
-	jr Audio_Process
-
-; ehl = command list
-; ehl <- next command
-Audio_ProcessOPLL:
-	sub 40H
-	inc hl
-	ld c,MSXMusic_DATA
-	out (MSXMusic_ADDRESS),a  ; wait 12 cycles
-	outi                      ; wait 84 cycles
-	jr Audio_Process
-
-; ehl = command list
-; ehl <- next command
-Audio_ProcessJump:
-	inc hl
-	ld e,(hl)
-	inc hl
-	ld a,(hl)
-	inc hl
-	ld h,(hl)
-	ld l,a
-	ld a,e
-	ld (ROM_mapper.page8000.BANK_SELECT),a
-	jr Audio_Process

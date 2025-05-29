@@ -3,7 +3,7 @@
 ;
 AudioTrack: MACRO ?commands
 	commands:
-		ROMAddress ?commands, 8000H
+		ROMAddress ?commands, 4000H
 	ENDM
 
 AudioCommand: MACRO ?command
@@ -34,5 +34,5 @@ AudioCommandJump: MACRO ?address
 	command:
 		AudioCommand 80H
 	address:
-		ROMAddress ?address, 8000H
+		ROMAddress ?address, 4000H
 	ENDM
