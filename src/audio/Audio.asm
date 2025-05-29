@@ -7,71 +7,54 @@
 
 Audio: MACRO
 	; Modifies: af, bc, de, hl
-	Tick:
-	playing: ret
+	Tick: PROC
+	playing:
 		ld hl,0
 	address: equ $ - 2
-		ld de,1 >> 8
-	bank: equ $ - 2
-	wait: equ $ - 1
-		ld a,e
+		ld a,0
+	bank: equ $ - 1
 		ld (ROM_mapper.page4000.BANK_SELECT),a
-		dec d
-		call z,Process
-		ld (bank),de
+		ld a,1
+	wait: equ $ - 1
+		dec a
+		jr nz,Wait
+	Loop:
+		ld a,(hl)
+		inc hl
+		cp 40H
+		jr c,PSG
+		cp 80H
+		jr c,OPLL
+		jr z,Jump
+		sub 80H
+	Wait:
+		ld (wait),a
 		ld (address),hl
 		ld a,(ROM_mapper.page4000.bank)
 		ld (ROM_mapper.page4000.BANK_SELECT),a
 		ret
-
-	; ehl = command list
-	; d <- wait
-	; ehl <- next command
-	Process:
-		ld a,(hl)
-		cp 40H
-		jr c,ProcessPSG
-		cp 80H
-		jr c,ProcessOPLL
-		jr z,ProcessJump
-		sub 80H
-		ld d,a
-		inc hl
-		ret
-
-	; ehl = command list
-	; ehl <- next command
-	ProcessPSG:
+	PSG:
 		ld c,PSG_DATA
-		inc hl
 		out (PSG_ADDRESS),a
 		outi
-		jr Process
-
-	; ehl = command list
-	; ehl <- next command
-	ProcessOPLL:
+		jp Loop
+	OPLL:
 		sub 40H
-		inc hl
 		ld c,MSXMusic_DATA
-		out (MSXMusic_ADDRESS),a  ; wait 12 cycles
-		outi                      ; wait 84 cycles
-		jr Process
-
-	; ehl = command list
-	; ehl <- next command
-	ProcessJump:
-		inc hl
-		ld e,(hl)
-		inc hl
+		out (MSXMusic_ADDRESS),a  ; wait 18 cycles (min 12)
+		outi                      ; wait 91 cycles (min 84)
+		jp Loop
+	Jump:
 		ld a,(hl)
 		inc hl
+		ld b,(hl)
+		inc hl
 		ld h,(hl)
-		ld l,a
-		ld a,e
+		ld l,b
+		ld (bank),a
 		ld (ROM_mapper.page4000.BANK_SELECT),a
-		jr Process
-
+		jp Loop
+		ENDP
 	psg:
 		PSG
 	msxMusic:
@@ -80,6 +63,7 @@ Audio: MACRO
 
 ; ix = this
 Audio_Construct:
+	call Audio_Stop
 	push ix
 	call Audio_GetPSG
 	call PSG_Construct
@@ -122,23 +106,23 @@ Audio_SetTrack:
 	ld iyl,e
 	ld iyh,d
 	ld a,(iy + AudioTrack.commands.bank)
-	ld (ix + Audio.bank),a
+	ld (ix + Audio.Tick.bank),a
 	ld a,(iy + AudioTrack.commands.address)
-	ld (ix + Audio.address),a
+	ld (ix + Audio.Tick.address),a
 	ld a,(iy + AudioTrack.commands.address + 1)
-	ld (ix + Audio.address + 1),a
+	ld (ix + Audio.Tick.address + 1),a
 	pop iy
-	ld (ix + Audio.wait),1
+	ld (ix + Audio.Tick.wait),1
 	ret
 
 ; ix = this
 Audio_Play:
-	ld (ix + Audio.playing),00H  ; nop
+	ld (ix + Audio.Tick.playing),021H  ; ld hl,nn
 	ret
 
 ; ix = this
 Audio_Stop:
-	ld (ix + Audio.playing),0C9H  ; ret
+	ld (ix + Audio.Tick.playing),0C9H  ; ret
 	ret
 
 ; ix = this
