@@ -98,7 +98,7 @@ export class AsepriteSheet {
 
 	async parse(gamma) {
 		checkTypes(arguments, "number");
-		const json = JSON.parse(await fs.promises.readFile(this.path));
+		const json = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
 		const sprite = await this.parseSprite(json.meta, gamma);
 		this.parseFrames(json.frames, sprite);
 		return sprite;

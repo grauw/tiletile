@@ -82,7 +82,7 @@ export class ResourcesLoader {
 	}
 
 	async parse() {
-		const json = JSON.parse(await fs.promises.readFile(this.path));
+		const json = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
 
 		const resources = new Resources(
 			json.screenMode,
