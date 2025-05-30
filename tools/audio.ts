@@ -1,16 +1,18 @@
 import fs from "fs";
-import { checkTypes, toAsmHex } from "./utils.js";
+import { toAsmHex } from "./utils.ts";
 
 export class AudioTrack {
-	constructor(name) {
-		checkTypes(arguments, "string");
+	public readonly name: string;
+	public readonly commands: AudioCommand[];
+	private loop: number;
+
+	constructor(name: string) {
 		this.name = name;
 		this.commands = [];
 		this.loop = -1;
 	}
 
-	addCommand(command) {
-		checkTypes(arguments, AudioCommand);
+	addCommand(command: AudioCommand) {
 		if (command instanceof AudioCommandWait && this.commands.length > 0) {
 			const lastCommand = this.commands[this.commands.length - 1];
 			if (lastCommand instanceof AudioCommandWait) {
@@ -23,9 +25,8 @@ export class AudioTrack {
 		this.commands.push(command);
 	}
 
-	toAsm(frameRate) {
-		checkTypes(arguments, "number");
-		const lines = [];
+	toAsm(frameRate: number) {
+		const lines: string[] = [];
 		lines.push(`${this.name}_track:`);
 		lines.push(`\tAudioTrack ${this.name}_commands`);
 		lines.push("");
@@ -33,7 +34,7 @@ export class AudioTrack {
 		lines.push("\tALIGN 2000H");
 		lines.push(`${this.name}_commands:`);
 		let size = 0;
-		const increaseSize = amount => {
+		const increaseSize = (amount: number) => {
 			const space = 0x2000 - (size & 0x1FFF);
 			if (space - amount < 4) {
 				lines.push(`\tAudioCommandJump ${this.name}_commands_${(size + space).toString(16).toUpperCase()}`);
@@ -85,8 +86,10 @@ class AudioCommand {
 }
 
 class AudioCommandPSG extends AudioCommand {
-	constructor(address, value) {
-		checkTypes(arguments, "number", "number");
+	public readonly address: number;
+	public readonly value: number;
+
+	constructor(address: number, value: number) {
 		if (address >= 0x0E)
 			throw new Error("Invalid PSG register.");
 		super();
@@ -96,8 +99,10 @@ class AudioCommandPSG extends AudioCommand {
 }
 
 class AudioCommandOPLL extends AudioCommand {
-	constructor(address, value) {
-		checkTypes(arguments, "number", "number");
+	public readonly address: number;
+	public readonly value: number;
+
+	constructor(address: number, value: number) {
 		if (address >= 0x40)
 			throw new Error("Invalid OPLL register.");
 		super();
@@ -107,8 +112,9 @@ class AudioCommandOPLL extends AudioCommand {
 }
 
 class AudioCommandWait extends AudioCommand {
-	constructor(time) {
-		checkTypes(arguments, "number");
+	public time: number;
+
+	constructor(time: number) {
 		super();
 		this.time = time;
 	}
@@ -127,17 +133,19 @@ class AudioCommandEnd extends AudioCommand {
 }
 
 export class VGMLoader {
-	constructor(name, path) {
-		checkTypes(arguments, "string", "string");
+	public readonly name: string;
+	public readonly path: string;
+
+	constructor(name: string, path: string) {
 		this.name = name;
 		this.path = path;
 	}
 
 	async loadTrack() {
 		const vgm = await fs.promises.readFile(this.path);
-		const getByte = address => vgm[address];
-		const getWord = address => getByte(address) | getByte(address + 1) << 8;
-		const getDoubleWord = address => getWord(address) | getWord(address + 2) << 16;
+		const getByte = (address: number) => vgm[address];
+		const getWord = (address: number) => getByte(address) | getByte(address + 1) << 8;
+		const getDoubleWord = (address: number) => getWord(address) | getWord(address + 2) << 16;
 		if (getDoubleWord(0x00) != 0x206d6756)
 			throw new Error("Not a VGM file.");
 		const version = getDoubleWord(0x08);

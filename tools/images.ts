@@ -1,20 +1,22 @@
 import fs from "fs";
 import PNG from "png-js";
-import { checkTypes } from "./utils.js";
-import { Array2D } from "./array2d.js";
+import { Array2D } from "./array2d.ts";
 
 export class Image {
-	constructor(pixels, palette) {
-		checkTypes(arguments, Array2D, Palette);
+	public readonly pixels: Array2D<PaletteColor>;
+	public readonly palette: Palette;
+	public name?: string;
+
+	constructor(pixels: Array2D<PaletteColor>, palette: Palette) {
 		this.pixels = pixels;
 		this.palette = palette;
 	}
 
-	getPixel(x, y) {
+	getPixel(x: number, y: number) {
 		return this.pixels.get(x, y);
 	}
 
-	getPixelData(screenMode) {
+	getPixelData(screenMode: number) {
 		if (this.pixels.width & 1)
 			throw new Error("Image width is not even.");
 
@@ -50,17 +52,16 @@ export class Image {
 		return pixelData;
 	}
 
-	tile(width, height) {
+	tile(width: number, height: number) {
 		return this.pixels.tile(width, height).map(pixels => new Image(pixels, this.palette)).apply();
 	}
 
-	slice(x, y, width, height) {
+	slice(x: number, y: number, width: number, height: number) {
 		return new Image(this.pixels.slice(x, y, width, height), this.palette);
 	}
 
-	toAsm(screenMode) {
-		checkTypes(arguments, "number");
-		const lines = [];
+	toAsm(screenMode: number) {
+		const lines: string[] = [];
 		if (this.name) {
 			lines.push(`${this.name}_instance: Image ${this.pixels.width}, ${this.pixels.height}, ${this.name}_palette, ${this.name}_pixelData`);
 			lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
@@ -76,17 +77,17 @@ export class Image {
 }
 
 export class Palette {
+	public readonly colors: PaletteColor[];
+
 	constructor() {
 		this.colors = [];
 	}
 
-	addColor(color) {
-		checkTypes(arguments, PaletteColor);
+	addColor(color: PaletteColor) {
 		this.colors.push(color);
 	}
 
-	getColor(index) {
-		checkTypes(arguments, "number");
+	getColor(index: number) {
 		return this.colors[index];
 	}
 
@@ -96,27 +97,31 @@ export class Palette {
 }
 
 class Color {
-	constructor(r, g, b, w) {
-		checkTypes(arguments, "number", "number", "number", "number");
+	public readonly r: number;
+	public readonly g: number;
+	public readonly b: number;
+	public readonly w: number;
+
+	constructor(r: number, g: number, b: number, w: number) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
 		this.w = w;
 	}
 
-	multiply(other) {
+	multiply(other: Color) {
 		return new Color(this.r * other.r, this.g * other.g, this.b * other.b, this.w * other.w);
 	}
 
-	power(exponent) {
+	power(exponent: Color) {
 		return new Color(Math.pow(this.r, exponent.r), Math.pow(this.g, exponent.g), Math.pow(this.b, exponent.b), Math.pow(this.w, exponent.w));
 	}
 
-	dot(other) {
+	dot(other: Color) {
 		return this.r * other.r + this.g * other.g + this.b * other.b + this.w * other.w;
 	}
 
-	project(scale) {
+	project(scale: number) {
 		return new Color(this.r * scale / this.w, this.g * scale / this.w, this.b * scale / this.w, scale);
 	}
 
@@ -126,14 +131,15 @@ class Color {
 }
 
 class ScalarColor extends Color {
-	constructor(scalar) {
+	constructor(scalar: number) {
 		super(scalar, scalar, scalar, scalar);
 	}
 }
 
 export class PaletteColor extends Color {
-	constructor(index, r, g, b, w) {
-		checkTypes(arguments, "number", "number", "number", "number", "number");
+	public readonly index: number;
+
+	constructor(index: number, r: number, g: number, b: number, w: number) {
 		super(r, g, b, w);
 		this.index = index;
 	}
@@ -144,13 +150,15 @@ export class PaletteColor extends Color {
 	}
 
 	toAsm() {
-		return `00${this.getWord().toString(16)}H`.substr(-4);
+		return `00${this.getWord().toString(16)}H`.slice(-4);
 	}
 }
 
 export class PNGLoader {
-	constructor(path, gamma) {
-		checkTypes(arguments, "string");
+	private readonly path: string;
+	private readonly gamma: number;
+
+	constructor(path: string, gamma: number) {
 		this.path = path;
 		this.gamma = gamma;
 	}
@@ -163,7 +171,7 @@ export class PNGLoader {
 
 		const palette = this.toPalette(png.palette);
 
-		const pngPixels = await new Promise(resolve => png.decodePixels(pixels => resolve(pixels)));
+		const pngPixels = await new Promise<Buffer>(resolve => png.decodePixels(pixels => resolve(pixels)));
 
 		const pixels = [];
 		for (const index of pngPixels)
@@ -172,8 +180,7 @@ export class PNGLoader {
 		return new Image(Array2D.ofArray(pixels, png.width, png.height), palette);
 	}
 
-	toPalette(palette8bit) {
-		checkTypes(arguments, Array);
+	toPalette(palette8bit: readonly number[]) {
 		const palette = new Palette();
 		for (let i = 0; i < palette8bit.length / 3; i++) {
 			const color = new Color(palette8bit[i * 3] || 0, palette8bit[i * 3 + 1] || 0, palette8bit[i * 3 + 2] || 0, 255);

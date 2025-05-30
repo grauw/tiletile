@@ -1,13 +1,15 @@
 import fs from "fs";
 import path from "path";
 import xml2js from "xml2js";
-import { checkTypes } from "./utils.js";
-import { Image, Palette, PNGLoader } from "./images.js";
-import { Array2D } from "./array2d.js";
+import { Image, Palette, PNGLoader } from "./images.ts";
+import { Array2D } from "./array2d.ts";
 
 export class TileMap {
-	constructor(name, tiles, tileSet) {
-		checkTypes(arguments, "string", Array2D, TileSet);
+	private readonly name: string;
+	private readonly tiles: Array2D<Tile>;
+	private readonly tileSet: TileSet;
+
+	constructor(name: string, tiles: Array2D<Tile>, tileSet: TileSet) {
 		this.name = name;
 		this.tiles = tiles;
 		this.tileSet = tileSet;
@@ -17,8 +19,7 @@ export class TileMap {
 		this.tileSet.optimize(this.tiles.toArray());
 	}
 
-	toAsm(screenMode) {
-		checkTypes(arguments, "number");
+	toAsm(screenMode: number) {
 		const lines = [];
 		lines.push(`${this.name}_instance:`);
 		lines.push(`\tTileMap ${this.tiles.width}, ${this.tiles.height}, ${this.tileSet.name}_palette, ${this.name}_tiles`);
@@ -37,22 +38,23 @@ export class TileMap {
 }
 
 export class TileSet {
-	constructor(name, tiles, palette) {
-		checkTypes(arguments, "string", Array, Palette);
+	public readonly name: string;
+	private tiles: readonly Tile[];
+	private readonly palette: Palette;
+
+	constructor(name: string, tiles: readonly Tile[], palette: Palette) {
 		this.name = name;
 		this.tiles = tiles;
 		this.palette = palette;
 	}
 
-	getTileByIndex(index) {
-		checkTypes(arguments, "number");
+	getTileByIndex(index: number) {
 		if (index < 0 || index >= this.tiles.length)
 			throw new Error(`Tile not found: ${index}`);
 		return this.tiles[index];
 	}
 
-	optimize(tiles) {
-		checkTypes(arguments, Array);
+	optimize(tiles: Tile[]) {
 		const counts = new Array(this.tiles.length).fill(0);
 		for (const tile of tiles) {
 			counts[tile.index]++;
@@ -67,8 +69,7 @@ export class TileSet {
 		this.tiles = newTiles;
 	}
 
-	toAsm(screenMode) {
-		checkTypes(arguments, "number");
+	toAsm(screenMode: number) {
 		const lines = [];
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN 100H");
@@ -84,8 +85,12 @@ export class TileSet {
 }
 
 export class Tile {
-	constructor(index, name, image, collision) {
-		checkTypes(arguments, "number", ["string"], Image, "number");
+	public index: number;
+	public readonly name?: string;
+	private readonly image: Image;
+	public readonly collision: number;
+
+	constructor(index: number, name: string | undefined, image: Image, collision: number) {
 		this.index = index;
 		this.name = name;
 		this.image = image;
@@ -96,35 +101,33 @@ export class Tile {
 		return this.name || this.index.toString();
 	}
 
-	toAsm(screenMode) {
-		checkTypes(arguments, "number");
+	toAsm(screenMode: number) {
 		return `\tdb ${this.image.getPixelData(screenMode).join(", ")}`;
 	}
 }
 
 export class Tmx {
-	constructor(name, path) {
-		checkTypes(arguments, "string", "string");
+	private readonly name: string;
+	private readonly path: string;
+
+	constructor(name: string, path: string) {
 		this.name = name;
 		this.path = path;
 	}
 
-	async parse(gamma) {
-		checkTypes(arguments, "number");
-		const xml = await xml2js.parseStringPromise(await fs.promises.readFile(this.path));
+	async parse(gamma: number) {
+		const xml: TmxXML = await xml2js.parseStringPromise(await fs.promises.readFile(this.path));
 		return this.parseMap(xml.map, gamma);
 	}
 
-	async parseMap(mapXml, gamma) {
-		checkTypes(arguments, Object, "number");
+	async parseMap(mapXml: TmxMapXML, gamma: number) {
 		const tileSet = await this.parseSet(mapXml.tileset[0], gamma);
 		const indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
 		const indexMap = Array2D.ofArray(indices, ~~mapXml.$.width, ~~mapXml.$.height);
 		return new TileMap(this.name, indexMap.map(index => tileSet.getTileByIndex(index)).apply(), tileSet);
 	}
 
-	async parseSet(setXml, gamma) {
-		checkTypes(arguments, Object, "number");
+	async parseSet(setXml: TmxTilesetXML, gamma: number) {
 		const imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
 		const image = await new PNGLoader(imagepath, gamma).loadImage();
 		const tileImages = image.tile(~~setXml.$.tilewidth, ~~setXml.$.tileheight);
@@ -133,17 +136,48 @@ export class Tmx {
 		return new TileSet(setXml.$.name, tiles, image.palette);
 	}
 
-	parseTile(tileXml, image) {
-		checkTypes(arguments, Object, Image);
-		const name = this.parseProperty(tileXml, "name", null);
+	parseTile(tileXml: TmxTileXML, image: Image) {
+		const name = this.parseProperty(tileXml, "name", undefined);
 		const collision = ~~this.parseProperty(tileXml, "collision", 0);
 		return new Tile(~~tileXml.$.id, name, image, collision);
 	}
 
-	parseProperty(xml, name, default_) {
-		checkTypes(arguments, Object, "string");
+	parseProperty<T>(xml: TmxTileXML, name: string, default_: T) {
 		const properties = (xml.properties || [])[0] || {};
 		const property = (properties.property || []).find(p => p.$.name == name);
 		return property !== undefined ? property.$.value : default_;
 	}
 }
+
+type TmxXML = {
+	map: TmxMapXML;
+};
+
+type TmxMapXML = {
+	$: { width: string; height: string; };
+	layer: [ TmxLayerXML ];
+	tileset: [ TmxTilesetXML ];
+};
+
+type TmxLayerXML = {
+	data: [ { _: string; } ];
+};
+
+type TmxTilesetXML = {
+	$: { name: string; tilewidth: string; tileheight: string; };
+	image: [ { $: { source: string; }; } ];
+	tile: TmxTileXML[];
+};
+
+type TmxTileXML = {
+	$: { id: number | string; };
+	properties?: [ TmxTilePropertiesXML ]
+};
+
+type TmxTilePropertiesXML = {
+	property?: TmxTilePropertyXML[];
+};
+
+type TmxTilePropertyXML = {
+	$: { name: string; value: string; };
+};

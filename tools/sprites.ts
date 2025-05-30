@@ -1,23 +1,23 @@
 import fs from "fs";
 import path from "path";
-import { checkTypes } from "./utils.js";
-import { Image, PNGLoader } from "./images.js";
+import { Image, PNGLoader } from "./images.ts";
 
 export class Sprite {
-	constructor(name, sheet) {
-		checkTypes(arguments, "string", Image);
+	private readonly name: string;
+	public readonly sheet: Image;
+	private readonly frames: SpriteFrame[];
+
+	constructor(name: string, sheet: Image) {
 		this.name = name;
 		this.sheet = sheet;
 		this.frames = [];
 	}
 
-	addFrame(frame) {
-		checkTypes(arguments, SpriteFrame);
+	addFrame(frame: SpriteFrame) {
 		this.frames.push(frame);
 	}
 
-	toAsm(frameRate) {
-		checkTypes(arguments, "number");
+	toAsm(frameRate: number) {
 		const lines = [];
 		lines.push(`${this.name}_frames:`);
 		for (const frame of this.frames) {
@@ -35,8 +35,12 @@ export class Sprite {
 }
 
 class SpriteFrame {
-	constructor(name, image, duration) {
-		checkTypes(arguments, "string", Image, "number");
+	private readonly name: string;
+	private readonly image: Image;
+	private readonly duration: number;
+	private readonly patterns: SpritePattern[];
+
+	constructor(name: string, image: Image, duration: number) {
 		this.name = name;
 		this.image = image;
 		this.duration = duration;
@@ -50,8 +54,7 @@ class SpriteFrame {
 		}
 	}
 
-	toAsm(frameRate) {
-		checkTypes(arguments, "number");
+	toAsm(frameRate: number) {
 		const duration = Math.round(this.duration * frameRate);
 		return `${this.name}: SpriteFrame ${duration}, ${this.patterns.length}, ${this.name}_patterns`;
 	}
@@ -67,8 +70,9 @@ class SpriteFrame {
 }
 
 class SpritePattern {
-	constructor(image, mask) {
-		checkTypes(arguments, Image, "number");
+	private readonly data: number[];
+
+	constructor(image: Image, mask: number) {
 		this.data = [];
 
 		const images = image.tile(8, 8);
@@ -90,29 +94,28 @@ class SpritePattern {
 }
 
 export class AsepriteSheet {
-	constructor(name, path) {
-		checkTypes(arguments, "string", "string");
+	private readonly name: string;
+	private readonly path: string;
+
+	constructor(name: string, path: string) {
 		this.name = name;
 		this.path = path;
 	}
 
-	async parse(gamma) {
-		checkTypes(arguments, "number");
-		const json = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
+	async parse(gamma: number) {
+		const json: AsepriteSheetJSON = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
 		const sprite = await this.parseSprite(json.meta, gamma);
 		this.parseFrames(json.frames, sprite);
 		return sprite;
 	}
 
-	async parseSprite(jsonMeta, gamma) {
-		checkTypes(arguments, Object, "number");
+	async parseSprite(jsonMeta: AsepriteSheetMetaJSON, gamma: number) {
 		const imagepath = path.resolve(path.dirname(this.path), jsonMeta.image);
 		const image = await new PNGLoader(imagepath, gamma).loadImage();
 		return new Sprite(this.name, image);
 	}
 
-	parseFrames(jsonFrames, sprite) {
-		checkTypes(arguments, Object, Sprite);
+	parseFrames(jsonFrames: AsepriteSheetFramesJSON, sprite: Sprite) {
 		for (const jsonFrameName in jsonFrames) {
 			const json = jsonFrames[jsonFrameName];
 			const image = sprite.sheet.slice(json.frame.x, json.frame.y, json.frame.w, json.frame.h);
@@ -120,3 +123,28 @@ export class AsepriteSheet {
 		}
 	}
 }
+
+type AsepriteSheetJSON = {
+	meta: AsepriteSheetMetaJSON;
+	frames: AsepriteSheetFramesJSON;
+};
+
+type AsepriteSheetMetaJSON = {
+	image: string;
+};
+
+type AsepriteSheetFramesJSON = {
+	[key: string]: AsepriteSheetFrameJSON;
+};
+
+type AsepriteSheetFrameJSON = {
+	frame: AsepriteSheetRectJSON;
+	duration: number;
+};
+
+type AsepriteSheetRectJSON = {
+	x: number;
+	y: number;
+	w: number;
+	h: number;
+};

@@ -1,10 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { checkTypes } from "./utils.js";
-import { TileMap, Tmx } from "./tilemaps.js";
-import { Image, PNGLoader } from "./images.js";
-import { Sprite, AsepriteSheet } from "./sprites.js";
-import { AudioTrack, VGMLoader } from "./audio.js";
+import { TileMap, Tmx } from "./tilemaps.ts";
+import { Image, PNGLoader } from "./images.ts";
+import { Sprite, AsepriteSheet } from "./sprites.ts";
+import { AudioTrack, VGMLoader } from "./audio.ts";
 
 async function main() {
 	if (process.argv.length < 3) {
@@ -20,8 +19,15 @@ async function main() {
 }
 
 export class Resources {
-	constructor(screenMode, frameRate, gamma) {
-		checkTypes(arguments, "number", "number", "number");
+	private readonly screenMode: number;
+	private readonly frameRate: number;
+	public readonly gamma: number;
+	private readonly tileMaps: TileMap[];
+	private readonly images: Image[];
+	private readonly sprites: Sprite[];
+	private readonly audio: AudioTrack[];
+
+	constructor(screenMode: number, frameRate: number, gamma: number) {
 		this.screenMode = screenMode;
 		this.frameRate = frameRate;
 		this.gamma = gamma;
@@ -31,23 +37,19 @@ export class Resources {
 		this.audio = [];
 	}
 
-	addTileMap(tileMap) {
-		checkTypes(arguments, TileMap);
+	addTileMap(tileMap: TileMap) {
 		this.tileMaps.push(tileMap);
 	}
 
-	addImage(image) {
-		checkTypes(arguments, Image);
+	addImage(image: Image) {
 		this.images.push(image);
 	}
 
-	addSprite(sprite) {
-		checkTypes(arguments, Sprite);
+	addSprite(sprite: Sprite) {
 		this.sprites.push(sprite);
 	}
 
-	addAudioTrack(track) {
-		checkTypes(arguments, AudioTrack);
+	addAudioTrack(track: AudioTrack) {
 		this.audio.push(track);
 	}
 
@@ -58,7 +60,7 @@ export class Resources {
 	}
 
 	toAsm() {
-		const lines = [];
+		const lines: string[] = [];
 		for (const tileMap of this.tileMaps) {
 			lines.push(tileMap.toAsm(this.screenMode));
 		}
@@ -76,13 +78,14 @@ export class Resources {
 }
 
 export class ResourcesLoader {
-	constructor(path) {
-		checkTypes(arguments, "string");
+	private readonly path: string;
+
+	constructor(path: string) {
 		this.path = path;
 	}
 
 	async parse() {
-		const json = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
+		const json: ResourcesJSON = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
 
 		const resources = new Resources(
 			json.screenMode,
@@ -124,5 +127,15 @@ export class ResourcesLoader {
 		return resources;
 	}
 }
+
+type ResourcesJSON = {
+	screenMode: number;
+	frameRate: number;
+	gamma: number;
+	tilemaps: { name: string; path: string; }[];
+	images: { name: string; path: string; }[];
+	sprites: { name: string; path: string; }[];
+	audio: { name: string; path: string; }[];
+};
 
 main().catch(reason => { throw reason; });
