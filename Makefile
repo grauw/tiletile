@@ -1,3 +1,4 @@
+.PHONY: all copy run run2 run3 run4
 COPY_TARGET = /Volumes/MSXDOS2
 
 all: node_modules
