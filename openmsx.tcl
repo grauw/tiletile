@@ -1,7 +1,7 @@
 source lib/neonlib/tools/symbols.tcl
 source lib/neonlib/tools/profile.tcl
 
-symbols::load bin/tiletile.sym
+symbols::load gen/tiletile.sym
 
 ext debugdevice
 set debugoutput stdout

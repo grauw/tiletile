@@ -4,7 +4,7 @@ COPY_TARGET = /Volumes/MSXDOS2
 all: node_modules
 	mkdir -p gen bin
 	node tools/resources.ts res/resources.json > gen/Resources.asm
-	java -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/tiletile.rom bin/tiletile.sym
+	java -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/tiletile.rom gen/tiletile.sym
 
 node_modules: package.json
 	npm install
