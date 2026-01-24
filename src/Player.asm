@@ -78,7 +78,6 @@ Player_SetPosition:
 	ex de,hl
 	call Player_GetTileMap
 	ex de,hl
-	call TileMap_PixelToTilePosition
 	call TileMap_GetTile
 	pop ix
 	ld (ix + Player.currentTile),l

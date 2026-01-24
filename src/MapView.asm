@@ -52,17 +52,9 @@ MapView_GetCamera:
 ; Modifies: af, bc, de
 MapView_GetTile:
 	push ix
-	REPT 4
-	sra b
-	rr c
-	ENDM
-	REPT 4
-	sra d
-	rr e
-	ENDM
-	push de
+	ex de,hl
 	call MapView_GetTileMap
-	pop de
+	ex de,hl
 	call TileMap_GetTile
 	ld e,(ix + TileMap.size.x)
 	ld d,(ix + TileMap.size.x + 1)
