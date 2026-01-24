@@ -14,7 +14,7 @@ Player: MACRO
 		Vector2
 	tileMap:
 		dw 0
-	tileMapWidthStride:
+	rowStride:
 		dw 0
 	currentTile:
 		dw 0
@@ -37,11 +37,14 @@ Player_Construct:
 	ld (ix + Player.tileMap + 1),d
 	push ix
 	call Player_GetTileMap
-	ld l,(ix + TileMap.widthStride)
-	ld h,(ix + TileMap.widthStride + 1)
+	ld bc,0
+	ld de,TileMap_TILE_SIZE
+	call TileMap_GetIndex
 	pop ix
-	ld (ix + Player.tileMapWidthStride),l
-	ld (ix + Player.tileMapWidthStride + 1),h
+	add hl,hl
+	add hl,hl
+	ld (ix + Player.rowStride),l
+	ld (ix + Player.rowStride + 1),h
 	ld bc,124
 	ld de,120
 	call Player_SetPosition
@@ -133,8 +136,8 @@ ContinueX:
 	add a,e
 	and 0F0H
 	ret z
-	ld e,(ix + Player.tileMapWidthStride)
-	ld d,(ix + Player.tileMapWidthStride + 1)
+	ld e,(ix + Player.rowStride)
+	ld d,(ix + Player.rowStride + 1)
 	jp p,IncreaseY
 DecreaseY:
 	sbc hl,de

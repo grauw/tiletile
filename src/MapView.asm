@@ -12,6 +12,8 @@ MapView: MACRO
 		dw 0
 	position:
 		Vector2W MapView_OFFSET_X, MapView_OFFSET_Y
+	rowStride:
+		dw 0
 	verticalDrawCommand:
 		VDPCommand 0, 0, 0, MapView_PAGE << 8, 4 << Video_HIRES, 100H, 0, 0, VDPCommand_HMMC
 	ENDM
@@ -24,6 +26,16 @@ MapView_Construct:
 	ld (ix + MapView.tileMap + 1),d
 	ld (ix + MapView.camera),l
 	ld (ix + MapView.camera + 1),h
+	push ix
+	call MapView_GetTileMap
+	ld bc,0
+	ld de,TileMap_TILE_SIZE
+	call TileMap_GetIndex
+	pop ix
+	add hl,hl
+	add hl,hl
+	ld (ix + MapView.rowStride),l
+	ld (ix + MapView.rowStride + 1),h
 	ret
 
 ; ix = this
@@ -48,7 +60,6 @@ MapView_GetCamera:
 ; de = y
 ; ix = this
 ; hl <- tile
-; de <- row stride
 ; Modifies: af, bc, de
 MapView_GetTile:
 	push ix
@@ -56,12 +67,6 @@ MapView_GetTile:
 	call MapView_GetTileMap
 	ex de,hl
 	call TileMap_GetTile
-	ld e,(ix + TileMap.size.x)
-	ld d,(ix + TileMap.size.x + 1)
-	sla e
-	rl d
-	sla e
-	rl d
 	pop ix
 	ret
 
@@ -239,6 +244,8 @@ MapView_DrawTileColumn: PROC
 	ld e,0
 	call MapView_GetTile
 	push hl
+	ld e,(ix + MapView.rowStride)
+	ld d,(ix + MapView.rowStride + 1)
 	ld hl,0
 	and a
 	sbc hl,de

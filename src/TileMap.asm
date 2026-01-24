@@ -1,11 +1,11 @@
 ;
 ; A tile map
 ;
+TileMap_TILE_SIZE: equ 16
+
 TileMap: MACRO ?width, ?height, ?palette, ?data
 	size:
 		Vector2W ?width, ?height
-	widthStride:
-		dw ?width * Tile._size
 	palette:
 		dw ?palette
 	data:
@@ -31,7 +31,21 @@ TileMap_Select:
 ; ix = this
 ; hl <- tile
 ; Modifies: af, bc, de
-TileMap_GetTile: PROC
+TileMap_GetTile:
+	call TileMap_GetIndex
+	add hl,hl
+	add hl,hl
+	ld e,(ix + TileMap.data.address)
+	ld d,(ix + TileMap.data.address + 1)
+	add hl,de
+	ret
+
+; bc = x
+; de = y
+; ix = this
+; hl <- tile index
+; Modifies: af, bc, de, hl
+TileMap_GetIndex: PROC
 	REPT 4
 	sra b
 	rr c
@@ -57,10 +71,5 @@ Negative:
 	sbc hl,de
 Continue:
 	add hl,bc
-	add hl,hl
-	add hl,hl
-	ld e,(ix + TileMap.data.address)
-	ld d,(ix + TileMap.data.address + 1)
-	add hl,de
 	ret
 	ENDP
