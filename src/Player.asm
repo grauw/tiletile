@@ -207,58 +207,113 @@ Player_TickVelocity:
 	ld (ix + Player.velocity.y),0
 	ret
 
+; a = x offset
+; c = x LSB
+; e = y LSB
+; hl = tile pointer
+; c <- x LSB
+; hl <- tile pointer
+Player_OffsetTileX:
+	and a
+	jp m,Player_OffsetTileLeft
+	jp Player_OffsetTileRight
+
+; a = x offset (positive)
+; c = x LSB
+; e = y LSB
+; hl = tile pointer
+; c <- x LSB
+; hl <- tile pointer
+Player_OffsetTileRight:
+	add a,c
+	ld c,a
+	jp nc,TileMap_GetTileIndex
+	inc h
+	jp TileMap_GetTileIndex
+
+; a = x offset (negative)
+; c = x LSB
+; e = y LSB
+; hl = tile pointer
+; c <- x LSB
+; hl <- tile pointer
+Player_OffsetTileLeft:
+	add a,c
+	ld c,a
+	jp c,TileMap_GetTileIndex
+	dec h
+	jp TileMap_GetTileIndex
+
+; a = y offset
+; e = y LSB
+; hl = tile pointer
+; e <- y LSB
+; hl <- tile pointer
+Player_OffsetTileY:
+	and a
+	jp m,Player_OffsetTileUp
+	jp Player_OffsetTileDown
+
+; a = y offset (positive)
+; e = y LSB
+; hl = tile pointer
+; e <- y LSB
+; hl <- tile pointer
+Player_OffsetTileDown:
+	add a,e
+	ld e,a
+	jp nc,TileMap_GetTileIndex
+	ld a,h
+	add a,(ix + Player.rowStride + 1)
+	ld h,a
+	jp TileMap_GetTileIndex
+
+; a = y offset (negative)
+; e = y LSB
+; hl = tile pointer
+; e <- y LSB
+; hl <- tile pointer
+Player_OffsetTileUp:
+	add a,e
+	ld e,a
+	jp c,TileMap_GetTileIndex
+	ld a,h
+	sub (ix + Player.rowStride + 1)
+	ld h,a
+	jp TileMap_GetTileIndex
+
 ; c = x
 ; e = y
 ; ix = this
 ; f <- c: can
-Player_CanMoveCollider:
+Player_CanMoveCollider: PROC
 	ld a,c
 	add a,-Player_COLLIDER_WIDTH / 2
 	ld c,a
 	ld a,e
 	add a,-Player_COLLIDER_HEIGHT / 2
 	ld e,a
-	call Player_CanMove
-	ret nc
-	ld a,e
-	add a,Player_COLLIDER_HEIGHT - 1
-	ld e,a
-	call Player_CanMove
-	ret nc
-	ld a,c
-	add a,Player_COLLIDER_WIDTH - 1
-	ld c,a
-	call Player_CanMove
-	ret nc
-	ld a,e
-	add a,-(Player_COLLIDER_HEIGHT - 1)
-	ld e,a
-	call Player_CanMove
-	ret nc
-	ld a,c
-	add a,-(Player_COLLIDER_WIDTH / 2 - 1)
-	ld c,a
-	ld a,e
-	add a,Player_COLLIDER_HEIGHT / 2
-	ld e,a
-	scf
-	ret
-
-; c = x
-; e = y
-; ix = this
-; f <- c: can
-Player_CanMove:
-	push bc
-	push de
 	call Player_GetTileWithOffset
 	bit 7,(hl)
-	pop de
-	pop bc
+	jr nz,Fail
+	ld a,Player_COLLIDER_HEIGHT - 1
+	call Player_OffsetTileDown
+	bit 7,(hl)
+	jr nz,Fail
+	ld a,Player_COLLIDER_WIDTH - 1
+	call Player_OffsetTileRight
+	bit 7,(hl)
+	jr nz,Fail
+	ld a,-(Player_COLLIDER_HEIGHT - 1)
+	call Player_OffsetTileUp
+	bit 7,(hl)
+	jr nz,Fail
 	scf
-	ret z
-	ccf
 	ret
+Fail:
+	and a
+	ret
+	ENDP
 
 ;
 Player_controlLUT:
