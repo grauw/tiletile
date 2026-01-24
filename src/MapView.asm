@@ -29,11 +29,15 @@ MapView_Construct:
 	push ix
 	call MapView_GetTileMap
 	ld bc,0
-	ld de,TileMap_TILE_SIZE
+	ld de,TileMap_TILE_SIZE * TileMap_CHUNK_SIZE
 	call TileMap_GetIndex
 	pop ix
 	add hl,hl
 	add hl,hl
+	ex de,hl
+	ld hl,0
+	and a
+	sbc hl,de
 	ld (ix + MapView.rowStride),l
 	ld (ix + MapView.rowStride + 1),h
 	ret
@@ -252,17 +256,9 @@ MapView_DrawTileColumn: PROC
 	ld e,0
 	call MapView_GetTile
 	push hl
-	ld e,(ix + MapView.rowStride)
-	ld d,(ix + MapView.rowStride + 1)
-	ld hl,0
-	and a
-	sbc hl,de
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ld c,l
-	ld b,h
+	ld de,TileMap_CHUNK_SIZE * Tile._size
+	ld c,(ix + MapView.rowStride)
+	ld b,(ix + MapView.rowStride + 1)
 	ld a,iyh
 	pop iy
 	rrca
@@ -392,7 +388,7 @@ MapView_DrawTileRow: PROC
 	call MapView_GetTile
 	push hl
 	ld de,Tile._size
-	ld bc,-16 * Tile._size
+	ld bc,-(TileMap_CHUNK_SIZE * TileMap_CHUNK_SIZE * Tile._size)
 	ld a,iyl
 	pop iy
 	rrca

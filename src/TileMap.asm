@@ -66,21 +66,39 @@ TileMap_GetCollision:
 ; ix = this
 ; hl <- tile index
 ; Modifies: af, bc, de, hl
-TileMap_GetIndex: PROC
-	REPT 4
-	sra b
-	rr c
-	ENDM
-	REPT 4
-	sra d
-	rr e
-	ENDM
-	ld a,(ix + TileMap.size.x + 1)
-	add a,a
-	add a,a
-	add a,a
-	add a,a
-	ld h,a
+TileMap_GetIndex:
+	call TileMap_GetTileIndex
+	ld c,l
+	call TileMap_GetChunkIndex
+	ld l,c
+	ret
+
+; c = x LSB
+; e = y LSB
+; l <- tile index within chunk
+; Modifies: af
+TileMap_GetTileIndex:
+	ld a,c
+	and 0F0H
+	rrca
+	rrca
+	rrca
+	rrca
+	ld l,a
+	ld a,e
+	and 0F0H
+	or l
+	ld l,a
+	ret
+
+; b = x MSB
+; d = y MSB
+; ix = this
+; h <- chunk index
+; Modifies: af, de, hl
+TileMap_GetChunkIndex: PROC
+	ld h,(ix + TileMap.size.x + 1)
+	ld e,d
 	bit 7,d
 	jr nz,Negative
 	call Math_Multiply8x8
@@ -95,6 +113,8 @@ Negative:
 	and a
 	sbc hl,de
 Continue:
-	add hl,bc
+	ld a,l
+	add a,b
+	ld h,a
 	ret
 	ENDP

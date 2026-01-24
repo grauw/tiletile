@@ -31,14 +31,30 @@ export class TileMap {
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN ROMMapper_BANK_SIZE");
 		lines.push(`${this.name}_tiles:`);
-		for (const tile of this.tiles.toArray()) {
-			lines.push(`\tTile ${this.tileSet.name}_${tile.getName()}_pixels`);
+		for (let cy = 0; cy < this.tiles.height; cy += chunkSize) {
+			for (let cx = 0; cx < this.tiles.width; cx += chunkSize) {
+				for (let y = 0; y < chunkSize; y++) {
+					for (let x = 0; x < chunkSize; x++) {
+						const tile = this.tiles.get(cx + x, cy + y);
+						lines.push(`\tTile ${this.tileSet.name}_${tile.getName()}_pixels`);
+					}
+				}
+			}
 		}
 		lines.push("");
 		lines.push("\tALIGN ROMMapper_BANK_SIZE");
 		lines.push(`${this.name}_collisions:`);
-		for (const tile of this.tiles.toArray()) {
-			lines.push(`\tdb ${tile.collision}`);
+		for (let cy = 0; cy < this.tiles.height; cy += chunkSize) {
+			for (let cx = 0; cx < this.tiles.width; cx += chunkSize) {
+				for (let y = 0; y < chunkSize; y++) {
+					const tiles: Tile[] = [];
+					for (let x = 0; x < chunkSize; x++) {
+						tiles.push(this.tiles.get(cx + x, cy + y));
+					}
+					lines.push(`\tdb ${tiles.map(tile => tile.collision).join(", ")}`);
+				}
+				lines.push("");
+			}
 		}
 		lines.push("\tENDS");
 		lines.push("");

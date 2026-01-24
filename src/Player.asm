@@ -38,7 +38,7 @@ Player_Construct:
 	push ix
 	call Player_GetTileMap
 	ld bc,0
-	ld de,TileMap_TILE_SIZE
+	ld de,TileMap_TILE_SIZE * TileMap_CHUNK_SIZE
 	call TileMap_GetIndex
 	pop ix
 	ld (ix + Player.rowStride),l
@@ -93,39 +93,44 @@ Player_GetCollision:
 	ld a,(hl)
 	ret
 
-; c = x offset (range: -16 .. 16)
-; e = y offset (range: -16 .. 16)
+; c = x offset (signed)
+; e = y offset (signed)
 ; ix = this
+; c <- x LSB
+; e <- y LSB
 ; hl <- collision tile
 Player_GetTileWithOffset: PROC
 	ld l,(ix + Player.currentTile)
 	ld h,(ix + Player.currentTile + 1)
 	ld a,(ix + Player.position.x)
-	and 0FH
 	add a,c
-	and 0F0H
-	jr z,ContinueX
-	jp p,IncreaseX
-DecreaseX:
-	dec hl
+	bit 7,c
+	ld c,a
+	jr z,PositiveX
+	jr c,ContinueX
+	dec h
 	jr ContinueX
-IncreaseX:
-	inc hl
+PositiveX:
+	jr nc,ContinueX
+	inc h
 ContinueX:
 	ld a,(ix + Player.position.y)
-	and 0FH
 	add a,e
-	and 0F0H
-	ret z
-	ld e,(ix + Player.rowStride)
-	ld d,(ix + Player.rowStride + 1)
-	jp p,IncreaseY
-DecreaseY:
-	sbc hl,de
-	ret
-IncreaseY:
-	add hl,de
-	ret
+	bit 7,e
+	ld e,a
+	jr z,PositiveY
+	jr c,ContinueY
+	ld a,h
+	sub (ix + Player.rowStride + 1)
+	ld h,a
+	jr ContinueY
+PositiveY:
+	jr nc,ContinueY
+	ld a,h
+	add a,(ix + Player.rowStride + 1)
+	ld h,a
+ContinueY:
+	jp TileMap_GetTileIndex
 	ENDP
 
 ; ix = this
@@ -196,7 +201,7 @@ Player_TickVelocity:
 	pop iy
 	ld (ix + Player.velocity.x),c
 	ld (ix + Player.velocity.y),e
-	call Player_CanMove16x16
+	call Player_CanMoveCollider
 	ret c
 	ld (ix + Player.velocity.x),0
 	ld (ix + Player.velocity.y),0
@@ -206,7 +211,7 @@ Player_TickVelocity:
 ; e = y
 ; ix = this
 ; f <- c: can
-Player_CanMove16x16:
+Player_CanMoveCollider:
 	ld a,c
 	add a,-Player_COLLIDER_WIDTH / 2
 	ld c,a
