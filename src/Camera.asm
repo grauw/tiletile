@@ -20,10 +20,6 @@ Camera_Construct:
 	ld iyh,d
 	ld l,(iy + TileMap.size.x)
 	ld h,(iy + TileMap.size.x + 1)
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
 	ld e,(ix + Camera.size.x)
 	ld d,0
 	and a
@@ -33,10 +29,6 @@ Camera_Construct:
 	ld (ix + Camera.maxPosition.x + 1),h
 	ld l,(iy + TileMap.size.y)
 	ld h,(iy + TileMap.size.y + 1)
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
 	ld e,(ix + Camera.size.y)
 	ld d,0
 	and a

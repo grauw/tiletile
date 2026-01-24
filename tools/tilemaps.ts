@@ -4,12 +4,16 @@ import xml2js from "xml2js";
 import { Image, Palette, PNGLoader } from "./images.ts";
 import { Array2D } from "./array2d.ts";
 
+const chunkSize = 16;
+
 export class TileMap {
 	private readonly name: string;
 	private readonly tiles: Array2D<Tile>;
 	private readonly tileSet: TileSet;
 
 	constructor(name: string, tiles: Array2D<Tile>, tileSet: TileSet) {
+		if ((tiles.width % chunkSize) || (tiles.height % chunkSize))
+			throw new Error(`Tile map ${name} size not a multiple of 16x16.`);
 		this.name = name;
 		this.tiles = tiles;
 		this.tileSet = tileSet;

@@ -2,10 +2,11 @@
 ; A tile map
 ;
 TileMap_TILE_SIZE: equ 16
+TileMap_CHUNK_SIZE: equ 16
 
 TileMap: MACRO ?width, ?height, ?palette, ?data
 	size:
-		Vector2W ?width, ?height
+		Vector2W ?width * TileMap_TILE_SIZE, ?height * TileMap_TILE_SIZE
 	palette:
 		dw ?palette
 	data:
@@ -54,16 +55,20 @@ TileMap_GetIndex: PROC
 	sra d
 	rr e
 	ENDM
+	ld a,(ix + TileMap.size.x + 1)
+	add a,a
+	add a,a
+	add a,a
+	add a,a
+	ld h,a
 	bit 7,d
 	jr nz,Negative
-	ld h,(ix + TileMap.size.x)
 	call Math_Multiply8x8
 	jr Continue
 Negative:
 	ld a,e
 	neg
 	ld e,a
-	ld h,(ix + TileMap.size.x)
 	call Math_Multiply8x8
 	ex de,hl
 	ld hl,0
