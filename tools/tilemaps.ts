@@ -26,13 +26,19 @@ export class TileMap {
 	toAsm(screenMode: number) {
 		const lines = [];
 		lines.push(`${this.name}_instance:`);
-		lines.push(`\tTileMap ${this.tiles.width}, ${this.tiles.height}, ${this.tileSet.name}_palette, ${this.name}_tiles`);
+		lines.push(`\tTileMap ${this.tiles.width}, ${this.tiles.height}, ${this.tileSet.name}_palette, ${this.name}_tiles, ${this.name}_collisions`);
 		lines.push("");
 		lines.push("\tSECTION ROM_DATA");
 		lines.push("\tALIGN ROMMapper_BANK_SIZE");
 		lines.push(`${this.name}_tiles:`);
 		for (const tile of this.tiles.toArray()) {
-			lines.push(`\tTile ${this.tileSet.name}_${tile.getName()}_pixels, ${tile.collision}`);
+			lines.push(`\tTile ${this.tileSet.name}_${tile.getName()}_pixels`);
+		}
+		lines.push("");
+		lines.push("\tALIGN ROMMapper_BANK_SIZE");
+		lines.push(`${this.name}_collisions:`);
+		for (const tile of this.tiles.toArray()) {
+			lines.push(`\tdb ${tile.collision}`);
 		}
 		lines.push("\tENDS");
 		lines.push("");

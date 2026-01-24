@@ -72,6 +72,10 @@ MapView_GetTile:
 
 ; ix = this
 MapView_DrawBitmap:
+	push ix
+	call MapView_GetTileMap
+	call TileMap_SelectTiles
+	pop ix
 	call MapView_MoveVertical
 	jp MapView_MoveHorizontal
 
@@ -168,6 +172,10 @@ Down:
 
 ; ix = this
 MapView_Start:
+	push ix
+	call MapView_GetTileMap
+	call TileMap_SelectTiles
+	pop ix
 	call MapView_Draw
 	ret
 

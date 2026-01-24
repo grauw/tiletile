@@ -40,11 +40,6 @@ Scene_Construct:
 	pop ix
 
 	push ix
-	call Scene_GetTileMap
-	call TileMap_Select
-	pop ix
-
-	push ix
 	call Scene_GetTileMap_DE
 	push de
 	call Scene_GetCamera
@@ -515,8 +510,11 @@ Scene_DrawBitmapSecondary:
 Scene_UpdateTriggers:
 	push ix
 	call Scene_GetPlayer
-	call Player_GetTile
-	Tile_GetCollision_M ix, a
+	push ix
+	call Player_GetTileMap
+	call TileMap_SelectCollision
+	pop ix
+	call Player_GetCollision
 	pop ix
 
 	push ix

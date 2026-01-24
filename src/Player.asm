@@ -41,8 +41,6 @@ Player_Construct:
 	ld de,TileMap_TILE_SIZE
 	call TileMap_GetIndex
 	pop ix
-	add hl,hl
-	add hl,hl
 	ld (ix + Player.rowStride),l
 	ld (ix + Player.rowStride + 1),h
 	ld bc,124
@@ -81,35 +79,24 @@ Player_SetPosition:
 	ex de,hl
 	call Player_GetTileMap
 	ex de,hl
-	call TileMap_GetTile
+	call TileMap_GetCollision
 	pop ix
 	ld (ix + Player.currentTile),l
 	ld (ix + Player.currentTile + 1),h
 	ret
 
 ; ix = this
-; ix <- tile
-Player_GetTile:
-	ld e,(ix + Player.currentTile)
-	ld d,(ix + Player.currentTile + 1)
-	ld ixl,e
-	ld ixh,d
+; a <- collision
+Player_GetCollision:
+	ld l,(ix + Player.currentTile)
+	ld h,(ix + Player.currentTile + 1)
+	ld a,(hl)
 	ret
 
 ; c = x offset (range: -16 .. 16)
 ; e = y offset (range: -16 .. 16)
 ; ix = this
-; ix <- tile
-Player_GetTileWithOffset_IX:
-	call Player_GetTileWithOffset
-	push hl
-	pop ix
-	ret
-
-; c = x offset (range: -16 .. 16)
-; e = y offset (range: -16 .. 16)
-; ix = this
-; hl <- tile
+; hl <- collision tile
 Player_GetTileWithOffset: PROC
 	ld l,(ix + Player.currentTile)
 	ld h,(ix + Player.currentTile + 1)
@@ -121,14 +108,8 @@ Player_GetTileWithOffset: PROC
 	jp p,IncreaseX
 DecreaseX:
 	dec hl
-	dec hl
-	dec hl
-	dec hl
 	jr ContinueX
 IncreaseX:
-	inc hl
-	inc hl
-	inc hl
 	inc hl
 ContinueX:
 	ld a,(ix + Player.position.y)
@@ -165,6 +146,10 @@ Player_UpdateInput:
 ; ix = this
 ; iy = engine
 Player_TickPrimary:
+	push ix
+	call Player_GetTileMap
+	call TileMap_SelectCollision
+	pop ix
 	call Player_TickVelocity
 	call Player_TickPosition
 	ret
@@ -261,10 +246,8 @@ Player_CanMove16x16:
 Player_CanMove:
 	push bc
 	push de
-	push ix
-	call Player_GetTileWithOffset_IX
-	Tile_IsSolid_M ix
-	pop ix
+	call Player_GetTileWithOffset
+	bit 7,(hl)
 	pop de
 	pop bc
 	scf

@@ -4,13 +4,15 @@
 TileMap_TILE_SIZE: equ 16
 TileMap_CHUNK_SIZE: equ 16
 
-TileMap: MACRO ?width, ?height, ?palette, ?data
+TileMap: MACRO ?width, ?height, ?palette, ?tiles, ?collision
 	size:
 		Vector2W ?width * TileMap_TILE_SIZE, ?height * TileMap_TILE_SIZE
 	palette:
 		dw ?palette
-	data:
-		ROMAddress ?data, 8000H
+	tiles:
+		ROMAddress ?tiles, 8000H
+	collision:
+		ROMAddress ?collision, 8000H
 	ENDM
 
 ; ix = this
@@ -22,9 +24,15 @@ TileMap_GetPalette:
 	ret
 
 ; ix = this
-TileMap_Select:
-	ld a,(ix + TileMap.data.bank)
-	ld h,(ix + TileMap.data.address + 1)
+TileMap_SelectTiles:
+	ld a,(ix + TileMap.tiles.bank)
+	ld h,(ix + TileMap.tiles.address + 1)
+	jp ROMMapper_SetBank
+
+; ix = this
+TileMap_SelectCollision:
+	ld a,(ix + TileMap.collision.bank)
+	ld h,(ix + TileMap.collision.address + 1)
 	jp ROMMapper_SetBank
 
 ; bc = x
@@ -36,8 +44,20 @@ TileMap_GetTile:
 	call TileMap_GetIndex
 	add hl,hl
 	add hl,hl
-	ld e,(ix + TileMap.data.address)
-	ld d,(ix + TileMap.data.address + 1)
+	ld e,(ix + TileMap.tiles.address)
+	ld d,(ix + TileMap.tiles.address + 1)
+	add hl,de
+	ret
+
+; bc = x
+; de = y
+; ix = this
+; hl <- collision
+; Modifies: af, bc, de
+TileMap_GetCollision:
+	call TileMap_GetIndex
+	ld e,(ix + TileMap.collision.address)
+	ld d,(ix + TileMap.collision.address + 1)
 	add hl,de
 	ret
 
