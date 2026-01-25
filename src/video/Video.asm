@@ -19,7 +19,12 @@
 Video_MODE: equ 5
 Video_4BPU: equ Video_MODE < 7 ? 1 : 0                     ; 8 or 4 bits per x-unit
 Video_HIRES: equ Video_MODE = 6 || Video_MODE = 7 ? 1 : 0  ; 1 or 2 pixels per x-unit
+Video_M12: equ Video_MODE = 0 ? 10H : Video_MODE = 3 ? 08H : 00H
+Video_M345: equ Video_MODE = 2 ? 02H : Video_MODE = 4 ? 04H : Video_MODE = 5 ? 06H :
+                Video_MODE = 6 ? 08H : Video_MODE = 7 ? 0AH : Video_MODE >= 8 ? 0EH : 00H
+Video_YJKYAE: equ Video_MODE = 12 ? 08H : Video_MODE >= 10 ? 18H : 00H
 
+Video_BACKDROP: equ Video_MODE = 8 ? 00H : 01H
 Video_VERTICAL_ADJUST: equ -2
 
 Video: MACRO
@@ -84,31 +89,39 @@ Video_DisableLineInterrupt:
 ; iy = this
 Video_StartIY:
 	call Video_StartFadeOutIY
-	ld a,Video_MODE > 8 ? 8 : Video_MODE
-	call VDP_InitScreen
-	call VDP_Enable212Lines
-	call VDP_EnableSprites
-	ld a,Video_MODE = 8 ? 0 : 0F1H
-	call VDP_SetColor
 	ld a,(VDP_MIRROR_0 + 1)
-	res 0,a  ; MAG
-	set 1,a  ; SI
+	and 10000100B
+	or  00100010B | Video_M12  ; BL: 1, IE0: 1, SI: 1, MAG: 0, M1, M2
 	ld (VDP_MIRROR_0 + 1),a
 	ld b,1
 	call VDP_SetRegister
+	ld a,(VDP_MIRROR_0 + 0)
+	and 11010001B
+	or  00000000B | Video_M345  ; IE2: 0, M3, M4, M5
+	ld (VDP_MIRROR_0 + 0),a
+	ld b,0
+	call VDP_SetRegister
 	ld a,(VDP_MIRROR_8 + 8)
-	set 5,a  ; TP
+	and 11011101B
+	or  00100000B  ; TP: 1, SPD: 0
 	ld (VDP_MIRROR_8 + 8),a
 	ld b,8
 	call VDP_SetRegister
+	ld a,(VDP_MIRROR_8 + 9)
+	and 01110001B
+	or  10000000B  ; LN: 1, IL: 0, NT: 0
+	ld (VDP_MIRROR_8 + 9),a
+	ld b,9
+	call VDP_SetRegister
+	ld a,1FH
+	ld b,2
+	call VDP_SetRegister
+	ld a,Video_BACKDROP
+	ld b,7
+	call VDP_SetRegister
 	ld a,(VDP_MIRROR_25 + 25)
-	set 1,a  ; MSK
-	IF Video_MODE >= 10
-	set 3,a  ; YJK
-	IF Video_MODE < 12
-	set 4,a  ; YAE
-	ENDIF
-	ENDIF
+	and 10100100B
+	or  01000010B | Video_YJKYAE ; CMD: 1, MSK: 1, SP2: 0, YJK, YAE
 	ld (VDP_MIRROR_25 + 25),a
 	ld b,25
 	call VDP_SetRegister
@@ -119,49 +132,14 @@ Video_StartIY:
 	ld b,27
 	call VDP_SetRegister
 	call Video_Recenter
-	call Video_FuzzTheV9958
-	ret
-
-Video_FuzzTheV9958:
-	ld a,(VDP_MIRROR_0 + 0)
-	or 10000001B  ; undocumented
-	ld (VDP_MIRROR_0 + 0),a
-	ld b,0
-	call VDP_SetRegister
+	ld hl,Video_clearScreen
+	call VDPCommand_Execute_HL
+	call VDPCommand_WaitReady
 	ld a,(VDP_MIRROR_0 + 1)
-	or 10000100B  ; undocumented
+	and 10111111B
+	or  01000000B | Video_M12  ; BL: 1
 	ld (VDP_MIRROR_0 + 1),a
 	ld b,1
-	call VDP_SetRegister
-	ld a,(VDP_MIRROR_8 + 8)
-	or 00000100B  ; undocumented
-	ld (VDP_MIRROR_8 + 8),a
-	ld b,8
-	call VDP_SetRegister
-	ld a,(VDP_MIRROR_8 + 9)
-	or 01000000B  ; undocumented
-	ld (VDP_MIRROR_8 + 9),a
-	ld b,9
-	call VDP_SetRegister
-	ld a,(VDP_MIRROR_25 + 25)
-	or 11000100B  ; undocumented + CMD + WTE
-	ld (VDP_MIRROR_25 + 25),a
-	ld b,25
-	call VDP_SetRegister
-	ld a,11111111B
-	ld b,24
-	call VDP_SetRegister
-	ld a,11111111B
-	ld b,28
-	call VDP_SetRegister
-	ld a,11111111B
-	ld b,29
-	call VDP_SetRegister
-	ld a,11111111B
-	ld b,30
-	call VDP_SetRegister
-	ld a,11111111B
-	ld b,31
 	call VDP_SetRegister
 	ret
 
@@ -230,3 +208,7 @@ NoOverflow:
 	call VDP_SetRegister
 	ret
 	ENDP
+
+;
+Video_clearScreen:
+	VDPCommand 000H, 000H, 000H, 000H, 100H << Video_HIRES, 100H, 00H, 00H, VDPCommand_HMMV
