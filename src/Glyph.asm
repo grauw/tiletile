@@ -24,7 +24,15 @@ Glyph: MACRO ?x, ?y, ?nx, ?metrics = 0
 ; a <- metrics
 Glyph_SetCopyHL:
 	ld a,(hl)
+	IF Video_HIRES
+	add a,a
+	ENDIF
 	ld (iy + VDPCommand.sx),a
+	IF Video_HIRES
+	ld a,0
+	adc a,a
+	ld (iy + VDPCommand.sx + 1),a
+	ENDIF
 	inc hl
 	ld a,(hl)
 	ld (iy + VDPCommand.sy),a

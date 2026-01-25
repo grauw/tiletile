@@ -177,7 +177,15 @@ NoNewline:
 	jr z,NoKerning
 	and Glyph_CAPITAL | Glyph_ASCENDER
 	jr nz,NoKerning
+	IF Video_HIRES
+	ld a,(iy + VDPCommand.dx)
+	sub 1 << Video_HIRES
+	ld (iy + VDPCommand.dx),a
+	jr nc,NoKerning
+	dec (iy + VDPCommand.dx + 1)
+	ELSE
 	dec (iy + VDPCommand.dx)
+	ENDIF
 NoKerning:
 	call VDPCommand_ExecuteS2IY
 	ld a,(iy + VDPCommand.dx)
