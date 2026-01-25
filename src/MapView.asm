@@ -211,7 +211,6 @@ Loop:
 ; de = y
 ; ix = this
 MapView_DrawTileColumn: PROC
-	push ix
 	ld hl,(ROM_mapper.pageA000)
 	push hl
 	ld iyl,c
@@ -257,24 +256,23 @@ MapView_DrawTileColumn: PROC
 	call MapView_GetTile
 	push hl
 	ld de,TileMap_CHUNK_SIZE * Tile._size
-	ld c,(ix + MapView.rowStride)
-	ld b,(ix + MapView.rowStride + 1)
 	ld a,iyh
 	pop iy
 	rrca
 	rrca
-	ld h,a
+	ld c,a
 	call DrawTilesBeforeSplit
-	add iy,bc
 	ld a,40H
-	sub h
-	ld h,a
+	sub c
+	ld c,(ix + MapView.rowStride)
+	ld b,(ix + MapView.rowStride + 1)
+	add iy,bc
+	ld c,a
 	call DrawTilesAfterSplit
 	pop hl
 	ld (hl),l
-	pop ix
 	ret
-; a = h = distance to split / 4
+; a = c = distance to split / 4
 ; de = tile stride
 ; c' = VDP port 3
 ; de' = tile pixels stride
@@ -283,11 +281,11 @@ MapView_DrawTileColumn: PROC
 DrawTilesBeforeSplit:
 	and ~03H
 	call nz,DrawTiles16
-	ld a,h
+	ld a,c
 	and 03H
 	jp nz,DrawTileA
 	ret
-; a = h = distance from split / 4
+; a = c = distance from split / 4
 ; de = tile stride
 ; c' = VDP port 3
 ; de' = tile pixels stride
@@ -299,7 +297,7 @@ DrawTilesAfterSplit: PROC
 	call DrawTileA
 	add iy,de
 Continue:
-	ld a,h
+	ld a,c
 	and ~03H
 	jp nz,DrawTiles16
 	ret
@@ -330,14 +328,14 @@ DrawTile12:
 DrawTiles16: PROC
 	rrca
 	rrca
-	ld l,a
+	ld b,a
 Loop:
 	exx
 	MapView_GetTileSource_M
 	MapView_DrawColumnTile_M 16
 	exx
 	add iy,de
-	dec l
+	dec b
 	jp nz,Loop
 	ret
 	ENDP
@@ -347,7 +345,6 @@ Loop:
 ; de = y
 ; ix = this
 MapView_DrawTileRow: PROC
-	push ix
 	ld hl,(ROM_mapper.pageA000)
 	push hl
 	ld iyl,c
@@ -388,23 +385,22 @@ MapView_DrawTileRow: PROC
 	call MapView_GetTile
 	push hl
 	ld de,Tile._size
-	ld bc,-(TileMap_CHUNK_SIZE * TileMap_CHUNK_SIZE * Tile._size)
 	ld a,iyl
 	pop iy
 	rrca
 	rrca
-	ld h,a
+	ld c,a
 	call DrawTilesBeforeSplit
-	add iy,bc
 	ld a,40H
-	sub h
-	ld h,a
+	sub c
+	ld bc,-(TileMap_CHUNK_SIZE * TileMap_CHUNK_SIZE * Tile._size)
+	add iy,bc
+	ld c,a
 	call DrawTilesAfterSplit
 	pop hl
 	ld (hl),l
-	pop ix
 	ret
-; a = h = distance to split / 4
+; a = c = distance to split / 4
 ; de = tile stride
 ; c' = VDP port 3
 ; de' = tile pixels stride
@@ -413,11 +409,11 @@ MapView_DrawTileRow: PROC
 DrawTilesBeforeSplit:
 	and ~03H
 	call nz,DrawTiles16
-	ld a,h
+	ld a,c
 	and 03H
 	jp nz,DrawTileA
 	ret
-; a = h = distance from split / 4
+; a = c = distance from split / 4
 ; de = tile stride
 ; c' = VDP port 3
 ; de' = tile pixels stride
@@ -429,7 +425,7 @@ DrawTilesAfterSplit: PROC
 	call DrawTileA
 	add iy,de
 Continue:
-	ld a,h
+	ld a,c
 	and ~03H
 	jp nz,DrawTiles16
 	ret
@@ -460,14 +456,14 @@ DrawTile12:
 DrawTiles16: PROC
 	rrca
 	rrca
-	ld l,a
+	ld b,a
 Loop:
 	exx
 	MapView_GetTileSource_M
 	MapView_DrawRowTile_M 16
 	exx
 	add iy,de
-	dec l
+	dec b
 	jp nz,Loop
 	ret
 	ENDP
