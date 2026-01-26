@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
-import { TileMap, Tmx } from "./tilemaps.ts";
-import { Image, PNGLoader } from "./images.ts";
-import { Sprite, AsepriteSheet } from "./sprites.ts";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { AudioTrack, VGMLoader } from "./audio.ts";
+import { Image, PNGLoader } from "./images.ts";
+import { AsepriteSheet, Sprite } from "./sprites.ts";
+import { TileMap, Tmx } from "./tilemaps.ts";
 
 async function main() {
 	if (process.argv.length < 3) {
@@ -85,7 +85,7 @@ export class ResourcesLoader {
 	}
 
 	async parse() {
-		const json: ResourcesJSON = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
+		const json: ResourcesJSON = JSON.parse(await readFile(this.path, "utf8"));
 
 		const resources = new Resources(
 			json.screenMode,

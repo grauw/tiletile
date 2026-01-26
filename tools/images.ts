@@ -1,4 +1,4 @@
-import fs from "fs";
+import { readFile } from "node:fs/promises";
 import PNG from "png-js";
 import { Array2D } from "./array2d.ts";
 
@@ -114,7 +114,7 @@ class Color {
 	}
 
 	power(exponent: Color) {
-		return new Color(Math.pow(this.r, exponent.r), Math.pow(this.g, exponent.g), Math.pow(this.b, exponent.b), Math.pow(this.w, exponent.w));
+		return new Color(this.r ** exponent.r, this.g ** exponent.g, this.b ** exponent.b, this.w ** exponent.w);
 	}
 
 	dot(other: Color) {
@@ -150,7 +150,7 @@ export class PaletteColor extends Color {
 	}
 
 	toAsm() {
-		return `00${this.getWord().toString(16)}H`.slice(-4);
+		return `${this.getWord().toString(16).padStart(3, "0")}H`;
 	}
 }
 
@@ -164,7 +164,7 @@ export class PNGLoader {
 	}
 
 	async loadImage() {
-		const png = new PNG(await fs.promises.readFile(this.path));
+		const png = new PNG(await readFile(this.path));
 
 		if (png.colorType != 3)
 			throw new Error("Not indexed RGB.");
@@ -183,7 +183,7 @@ export class PNGLoader {
 	toPalette(palette8bit: readonly number[]) {
 		const palette = new Palette();
 		for (let i = 0; i < palette8bit.length / 3; i++) {
-			const color = new Color(palette8bit[i * 3] || 0, palette8bit[i * 3 + 1] || 0, palette8bit[i * 3 + 2] || 0, 255);
+			const color = new Color(palette8bit[i * 3] ?? 0, palette8bit[i * 3 + 1] ?? 0, palette8bit[i * 3 + 2] ?? 0, 255);
 			const gammaColor = color.power(new ScalarColor(this.gamma / 2.2));
 			palette.addColor(new PaletteColor(i, gammaColor.r, gammaColor.g, gammaColor.b, gammaColor.w));
 		}

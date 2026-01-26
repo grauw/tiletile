@@ -2,7 +2,7 @@
 // See http://www.arklyffe.com/main/2010/08/29/xorshift-pseudorandom-number-generator/
 //
 if (process.argv.length != 5) {
-	console.log("Usage: node " + process.argv[1] + " a b c");
+	console.log(`Usage: node ${process.argv[1]} a b c`);
 	process.exit(1);
 }
 
@@ -18,10 +18,7 @@ do {
 	y ^= (y << a) & 255;
 	y ^= (y >> b) & 255;
 	y ^= (y << c) & 255;
-	console.log(
-			("0000000" + y.toString(2)).slice(-8) + " " +
-			("0" + y.toString(16)).slice(-2) + " " +
-			y);
+	console.log(`${y.toString(2).padStart(8, "0")} ${y.toString(16).padStart(2, "0")} ${y}`);
 	period++;
 } while (y != seed);
 

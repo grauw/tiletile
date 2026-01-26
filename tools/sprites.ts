@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { Image, PNGLoader } from "./images.ts";
 
 export class Sprite {
@@ -103,7 +103,7 @@ export class AsepriteSheet {
 	}
 
 	async parse(gamma: number) {
-		const json: AsepriteSheetJSON = JSON.parse(await fs.promises.readFile(this.path, { encoding: "utf8" }));
+		const json: AsepriteSheetJSON = JSON.parse(await readFile(this.path, "utf8"));
 		const sprite = await this.parseSprite(json.meta, gamma);
 		this.parseFrames(json.frames, sprite);
 		return sprite;
@@ -116,8 +116,7 @@ export class AsepriteSheet {
 	}
 
 	parseFrames(jsonFrames: AsepriteSheetFramesJSON, sprite: Sprite) {
-		for (const jsonFrameName in jsonFrames) {
-			const json = jsonFrames[jsonFrameName];
+		for (const [jsonFrameName, json] of Object.entries(jsonFrames)) {
 			const image = sprite.sheet.slice(json.frame.x, json.frame.y, json.frame.w, json.frame.h);
 			sprite.addFrame(new SpriteFrame(jsonFrameName, image, json.duration / 1000));
 		}

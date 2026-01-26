@@ -1,4 +1,4 @@
-import fs from "fs";
+import { readFile } from "node:fs/promises";
 import { toAsmHex } from "./utils.ts";
 
 export class AudioTrack {
@@ -14,7 +14,7 @@ export class AudioTrack {
 
 	addCommand(command: AudioCommand) {
 		if (command instanceof AudioCommandWait && this.commands.length > 0) {
-			const lastCommand = this.commands[this.commands.length - 1];
+			const lastCommand = this.commands.at(-1);
 			if (lastCommand instanceof AudioCommandWait) {
 				lastCommand.time += command.time;
 				return;
@@ -142,7 +142,7 @@ export class VGMLoader {
 	}
 
 	async loadTrack() {
-		const vgm = await fs.promises.readFile(this.path);
+		const vgm = await readFile(this.path);
 		const getByte = (address: number) => vgm[address];
 		const getWord = (address: number) => getByte(address) | getByte(address + 1) << 8;
 		const getDoubleWord = (address: number) => getWord(address) | getWord(address + 2) << 16;

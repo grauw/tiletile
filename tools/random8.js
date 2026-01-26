@@ -5,7 +5,7 @@ function shuffleArray(array) {
     }
 }
 
-let array = [];
+const array = [];
 for (let i = 0; i < 256; i++) {
 	array[i] = i;
 }

@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import xml2js from "xml2js";
-import { Image, Palette, PNGLoader } from "./images.ts";
 import { Array2D } from "./array2d.ts";
+import { Image, Palette, PNGLoader } from "./images.ts";
 
 const chunkSize = 16;
 
@@ -124,7 +124,7 @@ export class Tile {
 	}
 
 	getName() {
-		return this.name || this.index.toString();
+		return this.name ?? this.index.toString();
 	}
 
 	toAsm(screenMode: number) {
@@ -142,7 +142,7 @@ export class Tmx {
 	}
 
 	async parse(gamma: number) {
-		const xml: TmxXML = await xml2js.parseStringPromise(await fs.promises.readFile(this.path));
+		const xml: TmxXML = await xml2js.parseStringPromise(await readFile(this.path, "utf8"));
 		return this.parseMap(xml.map, gamma);
 	}
 
@@ -158,7 +158,7 @@ export class Tmx {
 		const image = await new PNGLoader(imagepath, gamma).loadImage();
 		const tileImages = image.tile(~~setXml.$.tilewidth, ~~setXml.$.tileheight);
 		const tiles = tileImages.toArray().map((image, index) =>
-			this.parseTile((setXml.tile || []).find(t => t.$.id == index) || { $: { id: index } }, image));
+			this.parseTile(setXml.tile?.find(t => t.$.id == index) ?? { $: { id: index } }, image));
 		return new TileSet(setXml.$.name, tiles, image.palette);
 	}
 
@@ -169,9 +169,7 @@ export class Tmx {
 	}
 
 	parseProperty<T>(xml: TmxTileXML, name: string, default_: T) {
-		const properties = (xml.properties || [])[0] || {};
-		const property = (properties.property || []).find(p => p.$.name == name);
-		return property !== undefined ? property.$.value : default_;
+		return xml.properties?.[0]?.property?.find(p => p.$.name == name)?.$.value ?? default_;
 	}
 }
 
