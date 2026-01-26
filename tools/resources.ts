@@ -65,7 +65,7 @@ export class Resources {
 			lines.push(tileMap.toAsm(this.screenMode));
 		}
 		for (const image of this.images) {
-			lines.push(image.toAsm(this.screenMode));
+			lines.push(image.toScreenMode(this.screenMode).toAsm(this.screenMode));
 		}
 		for (const sprite of this.sprites) {
 			lines.push(sprite.toAsm(this.frameRate));
@@ -95,12 +95,14 @@ export class ResourcesLoader {
 
 		const tileMaps = Promise.all(json.tilemaps.map(async jsonTileMap => {
 			const tileMapPath = path.resolve(path.dirname(this.path), jsonTileMap.path);
-			return new Tmx(jsonTileMap.name, tileMapPath).parse(resources.gamma);
+			const pixelsPerUnit = jsonTileMap.pixelsPerUnit ?? json.pixelsPerUnit ?? { x: 1, y: 1 };
+			return new Tmx(jsonTileMap.name, tileMapPath).parse(resources.gamma, pixelsPerUnit);
 		}));
 
 		const images = Promise.all(json.images.map(async jsonImage => {
 			const imagePath = path.resolve(path.dirname(this.path), jsonImage.path);
-			const image = await new PNGLoader(imagePath, resources.gamma).loadImage();
+			const pixelsPerUnit = jsonImage.pixelsPerUnit ?? json.pixelsPerUnit ?? { x: 1, y: 1 };
+			const image = await new PNGLoader(imagePath, resources.gamma, pixelsPerUnit).loadImage();
 			image.name = jsonImage.name;
 			return image;
 		}));
@@ -132,10 +134,16 @@ type ResourcesJSON = {
 	screenMode: number;
 	frameRate: number;
 	gamma: number;
-	tilemaps: { name: string; path: string; }[];
-	images: { name: string; path: string; }[];
+	pixelsPerUnit?: PixelsPerUnitJSON;
+	tilemaps: { name: string; path: string; pixelsPerUnit?: PixelsPerUnitJSON; }[];
+	images: { name: string; path: string; pixelsPerUnit?: PixelsPerUnitJSON; }[];
 	sprites: { name: string; path: string; }[];
 	audio: { name: string; path: string; }[];
+};
+
+type PixelsPerUnitJSON = {
+	x: number;
+	y: number;
 };
 
 main().catch(reason => { throw reason; });

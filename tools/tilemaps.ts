@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import xml2js from "xml2js";
 import { Array2D } from "./array2d.ts";
-import { Image, Palette, PNGLoader } from "./images.ts";
+import { Image, Palette, PNGLoader, type PixelsPerUnit } from "./images.ts";
 
 const chunkSize = 16;
 
@@ -128,7 +128,7 @@ export class Tile {
 	}
 
 	toAsm(screenMode: number) {
-		return `\tdb ${this.image.getPixelData(screenMode).join(", ")}`;
+		return `\tdb ${this.image.toScreenMode(screenMode).getPixelData(screenMode).join(", ")}`;
 	}
 }
 
@@ -141,21 +141,21 @@ export class Tmx {
 		this.path = path;
 	}
 
-	async parse(gamma: number) {
+	async parse(gamma: number, pixelsPerUnit: PixelsPerUnit) {
 		const xml: TmxXML = await xml2js.parseStringPromise(await readFile(this.path, "utf8"));
-		return this.parseMap(xml.map, gamma);
+		return this.parseMap(xml.map, gamma, pixelsPerUnit);
 	}
 
-	async parseMap(mapXml: TmxMapXML, gamma: number) {
-		const tileSet = await this.parseSet(mapXml.tileset[0], gamma);
+	async parseMap(mapXml: TmxMapXML, gamma: number, pixelsPerUnit: PixelsPerUnit) {
+		const tileSet = await this.parseSet(mapXml.tileset[0], gamma, pixelsPerUnit);
 		const indices = mapXml.layer[0].data[0]._.replace(/\s/g, "").split(",").map(i => ~~i - 1);
 		const indexMap = Array2D.ofArray(indices, ~~mapXml.$.width, ~~mapXml.$.height);
 		return new TileMap(this.name, indexMap.map(index => tileSet.getTileByIndex(index)).apply(), tileSet);
 	}
 
-	async parseSet(setXml: TmxTilesetXML, gamma: number) {
+	async parseSet(setXml: TmxTilesetXML, gamma: number, pixelsPerUnit: PixelsPerUnit) {
 		const imagepath = path.resolve(path.dirname(this.path), setXml.image[0].$.source);
-		const image = await new PNGLoader(imagepath, gamma).loadImage();
+		const image = await new PNGLoader(imagepath, gamma, pixelsPerUnit).loadImage();
 		const tileImages = image.tile(~~setXml.$.tilewidth, ~~setXml.$.tileheight);
 		const tiles = tileImages.toArray().map((image, index) =>
 			this.parseTile(setXml.tile?.find(t => t.$.id == index) ?? { $: { id: index } }, image));

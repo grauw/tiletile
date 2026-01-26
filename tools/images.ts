@@ -2,14 +2,21 @@ import { readFile } from "node:fs/promises";
 import PNG from "png-js";
 import { Array2D } from "./array2d.ts";
 
+export type PixelsPerUnit = {
+	x: number;
+	y: number;
+};
+
 export class Image {
 	public readonly pixels: Array2D<PaletteColor>;
 	public readonly palette: Palette;
+	public readonly pixelsPerUnit: PixelsPerUnit;
 	public name?: string;
 
-	constructor(pixels: Array2D<PaletteColor>, palette: Palette) {
+	constructor(pixels: Array2D<PaletteColor>, palette: Palette, pixelsPerUnit: PixelsPerUnit) {
 		this.pixels = pixels;
 		this.palette = palette;
+		this.pixelsPerUnit = pixelsPerUnit;
 	}
 
 	getPixel(x: number, y: number) {
@@ -17,21 +24,23 @@ export class Image {
 	}
 
 	getPixelData(screenMode: number) {
-		if (this.pixels.width & 1)
-			throw new Error("Image width is not even.");
-
 		const pixelData = [];
-		if (screenMode >= 5 && screenMode <= 6) {
+		if (screenMode == 5 || screenMode == 7) {
 			for (let y = 0; y < this.pixels.height; y++) {
 				for (let x = 0; x < this.pixels.width; x += 2) {
-					pixelData.push((this.pixels.get(x, y).index & 15) << 4 | (this.pixels.get(x + 1, y).index & 15));
+					const pixel1 = this.pixels.get(x, y);
+					const pixel2 = this.pixels.get(x + 1, y);
+					pixelData.push((pixel1.index & 15) << 4 | (pixel2.index & 15));
 				}
 			}
-		} else if (screenMode == 7) {
+		} else if (screenMode == 6) {
 			for (let y = 0; y < this.pixels.height; y++) {
-				for (let x = 0; x < this.pixels.width; x++) {
-					const pixel = this.pixels.get(x, y);
-					pixelData.push((pixel.index & 15) << 4 | (pixel.index & 15));
+				for (let x = 0; x < this.pixels.width; x += 4) {
+					const pixel1 = this.pixels.get(x, y);
+					const pixel2 = this.pixels.get(x + 1, y);
+					const pixel3 = this.pixels.get(x + 2, y);
+					const pixel4 = this.pixels.get(x + 3, y);
+					pixelData.push((pixel1.index & 3) << 6 | (pixel2.index & 3) << 4 | (pixel3.index & 3) << 2 | (pixel4.index & 3));
 				}
 			}
 		} else if (screenMode == 8) {
@@ -52,18 +61,44 @@ export class Image {
 		return pixelData;
 	}
 
+	toPixelsPerUnit(pixelsPerUnit: PixelsPerUnit) {
+		if (this.pixelsPerUnit.x == pixelsPerUnit.x && this.pixelsPerUnit.y == pixelsPerUnit.y)
+			return this;
+
+		const width = Math.floor(this.pixels.width / this.pixelsPerUnit.x) * pixelsPerUnit.x;
+		const height = Math.floor(this.pixels.height / this.pixelsPerUnit.y) * pixelsPerUnit.y;
+		const pixels: PaletteColor[] = [];
+		for (let y = 0; y < height; y++) {
+			const srcY = Math.floor(y * this.pixelsPerUnit.y / pixelsPerUnit.y);
+			for (let x = 0; x < width; x++) {
+				const srcX = Math.floor(x * this.pixelsPerUnit.x / pixelsPerUnit.x);
+				pixels.push(this.pixels.get(srcX, srcY));
+			}
+		}
+
+		const converted = new Image(Array2D.ofArray(pixels, width, height), this.palette, pixelsPerUnit);
+		converted.name = this.name;
+		return converted;
+	}
+
+	toScreenMode(screenMode: number) {
+		return this.toPixelsPerUnit({ x: screenMode == 6 || screenMode == 7 ? 2 : 1, y: 1 });
+	}
+
 	tile(width: number, height: number) {
-		return this.pixels.tile(width, height).map(pixels => new Image(pixels, this.palette)).apply();
+		return this.pixels.tile(width, height).map(pixels => new Image(pixels, this.palette, this.pixelsPerUnit)).apply();
 	}
 
 	slice(x: number, y: number, width: number, height: number) {
-		return new Image(this.pixels.slice(x, y, width, height), this.palette);
+		return new Image(this.pixels.slice(x, y, width, height), this.palette, this.pixelsPerUnit);
 	}
 
 	toAsm(screenMode: number) {
 		const lines: string[] = [];
 		if (this.name) {
-			lines.push(`${this.name}_instance: Image ${this.pixels.width}, ${this.pixels.height}, ${this.name}_palette, ${this.name}_pixelData`);
+			const width = Math.floor(this.pixels.width / this.pixelsPerUnit.x);
+			const height = Math.floor(this.pixels.height / this.pixelsPerUnit.y);
+			lines.push(`${this.name}_instance: Image ${width}, ${height}, ${this.name}_palette, ${this.name}_pixelData`);
 			lines.push(`${this.name}_palette: ${this.palette.toAsm()}`);
 			lines.push("\tSECTION ROM_DATA");
 			lines.push(`${this.name}_pixelData:`);
@@ -157,10 +192,12 @@ export class PaletteColor extends Color {
 export class PNGLoader {
 	private readonly path: string;
 	private readonly gamma: number;
+	private readonly pixelsPerUnit: PixelsPerUnit;
 
-	constructor(path: string, gamma: number) {
+	constructor(path: string, gamma: number, pixelsPerUnit: PixelsPerUnit) {
 		this.path = path;
 		this.gamma = gamma;
+		this.pixelsPerUnit = pixelsPerUnit;
 	}
 
 	async loadImage() {
@@ -177,7 +214,7 @@ export class PNGLoader {
 		for (const index of pngPixels)
 			pixels.push(palette.getColor(index));
 
-		return new Image(Array2D.ofArray(pixels, png.width, png.height), palette);
+		return new Image(Array2D.ofArray(pixels, png.width, png.height), palette, this.pixelsPerUnit);
 	}
 
 	toPalette(palette8bit: readonly number[]) {

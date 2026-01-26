@@ -111,7 +111,7 @@ export class AsepriteSheet {
 
 	async parseSprite(jsonMeta: AsepriteSheetMetaJSON, gamma: number) {
 		const imagepath = path.resolve(path.dirname(this.path), jsonMeta.image);
-		const image = await new PNGLoader(imagepath, gamma).loadImage();
+		const image = await new PNGLoader(imagepath, gamma, { x: 1, y: 1 }).loadImage();
 		return new Sprite(this.name, image);
 	}
 
