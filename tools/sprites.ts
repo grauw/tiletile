@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { Image, PNGLoader } from "./images.ts";
+import { Image, PaletteColor, PNGLoader } from "./images.ts";
 
 export class Sprite {
 	private readonly name: string;
@@ -80,7 +80,8 @@ class SpritePattern {
 			for (let y = 0; y < 8; y++) {
 				let byte = 0;
 				for (let x = 0; x < 8; x++) {
-					if (image.getPixel(x, y).index & mask)
+					const pixel = image.getPixel(x, y);
+					if (pixel instanceof PaletteColor && pixel.index & mask)
 						byte |= 128 >> x;
 				}
 				this.data.push(byte);

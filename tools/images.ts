@@ -8,12 +8,12 @@ export type PixelsPerUnit = {
 };
 
 export class Image {
-	public readonly pixels: Array2D<PaletteColor>;
+	public readonly pixels: Array2D<Color>;
 	public readonly palette: Palette;
 	public readonly pixelsPerUnit: PixelsPerUnit;
 	public name?: string;
 
-	constructor(pixels: Array2D<PaletteColor>, palette: Palette, pixelsPerUnit: PixelsPerUnit) {
+	constructor(pixels: Array2D<Color>, palette: Palette, pixelsPerUnit: PixelsPerUnit) {
 		this.pixels = pixels;
 		this.palette = palette;
 		this.pixelsPerUnit = pixelsPerUnit;
@@ -25,36 +25,43 @@ export class Image {
 
 	getPixelData(screenMode: number) {
 		const pixelData = [];
+		const getIndex = (pixel: Color, range: number, fallback = 0) =>
+			pixel instanceof PaletteColor && pixel.index >= 0 && pixel.index < range ? pixel.index : fallback;
 		if (screenMode == 5 || screenMode == 7) {
 			for (let y = 0; y < this.pixels.height; y++) {
 				for (let x = 0; x < this.pixels.width; x += 2) {
-					const pixel1 = this.pixels.get(x, y);
-					const pixel2 = this.pixels.get(x + 1, y);
-					pixelData.push((pixel1.index & 15) << 4 | (pixel2.index & 15));
+					pixelData.push(
+						getIndex(this.pixels.get(x, y), 16) << 4 |
+						getIndex(this.pixels.get(x + 1, y), 16)
+					);
 				}
 			}
 		} else if (screenMode == 6) {
 			for (let y = 0; y < this.pixels.height; y++) {
 				for (let x = 0; x < this.pixels.width; x += 4) {
-					const pixel1 = this.pixels.get(x, y);
-					const pixel2 = this.pixels.get(x + 1, y);
-					const pixel3 = this.pixels.get(x + 2, y);
-					const pixel4 = this.pixels.get(x + 3, y);
-					pixelData.push((pixel1.index & 3) << 6 | (pixel2.index & 3) << 4 | (pixel3.index & 3) << 2 | (pixel4.index & 3));
+					pixelData.push(
+						getIndex(this.pixels.get(x, y), 4) << 6 |
+						getIndex(this.pixels.get(x + 1, y), 4) << 4 |
+						getIndex(this.pixels.get(x + 2, y), 4) << 2 |
+						getIndex(this.pixels.get(x + 3, y), 4)
+					);
 				}
 			}
 		} else if (screenMode == 8) {
 			for (let y = 0; y < this.pixels.height; y++) {
 				for (let x = 0; x < this.pixels.width; x++) {
 					const pixel = this.pixels.get(x, y).project(7).round();
-					pixelData.push(pixel.g << 5 | pixel.r << 2 | pixel.b >> 1);
+					pixelData.push(
+						pixel.g << 5 | pixel.r << 2 | pixel.b >> 1
+					);
 				}
 			}
 		} else if (screenMode >= 10 && screenMode <= 11) {
 			for (let y = 0; y < this.pixels.height; y++) {
 				for (let x = 0; x < this.pixels.width; x++) {
-					const pixel = this.pixels.get(x, y);
-					pixelData.push((pixel.index & 15) << 4 | 8);
+					pixelData.push(
+						getIndex(this.pixels.get(x, y), 16) << 4 | 8
+					);
 				}
 			}
 		}
@@ -67,7 +74,7 @@ export class Image {
 
 		const width = Math.floor(this.pixels.width / this.pixelsPerUnit.x) * pixelsPerUnit.x;
 		const height = Math.floor(this.pixels.height / this.pixelsPerUnit.y) * pixelsPerUnit.y;
-		const pixels: PaletteColor[] = [];
+		const pixels: Color[] = [];
 		for (let y = 0; y < height; y++) {
 			const srcY = Math.floor(y * this.pixelsPerUnit.y / pixelsPerUnit.y);
 			for (let x = 0; x < width; x++) {
@@ -131,7 +138,7 @@ export class Palette {
 	}
 }
 
-class Color {
+export class Color {
 	public readonly r: number;
 	public readonly g: number;
 	public readonly b: number;
@@ -179,6 +186,10 @@ export class PaletteColor extends Color {
 		this.index = index;
 	}
 
+	static fromColor(index: number, color: Color) {
+		return new PaletteColor(index, color.r, color.g, color.b, color.w);
+	}
+
 	getWord() {
 		const color = this.project(7).round();
 		return color.r << 8 | color.g << 4 | color.b;
@@ -202,28 +213,40 @@ export class PNGLoader {
 
 	async loadImage() {
 		const png = new PNG(await readFile(this.path));
+		const gamma = new ScalarColor(this.gamma / 2.2);
+		const colorLookup = new Map<number, Color>();
 
-		if (png.colorType != 3)
-			throw new Error("Not indexed RGB.");
-
-		const palette = this.toPalette(png.palette);
+		const palette = new Palette();
+		for (let i = 0; i < png.palette.length; i += 3) {
+			const color = new Color(png.palette[i], png.palette[i + 1], png.palette[i + 2], 255);
+			const paletteColor = PaletteColor.fromColor(i / 3, color.power(gamma));
+			const key = color.r << 16 | color.g << 8 | color.b;
+			if (!colorLookup.has(key)) {
+				colorLookup.set(key, paletteColor);
+			}
+			palette.addColor(paletteColor);
+		}
 
 		const pngPixels = await new Promise<Buffer>(resolve => png.decodePixels(pixels => resolve(pixels)));
 
 		const pixels = [];
-		for (const index of pngPixels)
-			pixels.push(palette.getColor(index));
+		if (png.colorType == 3) {
+			for (const index of pngPixels) {
+				pixels.push(palette.getColor(index));
+			}
+		} else {
+			const bytesPerPixel = png.colors + (png.hasAlphaChannel ? 1 : 0);
+			const step = png.colors == 1 ? 0 : 1;
+			for (let i = 0; i < pngPixels.length; i += bytesPerPixel) {
+				const color = new Color(pngPixels[i], pngPixels[i + step], pngPixels[i + step + step], 255);
+				const key = color.r << 16 | color.g << 8 | color.b;
+				if (!colorLookup.has(key)) {
+					colorLookup.set(key, color.power(gamma));
+				}
+				pixels.push(colorLookup.get(key)!);
+			}
+		}
 
 		return new Image(Array2D.ofArray(pixels, png.width, png.height), palette, this.pixelsPerUnit);
-	}
-
-	toPalette(palette8bit: readonly number[]) {
-		const palette = new Palette();
-		for (let i = 0; i < palette8bit.length / 3; i++) {
-			const color = new Color(palette8bit[i * 3] ?? 0, palette8bit[i * 3 + 1] ?? 0, palette8bit[i * 3 + 2] ?? 0, 255);
-			const gammaColor = color.power(new ScalarColor(this.gamma / 2.2));
-			palette.addColor(new PaletteColor(i, gammaColor.r, gammaColor.g, gammaColor.b, gammaColor.w));
-		}
-		return palette;
 	}
 }
