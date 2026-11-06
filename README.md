@@ -10,7 +10,7 @@ Tile² game engine
 
   * Author: Laurens Holst <laurens@grauw.nl>
   * Site: <http://www.grauw.nl/projects/tiletile/>
-  * Source: <https://hg.sr.ht/~grauw/tiletile>
+  * Source: <https://github.com/grauw/tiletile>
   * Support: <https://www.msx.org/forum/msx-talk/development/grauw%E2%80%99s-rpg-in-development>
   * License: Simplified BSD License (code), CC BY-NC-ND (art, music, story, etc.)
 
@@ -34,11 +34,10 @@ mentioned in the project information section.
 You are also free to re-use code for your own projects, provided you abide by
 the license terms.
 
-Tile² depends on the library project Neonlib; it is recommended to clone the
-project with Mercurial so they will automatically be pulled in at the correct
-version, otherwise you have to download them manually:
+Tile² depends on the library project Neonlib, which is included as a Git
+submodule. Clone the project and its submodules at the correct versions with:
 
-    hg clone https://hg.sr.ht/~grauw/tiletile
+    git clone --recurse-submodules https://github.com/grauw/tiletile.git
 
 Building the project is easy on all modern desktop platforms. On MacOS and
 Linux, simply invoke `make` to build the binary and symbol files into the

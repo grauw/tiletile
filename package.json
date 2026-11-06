@@ -5,8 +5,8 @@
   "author": "Laurens Holst",
   "license": "MIT",
   "repository": {
-    "type": "hg",
-    "url": "https://hg.sr.ht/~grauw/tiletile"
+    "type": "git",
+    "url": "git+https://github.com/grauw/tiletile.git"
   },
   "type": "module",
   "private": true,
